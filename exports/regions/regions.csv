@@ -1,0 +1,28 @@
+INSEE_CODE,NUTS_CODE,NAME,WIKIPEDIA,CHEF_LIEU,START_DATE,PREV_INSEE_CODE,PREV_NUTS_CODE,PREV_NAME
+01,FRA1,Guadeloupe,https://fr.wikipedia.org/wiki/Guadeloupe,Basse-Terre,2016-01-01,01,FRA1,Guadeloupe
+02,FRA2,Martinique,https://fr.wikipedia.org/wiki/Martinique,Fort-de-France,2016-01-01,02,FRA2,Martinique
+03,FRA3,Guyane,https://fr.wikipedia.org/wiki/Guyane,Cayenne,2016-01-01,03,FRA3,Guyane
+04,FRA4,La Réunion,https://fr.wikipedia.org/wiki/La_R%C3%A9union,Saint-Denis,2016-01-01,04,FRA4,La Réunion
+06,FRA5,Mayotte,https://fr.wikipedia.org/wiki/Mayotte,Mamoudzou,2016-01-01,06,FRA5,Mayotte
+11,FR10,Île-de-France,https://fr.wikipedia.org/wiki/%C3%8Ele-de-France,Paris,2016-01-01,11,FR10,Île-de-France
+24,FR24,Centre-Val de Loire,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire,Orléans,2016-01-01,24,FR24,Centre
+27,FR26,Bourgogne-Franche-Comté,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9,Dijon,2016-01-01,26,FR26,Bourgogne
+27,FR26,Bourgogne-Franche-Comté,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9,Dijon,2016-01-01,43,FR43,Franche-Comté
+28,FR25,Normandie,https://fr.wikipedia.org/wiki/Normandie_(r%C3%A9gion_administrative),Rouen,2016-01-01,23,FR23,Haute-Normandie
+28,FR25,Normandie,https://fr.wikipedia.org/wiki/Normandie_(r%C3%A9gion_administrative),Rouen,2016-01-01,25,FR25,Basse-Normandie
+32,FR22,Hauts-de-France,https://fr.wikipedia.org/wiki/Hauts-de-France,Lille,2016-01-01,31,FR30,Nord-Pas-de-Calais
+32,FR22,Hauts-de-France,https://fr.wikipedia.org/wiki/Hauts-de-France,Lille,2016-01-01,22,FR22,Picardie
+44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,41,FR41,Lorraine
+44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,42,FR42,Alsace
+44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,21,FR21,Champagne-Ardenne
+52,FR51,Pays de la Loire,https://fr.wikipedia.org/wiki/Pays_de_la_Loire,Nantes,2016-01-01,52,FR51,Pays de la Loire
+53,FR52,Bretagne,https://fr.wikipedia.org/wiki/Bretagne,Rennes,2016-01-01,53,FR52,Bretagne
+75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,72,FR61,Aquitaine
+75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,54,FR53,Poitou-Charentes
+75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,74,FR63,Limousin
+76,FR62,Occitanie,https://fr.wikipedia.org/wiki/R%C3%A9gion_Occitanie,Toulouse,2016-01-01,73,FR62,Midi-Pyrénées
+76,FR62,Occitanie,https://fr.wikipedia.org/wiki/R%C3%A9gion_Occitanie,Toulouse,2016-01-01,91,FR81,Languedoc-Roussillon
+84,FR71,Auvergne-Rhône-Alpes,https://fr.wikipedia.org/wiki/Auvergne-Rh%C3%B4ne-Alpes,Lyon,2016-01-01,82,FR71,Rhône-Alpes
+84,FR71,Auvergne-Rhône-Alpes,https://fr.wikipedia.org/wiki/Auvergne-Rh%C3%B4ne-Alpes,Lyon,2016-01-01,83,FR72,Auvergne
+93,FR82,Provence-Alpes-Côte d'Azur,https://fr.wikipedia.org/wiki/Provence-Alpes-C%C3%B4te_d%27Azur,Marseille,2016-01-01,93,FR82,Provence-Alpes-Côte d'Azur
+94,FR83,Corse,https://fr.wikipedia.org/wiki/Collectivit%C3%A9_territoriale_de_Corse,Ajaccio,2016-01-01,94,FR83,Corse
