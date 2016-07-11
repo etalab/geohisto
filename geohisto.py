@@ -94,6 +94,20 @@ def _add_ancestor(town, history):
     current['ANCESTORS'].append(history['COMECH'])
 
 
+def _compute_name(town):
+    """Return the `town` name with optional article."""
+    if town['ARTMIN']:
+        # Special `L'` case, all other article require a space.
+        extra_space = int(town['TNCC']) != 5
+        return '{article}{extra_space}{name}'.format(
+            article=town['ARTMIN'][1:-1],
+            extra_space=' ' if extra_space else '',
+            name=town['NCCENR']
+        )
+    else:
+        return town['NCCENR']
+
+
 def _compute_population(populations, population_id, town=None):
     """
     Retrieve the population from `populations` dict cast as an integer.
@@ -200,12 +214,13 @@ def write_results_on(filename, towns, populations):
             # Root elements are the one still in use, skip others.
             if not current['END_DATE'] == END_DATE:
                 continue
-            population_id = id + current['NCCENR']
+            name = _compute_name(current)
+            population_id = id + name
             population = _compute_population(populations, population_id, town)
             # Main entry.
             write({
                 'DIRECTION': '==',
-                'NAME': current['NCCENR'],
+                'NAME': name,
                 'START_DATE': current['START_DATE'],
                 'END_DATE': current['END_DATE'],
                 'INSEE_CODE': id,
@@ -214,11 +229,12 @@ def write_results_on(filename, towns, populations):
             # Add an entry for each rename (same id).
             for t in town[1:]:
                 id = t['DEP'] + t['COM']
-                population_id = id + t['NCCENR']
+                name = _compute_name(t)
+                population_id = id + name
                 population = _compute_population(populations, population_id)
                 write({
                     'DIRECTION': '<-',
-                    'NAME': t['NCCENR'],
+                    'NAME': name,
                     'START_DATE': t['START_DATE'],
                     'END_DATE': t['END_DATE'],
                     'INSEE_CODE': id,
@@ -229,11 +245,12 @@ def write_results_on(filename, towns, populations):
             for ancestor in current['ANCESTORS']:
                 ancestor = towns[ancestor][0]
                 id = ancestor['DEP'] + ancestor['COM']
-                population_id = id + ancestor['NCCENR']
+                name = _compute_name(ancestor)
+                population_id = id + name
                 population = _compute_population(populations, population_id)
                 write({
                     'DIRECTION': '->',
-                    'NAME': ancestor['NCCENR'],
+                    'NAME': name,
                     'START_DATE': ancestor['START_DATE'],
                     'END_DATE': ancestor['END_DATE'],
                     'INSEE_CODE': id,
