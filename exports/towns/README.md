@@ -8,7 +8,7 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 ## Columns
 
 * `DIRECTION`: Either `==`, `<-` or `->` if the town is unchanged, has been renamed or merged respectively.
-* `NAME`: The name of the town.
+* `NAME`: The name of the town, including the article (`Le `, `La `, `L'` etc).
 * `START_DATE`: The effective start date for the given `NAME` + `INSEE_CODE`.
 * `END_DATE`: The effective end date for the given `NAME` + `INSEE_CODE`.
 * `INSEE_CODE`: The INSEE code for the given town.
