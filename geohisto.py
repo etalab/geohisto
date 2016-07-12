@@ -113,15 +113,17 @@ def _compute_name(town):
         return town['NCCENR']
 
 
-def _compute_population(populations, population_id, town=None):
+def _compute_population(
+        populations, population_id, town=None, key='metropole'):
     """
     Retrieve the population from `populations` dict cast as an integer.
 
+    Fallback on `arrondissements` and `dom` if no population is found.
     If the `population_id` is missing and `town` is available, we try
     to compute the population based on ancestors (renames + merges).
     """
     # If the population is already available, return it.
-    population = int(populations.get(population_id, 0))
+    population = int(populations[key].get(population_id, 0))
     if population or town is None:
         return population
     # Otherwise sum populations from renamed + ancestors towns.
@@ -133,6 +135,11 @@ def _compute_population(populations, population_id, town=None):
         ancestor = towns[ancestor][0]
         population_id = ancestor['DEP'] + ancestor['COM'] + ancestor['NCCENR']
         population += _compute_population(populations, population_id)
+    if not population:
+        population += _compute_population(
+            populations, population_id, key='arrondissements')
+        population += _compute_population(
+            populations, population_id, key='dom')
     return population
 
 
@@ -281,6 +288,12 @@ def generate_head_results_from(filename, nb_of_lines=100):
 if __name__ == '__main__':
     towns = load_towns_from('sources/france2016.txt')
     towns = compute_history_from('sources/historiq2016.txt', towns)
-    populations = load_population_from('sources/population_metropole.csv')
+    populations = {}
+    populations['metropole'] = load_population_from(
+        'sources/population_metropole.csv')
+    populations['arrondissements'] = load_population_from(
+        'sources/population_arrondissements.csv')
+    populations['dom'] = load_population_from(
+        'sources/population_dom.csv')
     write_results_on('exports/towns/towns.csv', towns, populations)
     generate_head_results_from('exports/towns/towns.csv')
