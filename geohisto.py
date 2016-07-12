@@ -119,6 +119,7 @@ def _compute_population(
     Retrieve the population from `populations` dict cast as an integer.
 
     Fallback on `arrondissements` and `dom` if no population is found.
+    Finally, a population of `-1` is added for dead towns.
     If the `population_id` is missing and `town` is available, we try
     to compute the population based on ancestors (renames + merges).
     """
@@ -138,8 +139,12 @@ def _compute_population(
     if not population:
         population += _compute_population(
             populations, population_id, key='arrondissements')
+    if not population:
         population += _compute_population(
             populations, population_id, key='dom')
+    if not population:
+        population += _compute_population(
+            populations, population_id, key='mortes')
     return population
 
 
@@ -295,5 +300,7 @@ if __name__ == '__main__':
         'sources/population_arrondissements.csv')
     populations['dom'] = load_population_from(
         'sources/population_dom.csv')
+    populations['mortes'] = load_population_from(
+        'sources/population_mortes.csv')
     write_results_on('exports/towns/towns.csv', towns, populations)
     generate_head_results_from('exports/towns/towns.csv')
