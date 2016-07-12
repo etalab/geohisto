@@ -19,9 +19,9 @@ Additionaly, files containing the population for almost all towns has been compu
 
 ## Development
 
-The project doesn’t require any dependency, you have to run it with Python 3.5:
+The project doesn’t require any dependency, you have to run it with Python 3:
 
-    $ python3.5 geohisto.py
+    $ python3 geohisto.py
 
 
 ## TODO
