@@ -1,28 +1,35 @@
-INSEE_CODE,NUTS_CODE,NAME,WIKIPEDIA,CHEF_LIEU,START_DATE,PREV_INSEE_CODE,PREV_NUTS_CODE,PREV_NAME
-01,FRA1,Guadeloupe,https://fr.wikipedia.org/wiki/Guadeloupe,Basse-Terre,2016-01-01,01,FRA1,Guadeloupe
-02,FRA2,Martinique,https://fr.wikipedia.org/wiki/Martinique,Fort-de-France,2016-01-01,02,FRA2,Martinique
-03,FRA3,Guyane,https://fr.wikipedia.org/wiki/Guyane,Cayenne,2016-01-01,03,FRA3,Guyane
-04,FRA4,La Réunion,https://fr.wikipedia.org/wiki/La_R%C3%A9union,Saint-Denis,2016-01-01,04,FRA4,La Réunion
-06,FRA5,Mayotte,https://fr.wikipedia.org/wiki/Mayotte,Mamoudzou,2016-01-01,06,FRA5,Mayotte
-11,FR10,Île-de-France,https://fr.wikipedia.org/wiki/%C3%8Ele-de-France,Paris,2016-01-01,11,FR10,Île-de-France
-24,FR24,Centre-Val de Loire,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire,Orléans,2016-01-01,24,FR24,Centre
-27,FR26,Bourgogne-Franche-Comté,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9,Dijon,2016-01-01,26,FR26,Bourgogne
-27,FR26,Bourgogne-Franche-Comté,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9,Dijon,2016-01-01,43,FR43,Franche-Comté
-28,FR25,Normandie,https://fr.wikipedia.org/wiki/Normandie_(r%C3%A9gion_administrative),Rouen,2016-01-01,23,FR23,Haute-Normandie
-28,FR25,Normandie,https://fr.wikipedia.org/wiki/Normandie_(r%C3%A9gion_administrative),Rouen,2016-01-01,25,FR25,Basse-Normandie
-32,FR22,Hauts-de-France,https://fr.wikipedia.org/wiki/Hauts-de-France,Lille,2016-01-01,31,FR30,Nord-Pas-de-Calais
-32,FR22,Hauts-de-France,https://fr.wikipedia.org/wiki/Hauts-de-France,Lille,2016-01-01,22,FR22,Picardie
-44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,41,FR41,Lorraine
-44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,42,FR42,Alsace
-44,FR21,Grand-Est,https://fr.wikipedia.org/wiki/Grand-Est,Strasbourg,2016-01-01,21,FR21,Champagne-Ardenne
-52,FR51,Pays de la Loire,https://fr.wikipedia.org/wiki/Pays_de_la_Loire,Nantes,2016-01-01,52,FR51,Pays de la Loire
-53,FR52,Bretagne,https://fr.wikipedia.org/wiki/Bretagne,Rennes,2016-01-01,53,FR52,Bretagne
-75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,72,FR61,Aquitaine
-75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,54,FR53,Poitou-Charentes
-75,FR61,Nouvelle-Aquitaine,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine,Bordeaux,2016-01-01,74,FR63,Limousin
-76,FR62,Occitanie,https://fr.wikipedia.org/wiki/R%C3%A9gion_Occitanie,Toulouse,2016-01-01,73,FR62,Midi-Pyrénées
-76,FR62,Occitanie,https://fr.wikipedia.org/wiki/R%C3%A9gion_Occitanie,Toulouse,2016-01-01,91,FR81,Languedoc-Roussillon
-84,FR71,Auvergne-Rhône-Alpes,https://fr.wikipedia.org/wiki/Auvergne-Rh%C3%B4ne-Alpes,Lyon,2016-01-01,82,FR71,Rhône-Alpes
-84,FR71,Auvergne-Rhône-Alpes,https://fr.wikipedia.org/wiki/Auvergne-Rh%C3%B4ne-Alpes,Lyon,2016-01-01,83,FR72,Auvergne
-93,FR82,Provence-Alpes-Côte d'Azur,https://fr.wikipedia.org/wiki/Provence-Alpes-C%C3%B4te_d%27Azur,Marseille,2016-01-01,93,FR82,Provence-Alpes-Côte d'Azur
-94,FR83,Corse,https://fr.wikipedia.org/wiki/Collectivit%C3%A9_territoriale_de_Corse,Ajaccio,2016-01-01,94,FR83,Corse
+DIRECTION,INSEE_CODE,NAME,START_DATE,END_DATE,NUTS_CODE,CHEF_LIEU,WIKIPEDIA
+--,1,Guadeloupe,1970-01-09,2020-01-01,FRA1,Basse-Terre,https://fr.wikipedia.org/wiki/Guadeloupe
+--,2,Martinique,1970-01-09,2020-01-01,FRA2,Fort-de-France,https://fr.wikipedia.org/wiki/Martinique
+--,3,Guyane,1970-01-09,2020-01-01,FRA3,Cayenne,https://fr.wikipedia.org/wiki/Guyane
+--,4,La Réunion,1970-01-09,2020-01-01,FRA4,Saint-Denis,https://fr.wikipedia.org/wiki/La_R%C3%A9union
+--,6,Mayotte,1970-01-09,2020-01-01,FRA5,Mamoudzou,https://fr.wikipedia.org/wiki/Mayotte
+--,11,Île-de-France,1970-01-09,2020-01-01,FR10,Paris,https://fr.wikipedia.org/wiki/%C3%8Ele-de-France
+--,24,Centre-Val de Loire,1970-01-09,2020-01-01,FR24,Orléans,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire
+--,27,Bourgogne-Franche-Comté,2016-01-01,2020-01-01,FR26,Dijon,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9
+->,26,Bourgogne,1970-01-09,2016-01-01,FR26,Dijon,https://fr.wikipedia.org/wiki/Bourgogne
+->,43,Franche-Comté,1970-01-09,2016-01-01,FR43,Besançon,https://fr.wikipedia.org/wiki/Franche-Comt%C3%A9
+--,28,Normandie,2016-01-01,2020-01-01,FR25,Rouen,https://fr.wikipedia.org/wiki/Normandie_(r%C3%A9gion_administrative)
+->,23,Haute-Normandie,1970-01-09,2016-01-01,FR23,Rouen,https://fr.wikipedia.org/wiki/Haute-Normandie
+->,25,Basse-Normandie,1970-01-09,2016-01-01,FR25,Caen,https://fr.wikipedia.org/wiki/Basse-Normandie
+--,32,Hauts-de-France,2016-01-01,2020-01-01,FR22,Lille,https://fr.wikipedia.org/wiki/Hauts-de-France
+->,31,Nord-Pas-de-Calais,1970-01-09,2016-01-01,FR30,Lille,https://fr.wikipedia.org/wiki/Nord-Pas-de-Calais
+->,22,Picardie,1970-01-09,2016-01-01,FR22,Amiens,https://fr.wikipedia.org/wiki/Picardie
+--,44,Grand-Est,2016-01-01,2020-01-01,FR21,Strasbourg,https://fr.wikipedia.org/wiki/Grand-Est
+->,21,Champagne-Ardenne,1970-01-09,2016-01-01,FR21,Châlons-en-Champagne,https://fr.wikipedia.org/wiki/Champagne-Ardenne
+->,41,Lorraine,1970-01-09,2016-01-01,FR41,Metz,https://fr.wikipedia.org/wiki/Lorraine
+->,42,Alsace,1970-01-09,2016-01-01,FR42,Strasbourg,https://fr.wikipedia.org/wiki/Alsace
+--,52,Pays de la Loire,1970-01-09,2020-01-01,FR51,Nantes,https://fr.wikipedia.org/wiki/Pays_de_la_Loire
+--,53,Bretagne,1970-01-09,2020-01-01,FR52,Rennes,https://fr.wikipedia.org/wiki/Bretagne
+--,75,Nouvelle-Aquitaine,2016-01-01,2020-01-01,FR61,Bordeaux,https://fr.wikipedia.org/wiki/Nouvelle-Aquitaine
+->,54,Poitou-Charentes,1970-01-09,2016-01-01,FR53,Poitiers,https://fr.wikipedia.org/wiki/Poitou-Charentes
+->,72,Aquitaine,1970-01-09,2016-01-01,FR61,Bordeaux,https://fr.wikipedia.org/wiki/Aquitaine
+->,74,Limousin,1970-01-09,2016-01-01,FR63,Limoges,https://fr.wikipedia.org/wiki/Limousin
+--,76,Occitanie,2016-01-01,2020-01-01,FR62,Toulouse,https://fr.wikipedia.org/wiki/R%C3%A9gion_Occitanie
+->,73,Midi-Pyrénées,1970-01-09,2016-01-01,FR62,Toulouse,https://fr.wikipedia.org/wiki/Midi-Pyrénées
+->,91,Languedoc-Roussillon,1970-01-09,2016-01-01,FR81,Montpellier,https://fr.wikipedia.org/wiki/Languedoc-Roussillon
+--,84,Auvergne-Rhône-Alpes,2016-01-01,2020-01-01,FR71,Lyon,https://fr.wikipedia.org/wiki/Auvergne-Rh%C3%B4ne-Alpes
+->,82,Rhône-Alpes,1970-01-09,2016-01-01,FR71,Lyon,https://fr.wikipedia.org/wiki/Rhône-Alpes
+->,83,Auvergne,1970-01-09,2016-01-01,FR72,Clermont-Ferrand,https://fr.wikipedia.org/wiki/Auvergne
+--,93,Provence-Alpes-Côte d'Azur,1970-01-09,2020-01-01,FR82,Marseille,https://fr.wikipedia.org/wiki/Provence-Alpes-C%C3%B4te_d%27Azur
+--,94,Corse,1970-01-09,2020-01-01,FR83,Ajaccio,https://fr.wikipedia.org/wiki/Collectivit%C3%A9_territoriale_de_Corse

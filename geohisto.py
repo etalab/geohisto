@@ -93,7 +93,7 @@ def write_results_on(filename, towns, populations):
     """
     with open(filename, 'w') as csvfile:
         fieldnames = [
-            'DIRECTION', 'NAME', 'START_DATE', 'END_DATE', 'INSEE_CODE',
+            'DIRECTION', 'INSEE_CODE', 'NAME', 'START_DATE', 'END_DATE',
             'POPULATION'
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
@@ -111,11 +111,11 @@ def write_results_on(filename, towns, populations):
                 populations, population_id, towns, town)
             # Main entry.
             write({
-                'DIRECTION': '==',
+                'DIRECTION': '--',
+                'INSEE_CODE': id,
                 'NAME': name,
                 'START_DATE': current['START_DATE'],
                 'END_DATE': current['END_DATE'],
-                'INSEE_CODE': id,
                 'POPULATION': population
             })
             # Add an entry for each rename (same id).
@@ -126,10 +126,10 @@ def write_results_on(filename, towns, populations):
                     populations, population_id, towns)
                 write({
                     'DIRECTION': '<-',
+                    'INSEE_CODE': id,
                     'NAME': name,
                     'START_DATE': t['START_DATE'],
                     'END_DATE': t['END_DATE'],
-                    'INSEE_CODE': id,
                     'POPULATION': population
                 })
 
@@ -143,10 +143,10 @@ def write_results_on(filename, towns, populations):
                     populations, population_id, towns)
                 write({
                     'DIRECTION': '->',
+                    'INSEE_CODE': id,
                     'NAME': name,
                     'START_DATE': ancestor['START_DATE'],
                     'END_DATE': ancestor['END_DATE'],
-                    'INSEE_CODE': id,
                     'POPULATION': population
                 })
 
