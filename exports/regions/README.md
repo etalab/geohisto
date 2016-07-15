@@ -14,6 +14,8 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 * `NAME`: The new name of the region.
 * `START_DATE`: The start date of existence, in our case either `1970-01-09` or `2016-01-01`.
 * `END_DATE`: The end date of existence, in our case always `2016-01-01` or `2020-01-01`.
+* `POPULATION`: The population as of 2013.
+* `SURFACE`: The area in km2.
 * `CHEF_LIEU`: The Chef-lieu for that new region.
 * `NUTS_CODE`: The 4-chars code delivered by Eurostat.
 * `WIKIPEDIA`: The wikipedia page for that new region (note that given how recent the change is, some links still redirect to temporary region names).
