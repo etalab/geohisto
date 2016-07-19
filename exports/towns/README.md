@@ -7,7 +7,7 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 
 ## Columns
 
-* `DIRECTION`: Either `--`, `<-` or `->` if the town is unchanged, has been renamed or merged respectively.
+* `DIRECTION`: Either `--`, `<-`, `<<` or `->` if the town is unchanged, has been renamed, has been moved or merged respectively.
 * `INSEE_CODE`: The INSEE code for the given town.
 * `NAME`: The name of the town, including the article (`Le `, `La `, `L'` etc).
 * `START_DATE`: The effective start date for the given `NAME` + `INSEE_CODE`.
@@ -45,4 +45,13 @@ As of `1955-03-31`, the town of `Ambérieu` has been renamed to `Ambérieu-en-Bu
 ```
 
 As of `2016-01-01`, towns of `Arbignieu` and `Saint-Bois` has been merged to `Arboys en Bugey`, keeping the INSEE code of `Arbignieu` (`01015`). It has a computed (sum) population of `631` inhabitants.
+
+### Move
+
+```
+--,2A001,Afa,1976-01-01,2020-01-01,2955
+<<,20001,Afa,1943-01-01,1976-01-01,NULL
+```
+
+As of `1976-01-01`, town of `Afa` has moved from `20001` to `2A001` (actually the code name for the county has changed but you get the point).
 

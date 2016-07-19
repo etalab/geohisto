@@ -63,6 +63,11 @@ def has_ancestor(town, towns, history):
             and town[0]['NCCENR'] != towns[history['COMECH']][0]['NCCENR'])
 
 
+def has_changed_county(town, towns, history):
+    """Return `True` in case of a move to another county."""
+    return int(history['MOD']) in (410, 411)
+
+
 def add_same_ancestor(town, history):
     """
     Enrich the `town` with a copy of itself.
@@ -90,6 +95,21 @@ def add_ancestor(town, towns, history):
     ancestor['END_DATE'] = history['EFF']
     current['START_DATE'] = history['EFF']
     current['ANCESTORS'].append(history['COMECH'])
+
+
+def add_neighbor(town, towns, history):
+    """
+    Add a neighbor to a given `town`, updating dates.
+
+    By neighbor, we mean an adjacent county.
+    """
+    current = town[0]
+    neighbor = current.copy()
+    neighbor['END_DATE'] = history['EFF']
+    neighbor['DEP'] = history['DEPANC'][:2]
+    neighbor['COM'] = history['DEPANC'][2:]
+    current['START_DATE'] = history['EFF']
+    current['NEIGHBORS'].append(neighbor)
 
 
 def compute_name(town):

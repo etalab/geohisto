@@ -12,7 +12,7 @@ from itertools import islice
 from utils import (
     convert_date, convert_leg, compute_name, compute_population,
     has_been_hard_renamed, add_same_ancestor, has_been_renamed,
-    add_ancestor, has_ancestor
+    add_ancestor, has_ancestor, has_changed_county, add_neighbor
 )
 
 # The first date in history records is 1943-08-12. We need these
@@ -33,6 +33,7 @@ def load_towns_from(filename):
         for town in csv.DictReader(file, delimiter='\t'):
             actual = int(town['ACTUAL'])
             town['ANCESTORS'] = []
+            town['NEIGHBORS'] = []
             town['START_DATE'] = START_DATE
             town['END_DATE'] = END_DATE
             if actual == 9:  # Cantonal fraction.
@@ -64,6 +65,8 @@ def compute_history_from(filename, towns):
                 add_same_ancestor(town, history)
             elif has_ancestor(town, towns, history):
                 add_ancestor(town, towns, history)
+            elif has_changed_county(town, towns, history):
+                add_neighbor(town, towns, history)
     return towns
 
 
@@ -130,6 +133,22 @@ def write_results_on(filename, towns, populations):
                     'NAME': name,
                     'START_DATE': t['START_DATE'],
                     'END_DATE': t['END_DATE'],
+                    'POPULATION': population
+                })
+
+            # Add an entry for each neighbor (different id).
+            for neighbor in current['NEIGHBORS']:
+                id = neighbor['DEP'] + neighbor['COM']
+                name = compute_name(neighbor)
+                population_id = id + name
+                population = compute_population(
+                    populations, population_id, towns)
+                write({
+                    'DIRECTION': '<<',
+                    'INSEE_CODE': id,
+                    'NAME': name,
+                    'START_DATE': neighbor['START_DATE'],
+                    'END_DATE': neighbor['END_DATE'],
                     'POPULATION': population
                 })
 
