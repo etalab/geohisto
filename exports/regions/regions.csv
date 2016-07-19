@@ -1,9 +1,9 @@
 DIRECTION,INSEE_CODE,NAME,START_DATE,END_DATE,POPULATION,SURFACE,NUTS_CODE,CHEF_LIEU,WIKIPEDIA
---,1,Guadeloupe,1970-01-09,2020-01-01,402119,1628,FRA1,Basse-Terre,https://fr.wikipedia.org/wiki/Guadeloupe
---,2,Martinique,1970-01-09,2020-01-01,385551,1128,FRA2,Fort-de-France,https://fr.wikipedia.org/wiki/Martinique
---,3,Guyane,1970-01-09,2020-01-01,244118,83846,FRA3,Cayenne,https://fr.wikipedia.org/wiki/Guyane
---,4,La Réunion,1970-01-09,2020-01-01,833944,2512,FRA4,Saint-Denis,https://fr.wikipedia.org/wiki/La_R%C3%A9union
---,6,Mayotte,1970-01-09,2020-01-01,226915,376,FRA5,Mamoudzou,https://fr.wikipedia.org/wiki/Mayotte
+--,01,Guadeloupe,1970-01-09,2020-01-01,402119,1628,FRA1,Basse-Terre,https://fr.wikipedia.org/wiki/Guadeloupe
+--,02,Martinique,1970-01-09,2020-01-01,385551,1128,FRA2,Fort-de-France,https://fr.wikipedia.org/wiki/Martinique
+--,03,Guyane,1970-01-09,2020-01-01,244118,83846,FRA3,Cayenne,https://fr.wikipedia.org/wiki/Guyane
+--,04,La Réunion,1970-01-09,2020-01-01,833944,2512,FRA4,Saint-Denis,https://fr.wikipedia.org/wiki/La_R%C3%A9union
+--,06,Mayotte,1970-01-09,2020-01-01,226915,376,FRA5,Mamoudzou,https://fr.wikipedia.org/wiki/Mayotte
 --,11,Île-de-France,1970-01-09,2020-01-01,11959807,12011,FR10,Paris,https://fr.wikipedia.org/wiki/%C3%8Ele-de-France
 --,24,Centre-Val de Loire,1970-01-09,2020-01-01,2570546,39151,FR24,Orléans,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire
 --,27,Bourgogne-Franche-Comté,2016-01-01,2020-01-01,2816814,47784,FR26,Dijon,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9

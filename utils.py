@@ -112,7 +112,9 @@ def compute_population(populations, population_id,
     Retrieve the population from `populations` dict cast as an integer.
 
     Fallback on `arrondissements` and `dom` if no population is found.
-    Finally, a population of `-1` is added for dead towns.
+    Finally, a population of `0` is added for listed dead towns.
+    In case of unknown population the value `NULL` is returned.
+
     If the `population_id` is missing and `town` is available, we try
     to compute the population based on ancestors (renames + merges).
     The `key` is useful for the recursivity of the function in order to
@@ -120,24 +122,40 @@ def compute_population(populations, population_id,
     """
     # If the population is already available, return it.
     population = int(populations[key].get(population_id, 0))
-    if population or town is None:
+    if population:
         return population
+    elif town is None:
+        return 'NULL'
+
     # Otherwise sum populations from renamed + ancestors towns.
     population = 0
     for t in town[1:]:
         population_id = t['DEP'] + t['COM'] + t['NCCENR']
-        population += compute_population(populations, population_id, towns)
+        try:
+            population += compute_population(populations, population_id, towns)
+        except TypeError:  # Returned population equals 'NULL'
+            pass
     for ancestor in town[0]['ANCESTORS']:
+        # TODO: restrict to direct ancestors only?
         ancestor = towns[ancestor][0]
         population_id = ancestor['DEP'] + ancestor['COM'] + ancestor['NCCENR']
-        population += compute_population(populations, population_id, towns)
+        try:
+            population += compute_population(populations, population_id, towns)
+        except TypeError:  # Returned population equals 'NULL'
+            pass
     if not population:
-        population += compute_population(
-            populations, population_id, towns, key='arrondissements')
+        try:
+            population += compute_population(
+                populations, population_id, towns, key='arrondissements')
+        except TypeError:  # Returned population equals 'NULL'
+            pass
     if not population:
-        population += compute_population(
-            populations, population_id, towns, key='dom')
-    if not population:
-        population += compute_population(
-            populations, population_id, towns, key='mortes')
+        try:
+            population += compute_population(
+                populations, population_id, towns, key='dom')
+        except TypeError:  # Returned population equals 'NULL'
+            pass
+    if not population and population_id not in populations['mortes']:
+        population = 'NULL'
+
     return population
