@@ -9,6 +9,8 @@ It might be useful if you have to deal with redirections and is in use by the [g
 
 If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/) and [towns](exports/towns/). There is a dedicated documentation at these places.
 
+Note that files are written as sequences and must be parsed one line after another.
+
 
 ## Sources
 

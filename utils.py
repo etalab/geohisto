@@ -110,9 +110,12 @@ def add_neighbor(town, towns, history):
     neighbor['COM'] = history['DEPANC'][2:]
     current['START_DATE'] = history['EFF']
     current['NEIGHBORS'].append(neighbor)
-    # Finally change the end date for the reference town
-    # for removal when the result is written.
-    towns[history['DEPANC']][0]['END_DATE'] = history['EFF']
+    # Handle special cases of `Châteaufort` and `Toussus-le-Noble`,
+    # these towns have switched twice from one county to another.
+    if history['DEPANC'] not in ('78143', '78620'):
+        # Finally change the end date of the reference town
+        # for clean removal when the result is written.
+        towns[history['DEPANC']][0]['END_DATE'] = history['EFF']
 
 
 def compute_name(town):
