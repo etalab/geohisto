@@ -5,21 +5,18 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 ?page=telechargement/2016/doc/doc_variables.htm
 """
 import csv
+import subprocess
+import unittest
 from collections import defaultdict
-from datetime import date
 from itertools import islice
 
+from constants import START_DATE, END_DATE
 from utils import (
     convert_date, convert_leg, compute_name, compute_population,
     has_been_hard_renamed, add_same_ancestor, has_been_renamed,
-    add_ancestor, has_ancestor, has_changed_county, add_neighbor
+    add_ancestor, has_ancestor, has_changed_county, add_neighbor,
+    has_been_restablished, restablish_town
 )
-
-# The first date in history records is 1943-08-12. We need these
-# boundaries to deal with ranges related to renamed towns
-# with the same INSEE (DEP+COM) codes.
-START_DATE = date(1943, 1, 1)
-END_DATE = date(2020, 1, 1)
 
 
 def load_towns_from(filename):
@@ -67,6 +64,8 @@ def compute_history_from(filename, towns):
                 add_ancestor(town, towns, history)
             elif has_changed_county(town, towns, history):
                 add_neighbor(town, towns, history)
+            elif has_been_restablished(town, history):
+                restablish_town(town, towns, history)
     return towns
 
 
@@ -107,6 +106,8 @@ def write_results_on(filename, towns, populations):
             current = town[0]
             # Root elements are the one still in use, skip others.
             if not current['END_DATE'] == END_DATE:
+                # if current['ACTUAL'] != '1':
+                #     print(current)
                 continue
             name = compute_name(current)
             population_id = id + name
@@ -185,6 +186,40 @@ def generate_head_results_from(filename, nb_of_lines=100):
         csvfileout.write(''.join(head))
 
 
+def check_generated_results_from(filename):
+    test_case = unittest.TestCase()
+    base_command = 'cat {filename} | grep -e "{{term}}" | wc -l'.format(
+        filename=filename)
+    extra_args = {'executable': '/bin/bash', 'shell': True}
+
+    # Check the number of lines with current towns.
+    output = subprocess.check_output(
+        base_command.format(term='--'), **extra_args)
+    test_case.assertEqual(int(output.strip()), 35966)  # Should be 35930.
+
+    # Check the number of lines with arrondissements.
+    output = subprocess.check_output(
+        base_command.format(term='Arrondissement'), **extra_args)
+    test_case.assertEqual(int(output.strip()), 20 + 9 + 16)
+
+    # Check a new town from 2016 is present.
+    new_2016_town = '--,01015,Arboys en Bugey,2016-01-01,2020-01-01,631'
+    output = subprocess.check_output(
+        base_command.format(term=new_2016_town), **extra_args)
+    test_case.assertEqual(int(output.strip()), 1)
+
+    # Check it's a rename from a previous INSEE code.
+    rename_2016_town = '<-,01015,Arbignieu,1943-01-01,2016-01-01,495'
+    output = subprocess.check_output(
+        base_command.format(term=rename_2016_town), **extra_args)
+    test_case.assertEqual(int(output.strip()), 1)
+
+    # Check it's a merge too from a previous INSEE code.
+    merge_2016_town = '->,01340,Saint-Bois,1943-01-01,2016-01-01,136'
+    output = subprocess.check_output(
+        base_command.format(term=merge_2016_town), **extra_args)
+    test_case.assertEqual(int(output.strip()), 1)
+
 if __name__ == '__main__':
     towns = load_towns_from('sources/france2016.txt')
     towns = compute_history_from('sources/historiq2016.txt', towns)
@@ -199,3 +234,4 @@ if __name__ == '__main__':
         'sources/population_mortes.csv')
     write_results_on('exports/towns/towns.csv', towns, populations)
     generate_head_results_from('exports/towns/towns.csv')
+    check_generated_results_from('exports/towns/towns.csv')

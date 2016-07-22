@@ -8,6 +8,8 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 """
 from datetime import date
 
+from constants import START_DATE, END_DATE
+
 
 def chunks(string, num):
     """Split a given `string` by `num` characters and return a list."""
@@ -51,9 +53,14 @@ def has_been_hard_renamed(town, history):
     return int(history['MOD']) in (100, 110)
 
 
+def has_been_restablished(town, history):
+    """Return `True` in case of a restablishement."""
+    return int(history['MOD']) in (210, 230)
+
+
 def has_been_renamed(town, history):
     """Return `True` in case of a rename with the same INSEE code."""
-    return (int(history['MOD']) == 331
+    return (int(history['MOD']) in (120, 331)
             and history['NCCOFF'] != town[0]['NCCENR'])
 
 
@@ -92,7 +99,9 @@ def add_ancestor(town, towns, history):
     """Add an ancestor to a given `town`, updating dates."""
     current = town[0]
     ancestor = towns[history['COMECH']][0]
-    ancestor['END_DATE'] = history['EFF']
+    # Only update consistent ranges.
+    if ancestor['START_DATE'] < history['EFF']:
+        ancestor['END_DATE'] = history['EFF']
     current['START_DATE'] = history['EFF']
     current['ANCESTORS'].append(history['COMECH'])
 
@@ -116,6 +125,16 @@ def add_neighbor(town, towns, history):
         # Finally change the end date of the reference town
         # for clean removal when the result is written.
         towns[history['DEPANC']][0]['END_DATE'] = history['EFF']
+
+
+def restablish_town(town, towns, history):
+    """Restablish a previously merged town."""
+    current = town[0]
+    current['END_DATE'] = END_DATE
+    current['START_DATE'] = history['EFF']
+    # Avoid duplicates.
+    if history['COMECH'] not in current['ANCESTORS']:
+        current['ANCESTORS'].append(history['COMECH'])
 
 
 def compute_name(town):
