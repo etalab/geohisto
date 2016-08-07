@@ -195,7 +195,7 @@ def check_generated_results_from(filename):
     # Check the number of lines with current towns.
     output = subprocess.check_output(
         base_command.format(term='--'), **extra_args)
-    test_case.assertEqual(int(output.strip()), 35966)  # Should be 35930.
+    test_case.assertEqual(int(output.strip()), 35962)  # Should be 35930.
 
     # Check the number of lines with arrondissements.
     output = subprocess.check_output(
@@ -209,13 +209,13 @@ def check_generated_results_from(filename):
     test_case.assertEqual(int(output.strip()), 1)
 
     # Check it's a rename from a previous INSEE code.
-    rename_2016_town = '<-,01015,Arbignieu,1943-01-01,2016-01-01,495'
+    rename_2016_town = '<-,01015,Arbignieu,1942-01-01,2016-01-01,495'
     output = subprocess.check_output(
         base_command.format(term=rename_2016_town), **extra_args)
     test_case.assertEqual(int(output.strip()), 1)
 
     # Check it's a merge too from a previous INSEE code.
-    merge_2016_town = '->,01340,Saint-Bois,1943-01-01,2016-01-01,136'
+    merge_2016_town = '->,01340,Saint-Bois,1942-01-01,2016-01-01,136'
     output = subprocess.check_output(
         base_command.format(term=merge_2016_town), **extra_args)
     test_case.assertEqual(int(output.strip()), 1)

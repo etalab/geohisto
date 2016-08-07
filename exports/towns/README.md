@@ -14,7 +14,7 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 * `END_DATE`: The effective end date for the given `NAME` + `INSEE_CODE`.
 * `POPULATION`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
 
-Regarding dates, the initial date has been set as `1943-01-01` given that the first date in historical data is `1943-08-12`. Arbitrarily, the far future end date has been set to `2020-01-01`.
+Regarding dates, the initial date has been set as `1942-01-01` given that the first date in historical data is `1942-08-01`. Arbitrarily, the far future end date has been set to `2020-01-01`.
 
 
 ## Format
