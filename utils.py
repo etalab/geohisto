@@ -68,11 +68,6 @@ def has_been_deleted(town, history):
     return (int(history['MOD']) == 300)
 
 
-def has_been_deleted(town, history):
-    """Return `True` in case of a deletion."""
-    return (int(history['MOD']) == 300)
-
-
 def has_errored_numerotation(town, history):
     """Return `True` in case of a errored numerotation."""
     return (int(history['MOD']) == 990)
@@ -80,8 +75,13 @@ def has_errored_numerotation(town, history):
 
 def has_ancestor(town, towns, history):
     """Return `True` in case of a merge with a different name."""
-    return (int(history['MOD']) in (320, 340, 321, 341)
+    return (int(history['MOD']) in (340, 321, 341)
             and town[0]['NCCENR'] != towns[history['COMECH']][0]['NCCENR'])
+
+
+def has_absorbed(town, history):
+    """Return `True` in case of a simple town absorption."""
+    return (int(history['MOD']) == 320)
 
 
 def has_changed_county(town, towns, history):
@@ -119,6 +119,15 @@ def add_ancestor(town, towns, history):
     current['START_DATE'] = history['EFF']
     current['ANCESTORS'].append(history['COMECH'])
 
+
+def add_absorbed_town(town, towns, history):
+    """Add an ancestor as an absorbed town to a given `town`, updating dates."""
+    current = town[0]
+    ancestor = towns[history['COMECH']][0]
+    # Only update consistent ranges.
+    if ancestor['START_DATE'] < history['EFF']:
+        ancestor['END_DATE'] = history['EFF']
+    current['ANCESTORS'].append(history['COMECH'])
 
 def add_neighbor(town, towns, history):
     """

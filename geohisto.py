@@ -16,7 +16,7 @@ from utils import (
     has_been_hard_renamed, add_same_ancestor, has_been_renamed,
     add_ancestor, has_ancestor, has_changed_county, add_neighbor,
     has_been_restablished, has_been_deleted, restablish_town, delete_town,
-    has_errored_numerotation, mark_as_errored
+    has_errored_numerotation, mark_as_errored, has_absorbed, add_absorbed_town
 )
 
 
@@ -63,6 +63,8 @@ def compute_history_from(filename, towns):
                 add_same_ancestor(town, history)
             elif has_been_renamed(town, history):
                 add_same_ancestor(town, history)
+            elif has_absorbed(town, history):
+                add_absorbed_town(town, towns, history)
             elif has_ancestor(town, towns, history):
                 add_ancestor(town, towns, history)
             elif has_changed_county(town, towns, history):
