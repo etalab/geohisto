@@ -60,7 +60,7 @@ def has_been_restablished(town, history):
 
 def has_been_renamed(town, history):
     """Return `True` in case of a rename with the same INSEE code."""
-    return (int(history['MOD']) in (120, 331)
+    return (int(history['MOD']) in (120, 311, 331)
             and history['NCCOFF'] != town[0]['NCCENR'])
 
 def has_been_deleted(town, history):
@@ -80,7 +80,7 @@ def has_errored_numerotation(town, history):
 
 def has_ancestor(town, towns, history):
     """Return `True` in case of a merge with a different name."""
-    return (int(history['MOD']) in (320, 340, 341)
+    return (int(history['MOD']) in (320, 340, 321, 341)
             and town[0]['NCCENR'] != towns[history['COMECH']][0]['NCCENR'])
 
 
