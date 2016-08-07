@@ -68,6 +68,16 @@ def has_been_deleted(town, history):
     return (int(history['MOD']) == 300)
 
 
+def has_been_deleted(town, history):
+    """Return `True` in case of a deletion."""
+    return (int(history['MOD']) == 300)
+
+
+def has_errored_numerotation(town, history):
+    """Return `True` in case of a errored numerotation."""
+    return (int(history['MOD']) == 990)
+
+
 def has_ancestor(town, towns, history):
     """Return `True` in case of a merge with a different name."""
     return (int(history['MOD']) in (320, 340, 341)
@@ -145,6 +155,11 @@ def delete_town(town, history):
     current = town[0]
     current['END_DATE'] = history['EFF']
     current['DELETED'] = True
+
+def mark_as_errored(town):
+    """Mark a town as errored."""
+    current = town[0]
+    current['ERRORED'] = True
 
 def compute_name(town):
     """Return the `town` name with optional article."""
