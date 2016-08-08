@@ -65,12 +65,12 @@ def has_been_renamed(town, history):
 
 def has_been_deleted(town, history):
     """Return `True` in case of a deletion."""
-    return (int(history['MOD']) == 300)
+    return int(history['MOD']) == 300
 
 
 def has_errored_numerotation(town, history):
     """Return `True` in case of a errored numerotation."""
-    return (int(history['MOD']) == 990)
+    return int(history['MOD']) == 990
 
 
 def has_ancestor(town, towns, history):
@@ -81,7 +81,7 @@ def has_ancestor(town, towns, history):
 
 def has_absorbed(town, history):
     """Return `True` in case of a simple town absorption."""
-    return (int(history['MOD']) == 320)
+    return int(history['MOD']) == 320
 
 
 def has_changed_county(town, towns, history):
