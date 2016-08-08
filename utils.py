@@ -8,7 +8,7 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 """
 from datetime import date
 
-from constants import START_DATE, END_DATE
+from constants import END_DATE
 
 
 def chunks(string, num):

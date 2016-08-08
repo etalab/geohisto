@@ -114,9 +114,8 @@ def write_results_on(filename, towns, populations):
         for id, town in sorted(towns.items()):
             current = town[0]
             # Root elements are the one still in use, skip others.
-            if current['ERRORED'] or (current['END_DATE'] != END_DATE and not current['DELETED']):
-                # if current['ACTUAL'] != '1':
-                #     print(current)
+            if current['ERRORED'] or (current['END_DATE'] != END_DATE
+                                      and not current['DELETED']):
                 continue
             name = compute_name(current)
             population_id = id + name
@@ -204,7 +203,7 @@ def check_generated_results_from(filename):
     # Check the number of lines with current towns.
     output = subprocess.check_output(
         base_command.format(term='--'), **extra_args)
-    test_case.assertEqual(int(output.strip()), 35962)  # Should be 35930.
+    test_case.assertEqual(int(output.strip()), 35942)  # Should be 35930.
 
     # Check the number of lines with arrondissements.
     output = subprocess.check_output(
