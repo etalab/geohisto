@@ -8,7 +8,7 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 """
 from datetime import date
 
-from constants import END_DATE
+from .constants import END_DATE
 
 
 def chunks(string, num):
@@ -48,20 +48,20 @@ def convert_leg(string):
     return string[0], convert_date(string[1:])
 
 
-def has_been_hard_renamed(town, history):
+def has_been_hard_renamed(modification_type):
     """Return `True` in case of a rename without any other operation."""
-    return int(history['MOD']) in (100, 110)
+    return modification_type in (100, 110)
 
 
-def has_been_restablished(town, history):
-    """Return `True` in case of a restablishement."""
-    return int(history['MOD']) in (210, 230)
-
-
-def has_been_renamed(town, history):
+def has_been_renamed(modification_type):
     """Return `True` in case of a rename with the same INSEE code."""
-    return (int(history['MOD']) in (120, 311, 331)
-            and history['NCCOFF'] != town[0]['NCCENR'])
+    return modification_type in (120, 311, 331)
+
+
+def has_been_restablished(modification_type):
+    """Return `True` in case of a restablishement."""
+    return modification_type in (210, 230)
+
 
 def has_been_deleted(town, history):
     """Return `True` in case of a deletion."""
@@ -89,24 +89,68 @@ def has_changed_county(town, towns, history):
     return int(history['MOD']) in (410, 411)
 
 
-def add_same_ancestor(town, history):
+def add_same_ancestor(towns, town, history):
     """
     Enrich the `town` with a copy of itself.
 
     Keeping the old name and updating dates.
     """
-    current = town[0]
-    same_ancestor = current.copy()
-    same_ancestor['ANCESTORS'] = []
-    same_ancestor['END_DATE'] = history['EFF']
+    original_start_date = town['start_date']
+    town['start_date'] = history['eff'].isoformat()
+    towns.update(town, 'id')
+    town['start_date'] = original_start_date
+    town['successors'] = town['dep'] + town['com']
+    town['modification'] = history['mod']
+    town['end_date'] = history['eff'].isoformat()
     # Take the `OFF`icial name if different from actual,
     # otherwise fallback on the `ANC`ient one.
-    if same_ancestor['NCCENR'] != history['NCCOFF']:
-        same_ancestor['NCCENR'] = history['NCCOFF']
+    if town['nccenr'] != history['NCCOFF']:
+        town['nccenr'] = history['NCCOFF']
     else:
-        same_ancestor['NCCENR'] = history['NCCANC']
-    current['START_DATE'] = history['EFF']
-    town.append(same_ancestor)
+        town['nccenr'] = history['NCCANC']
+    del town['id']  # We cannot insert a new town with the same id.
+    towns.insert(town)
+
+
+def add_fusion_ancestor(towns, town, history):
+    """
+    Enrich the `town` with a copy of itself.
+
+    Keeping the old name and updating dates.
+    """
+    original_end_date = town['end_date']
+    town['end_date'] = history['eff'].isoformat()
+    towns.update(town, 'id')
+    town['start_date'] = history['eff'].isoformat()
+    town['end_date'] = original_end_date
+    town['successors'] = town['dep'] + town['com']
+    # Take the `OFF`icial name if different from actual,
+    # otherwise fallback on the `ANC`ient one.
+    if town['nccenr'] != history['NCCOFF']:
+        town['nccenr'] = history['NCCOFF']
+    else:
+        town['nccenr'] = history['NCCANC']
+    del town['id']  # We cannot insert a new town with the same id.
+    towns.insert(town)
+
+
+def restablish_town(towns, town, history):
+    """Restablish a previously merged town."""
+    town['end_date'] = END_DATE.isoformat()
+    town['start_date'] = history['eff'].isoformat()
+    # Take the `OFF`icial name if different from actual,
+    # otherwise fallback on the `ANC`ient one.
+    if town['nccenr'] != history['NCCOFF']:
+        town['nccenr'] = history['NCCOFF']
+    else:
+        town['nccenr'] = history['NCCANC']
+    del town['id']  # We cannot insert a new town with the same id.
+    towns.insert(town)
+    # Add the current town to successors of the ancestor.
+    ancestor = towns.find_one(nccenr=history['NCCANC'])
+    if ancestor:
+        ancestor['successors'] = history['COMECH']
+        towns.update(ancestor, 'id')
 
 
 def add_ancestor(town, towns, history):
@@ -129,6 +173,7 @@ def add_absorbed_town(town, towns, history):
         ancestor['END_DATE'] = history['EFF']
     current['ANCESTORS'].append(history['COMECH'])
 
+
 def add_neighbor(town, towns, history):
     """
     Add a neighbor to a given `town`, updating dates.
@@ -149,15 +194,6 @@ def add_neighbor(town, towns, history):
         # for clean removal when the result is written.
         towns[history['DEPANC']][0]['END_DATE'] = history['EFF']
 
-
-def restablish_town(town, towns, history):
-    """Restablish a previously merged town."""
-    current = town[0]
-    current['END_DATE'] = END_DATE
-    current['START_DATE'] = history['EFF']
-    # Avoid duplicates.
-    if history['COMECH'] not in current['ANCESTORS']:
-        current['ANCESTORS'].append(history['COMECH'])
 
 def delete_town(town, history):
     """Delete a town."""
