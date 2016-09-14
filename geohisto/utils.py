@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Utils in use to convert/compute historical data.
 
@@ -7,8 +6,6 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 ?page=telechargement/2016/doc/doc_variables.htm
 """
 from datetime import date
-
-from .constants import END_DATE
 
 
 def chunks(string, num):
@@ -48,165 +45,7 @@ def convert_leg(string):
     return string[0], convert_date(string[1:])
 
 
-def has_been_hard_renamed(modification_type):
-    """Return `True` in case of a rename without any other operation."""
-    return modification_type in (100, 110)
-
-
-def has_been_renamed(modification_type):
-    """Return `True` in case of a rename with the same INSEE code."""
-    return modification_type in (120, 311, 331)
-
-
-def has_been_restablished(modification_type):
-    """Return `True` in case of a restablishement."""
-    return modification_type in (210, 230)
-
-
-def has_been_deleted(town, history):
-    """Return `True` in case of a deletion."""
-    return int(history['MOD']) == 300
-
-
-def has_errored_numerotation(town, history):
-    """Return `True` in case of a errored numerotation."""
-    return int(history['MOD']) == 990
-
-
-def has_ancestor(town, towns, history):
-    """Return `True` in case of a merge with a different name."""
-    return (int(history['MOD']) in (340, 321, 341)
-            and town[0]['NCCENR'] != towns[history['COMECH']][0]['NCCENR'])
-
-
-def has_absorbed(town, history):
-    """Return `True` in case of a simple town absorption."""
-    return int(history['MOD']) == 320
-
-
-def has_changed_county(town, towns, history):
-    """Return `True` in case of a move to another county."""
-    return int(history['MOD']) in (410, 411)
-
-
-def add_same_ancestor(towns, town, history):
-    """
-    Enrich the `town` with a copy of itself.
-
-    Keeping the old name and updating dates.
-    """
-    original_start_date = town['start_date']
-    town['start_date'] = history['eff'].isoformat()
-    towns.update(town, 'id')
-    town['start_date'] = original_start_date
-    town['successors'] = town['dep'] + town['com']
-    town['modification'] = history['mod']
-    town['end_date'] = history['eff'].isoformat()
-    # Take the `OFF`icial name if different from actual,
-    # otherwise fallback on the `ANC`ient one.
-    if town['nccenr'] != history['NCCOFF']:
-        town['nccenr'] = history['NCCOFF']
-    else:
-        town['nccenr'] = history['NCCANC']
-    del town['id']  # We cannot insert a new town with the same id.
-    towns.insert(town)
-
-
-def add_fusion_ancestor(towns, town, history):
-    """
-    Enrich the `town` with a copy of itself.
-
-    Keeping the old name and updating dates.
-    """
-    original_end_date = town['end_date']
-    town['end_date'] = history['eff'].isoformat()
-    towns.update(town, 'id')
-    town['start_date'] = history['eff'].isoformat()
-    town['end_date'] = original_end_date
-    town['successors'] = town['dep'] + town['com']
-    # Take the `OFF`icial name if different from actual,
-    # otherwise fallback on the `ANC`ient one.
-    if town['nccenr'] != history['NCCOFF']:
-        town['nccenr'] = history['NCCOFF']
-    else:
-        town['nccenr'] = history['NCCANC']
-    del town['id']  # We cannot insert a new town with the same id.
-    towns.insert(town)
-
-
-def restablish_town(towns, town, history):
-    """Restablish a previously merged town."""
-    town['end_date'] = END_DATE.isoformat()
-    town['start_date'] = history['eff'].isoformat()
-    # Take the `OFF`icial name if different from actual,
-    # otherwise fallback on the `ANC`ient one.
-    if town['nccenr'] != history['NCCOFF']:
-        town['nccenr'] = history['NCCOFF']
-    else:
-        town['nccenr'] = history['NCCANC']
-    del town['id']  # We cannot insert a new town with the same id.
-    towns.insert(town)
-    # Add the current town to successors of the ancestor.
-    ancestor = towns.find_one(nccenr=history['NCCANC'])
-    if ancestor:
-        ancestor['successors'] = history['COMECH']
-        towns.update(ancestor, 'id')
-
-
-def add_ancestor(town, towns, history):
-    """Add an ancestor to a given `town`, updating dates."""
-    current = town[0]
-    ancestor = towns[history['COMECH']][0]
-    # Only update consistent ranges.
-    if ancestor['START_DATE'] < history['EFF']:
-        ancestor['END_DATE'] = history['EFF']
-    current['START_DATE'] = history['EFF']
-    current['ANCESTORS'].append(history['COMECH'])
-
-
-def add_absorbed_town(town, towns, history):
-    """Add an ancestor as an absorbed town to a given `town`, updating dates."""
-    current = town[0]
-    ancestor = towns[history['COMECH']][0]
-    # Only update consistent ranges.
-    if ancestor['START_DATE'] < history['EFF']:
-        ancestor['END_DATE'] = history['EFF']
-    current['ANCESTORS'].append(history['COMECH'])
-
-
-def add_neighbor(town, towns, history):
-    """
-    Add a neighbor to a given `town`, updating dates.
-
-    By neighbor, we mean an adjacent county.
-    """
-    current = town[0]
-    neighbor = current.copy()
-    neighbor['END_DATE'] = history['EFF']
-    neighbor['DEP'] = history['DEPANC'][:2]
-    neighbor['COM'] = history['DEPANC'][2:]
-    current['START_DATE'] = history['EFF']
-    current['NEIGHBORS'].append(neighbor)
-    # Handle special cases of `Châteaufort` and `Toussus-le-Noble`,
-    # these towns have switched twice from one county to another.
-    if history['DEPANC'] not in ('78143', '78620'):
-        # Finally change the end date of the reference town
-        # for clean removal when the result is written.
-        towns[history['DEPANC']][0]['END_DATE'] = history['EFF']
-
-
-def delete_town(town, history):
-    """Delete a town."""
-    current = town[0]
-    current['END_DATE'] = history['EFF']
-    current['DELETED'] = True
-
-def mark_as_errored(town):
-    """Mark a town as errored."""
-    current = town[0]
-    current['ERRORED'] = True
-
-def compute_name(town):
+def convert_name_with_article(town):
     """Return the `town` name with optional article."""
     if town['ARTMIN']:
         # Special `L'` case, all other article require a space.
@@ -218,6 +57,23 @@ def compute_name(town):
         )
     else:
         return town['NCCENR']
+
+
+def compute_ancestors(towns):
+    """
+    Reverse the tree of successors to have ancestors.
+
+    Useful to compute new populations for instance.
+    """
+    for town in towns.with_successors():
+        for successor_id in town.successors.split(';'):
+            successor = towns.get(successor_id)
+            if successor:
+                new_ancestors = (successor.ancestors
+                                 and successor.ancestors + ';' + town.id
+                                 or town.id)
+                towns += successor._replace(ancestors=new_ancestors)
+    return towns
 
 
 def compute_population(populations, population_id,
@@ -233,6 +89,8 @@ def compute_population(populations, population_id,
     to compute the population based on ancestors (renames + merges).
     The `key` is useful for the recursivity of the function in order to
     explore different `populations` sub-dictionnaries.
+
+    WARNING: you have to compute population AFTER computing ancestors.
     """
     # If the population is already available, return it.
     population = int(populations[key].get(population_id, 0))
@@ -241,22 +99,18 @@ def compute_population(populations, population_id,
     elif town is None:
         return 'NULL'
 
-    # Otherwise sum populations from renamed + ancestors towns.
+    # Otherwise sum populations from ancestors towns.
     population = 0
-    for t in town[1:]:
-        population_id = t['DEP'] + t['COM'] + t['NCCENR']
-        try:
-            population += compute_population(populations, population_id, towns)
-        except TypeError:  # Returned population equals 'NULL'
-            pass
-    for ancestor in town[0]['ANCESTORS']:
-        # TODO: restrict to direct ancestors only?
-        ancestor = towns[ancestor][0]
-        population_id = ancestor['DEP'] + ancestor['COM'] + ancestor['NCCENR']
-        try:
-            population += compute_population(populations, population_id, towns)
-        except TypeError:  # Returned population equals 'NULL'
-            pass
+    if town.ancestors:
+        for ancestor_id in town.ancestors.split(';'):
+            ancestor = towns.get(ancestor_id)
+            population_id = ancestor.depcom + ancestor.nccenr
+            try:
+                population += compute_population(
+                    populations, population_id, towns)
+            except TypeError:  # Returned population equals 'NULL'
+                pass
+
     if not population:
         try:
             population += compute_population(

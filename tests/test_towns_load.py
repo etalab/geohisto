@@ -1,16 +1,13 @@
-import dataset
+import datetime
+
 import pytest
 
 from geohisto.loaders import load_towns
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def towns():
-    with dataset.connect('sqlite:///:memory:') as database:
-        towns = database['towns']
-        load_towns(towns)
-        database.commit()
-        return towns
+    return load_towns()
 
 
 def test_initial_load(towns):
@@ -18,10 +15,18 @@ def test_initial_load(towns):
 
 
 def test_contains_arles(towns):
-    arles = towns.find_one(nccenr='Arles')
-    assert arles['dep'] == '13'
-    assert arles['com'] == '004'
-    assert arles['start_date'] == '1942-01-01'
-    assert arles['end_date'] == '2020-01-01'
-    assert arles['successors'] == ''
-    assert arles['actual'] == 1
+    arles = towns.filter(depcom='13004')[0]
+    assert arles.dep == '13'
+    assert arles.com == '004'
+    assert arles.start_date == datetime.date(1942, 1, 1)
+    assert arles.end_date == datetime.date(9999, 1, 1)
+    assert arles.successors == ''
+    assert arles.actual == 1
+    assert arles.nccenr == 'Arles'
+
+
+def test_convert_name(towns):
+    la_breole = towns.filter(depcom='04033')[0]
+    assert la_breole.nccenr == 'La Bréole'
+    lescale = towns.filter(depcom='04079')[0]
+    assert lescale.nccenr == "L'Escale"

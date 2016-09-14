@@ -1,2 +1,1 @@
 pytest==2.9.2
-dataset==0.6.4

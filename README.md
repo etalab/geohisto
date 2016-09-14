@@ -9,8 +9,6 @@ It might be useful if you have to deal with redirections and is in use by the [g
 
 If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/) and [towns](exports/towns/). There is a dedicated documentation at these places.
 
-Note that files are written as sequences and must be parsed one line after another.
-
 
 ## Sources
 
@@ -23,10 +21,12 @@ Additionaly, files containing the population for almost all towns has been compu
 
 The project doesn’t require any dependency, you have to run it with Python 3:
 
-    $ python3 geohisto.py
+    $ python3 -m geohisto
 
 
 ## TODO
 
 * Handle more cases of splits/merges of towns.
 * Make the export configurable through command-line options?
+* Make tests faster with subsets of data for each test.
+* Fix inconsistencies, see TODOs within the code/output.
