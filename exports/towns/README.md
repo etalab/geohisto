@@ -16,7 +16,7 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 * `ANCESTORS`: List of IDs separated by semicolons which are ancestors of the current `ID`. Default is an empty string.
 * `POPULATION`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
 
-Regarding dates, the initial date has been set as `1942-01-01` given that the first date in historical data is `1942-08-01`. Arbitrarily, the far future end date has been set to `9999-01-01`.
+Regarding dates, the initial date + time has been set as `1942-01-01 00:00:00` given that the first date in historical data is `1942-08-01`. Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
 
 
 ## Format

@@ -1,10 +1,11 @@
-from datetime import date
+from datetime import datetime, timedelta
 
 # The first date in history records is 1942-08-01. We need these
 # boundaries to deal with ranges related to renamed towns
 # with the same INSEE (DEP+COM) codes.
-START_DATE = date(1942, 1, 1)
-END_DATE = date(9999, 1, 1)
+START_DATE = datetime(1942, 1, 1, 0, 0, 0)
+END_DATE = datetime(9999, 12, 31, 23, 59, 59)
+DELTA = timedelta(seconds=1)
 
 # Modification keys from INSEE/COG:
 # http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
