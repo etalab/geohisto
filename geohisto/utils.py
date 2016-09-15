@@ -5,7 +5,7 @@ Most of the cryptic keys in that script are documented here:
 http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
 ?page=telechargement/2016/doc/doc_variables.htm
 """
-from datetime import date
+from datetime import datetime
 
 
 def chunks(string, num):
@@ -15,10 +15,10 @@ def chunks(string, num):
 
 def convert_date(string):
     """
-    Convert '01-01-2016' to a Python `datetime.date` object.
+    Convert '01-01-2016' to a Python `datetime` object.
 
     For the particular case where there are multiple dates within the
-    same key, we return a list of `datetime.date` object.
+    same key, we return a list of `datetime` object.
     """
     if not string or string == '         .':  # Yes, it happens once!
         return ''
@@ -26,12 +26,13 @@ def convert_date(string):
     if len(string) > 10:
         return [convert_date(chunk) for chunk in chunks(string, 10)]
 
-    return date(*reversed([int(i) for i in string.split('-')]))
+    date = reversed([int(i) for i in string.split('-')])
+    return datetime(*list(date) + [0, 0, 0])
 
 
 def convert_leg(string):
     """
-    Convert 'L01-01-2016' to a Python tuple ('L', `datetime.date`).
+    Convert 'L01-01-2016' to a Python tuple ('L', `datetime`).
 
     For the particular case where there are multiple dates within the
     same key, we return a list of tuples.
