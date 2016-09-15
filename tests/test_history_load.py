@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import pytest
 
@@ -19,4 +19,4 @@ def test_contains_neuville(history_list):
     assert neuville.mod == 100
     assert neuville.nccoff == 'Neuville-sur-Vanne'
     assert neuville.nccanc == 'Neuville-sur-Vannes'
-    assert neuville.eff == datetime.date(2008, 10, 6)
+    assert neuville.eff == datetime(2008, 10, 6, 0, 0, 0)

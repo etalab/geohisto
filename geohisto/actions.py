@@ -1,7 +1,7 @@
 from .constants import (
     RENAME_FUSION_LEADER, FUSION_FOLLOWER, SPLIT_LEADER, SPLIT_FOLLOWER,
     RENAME_SIMPLE, FUSION_TO_NEW_LEADER, FUSION_TO_NEW_FOLLOWER, DELETION,
-    OBSOLETE, CHANGE_COUNTY
+    OBSOLETE, CHANGE_COUNTY, DELTA
 )
 
 
@@ -16,10 +16,10 @@ def do_renames(towns, history_list):
             towns += recent_town
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             old_town = old_town._replace(successors=recent_town.id)
             old_town = old_town._replace(modification=history.mod)
             old_town = old_town._replace(nccenr=history.nccanc)
@@ -43,10 +43,10 @@ def _do_fusions_leaders(towns, history_list):
             towns += recent_town
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             old_town = old_town._replace(successors=recent_town.id)
             old_town = old_town._replace(modification=history.mod)
             old_town = old_town._replace(nccenr=history.nccanc)
@@ -69,10 +69,10 @@ def _do_fusions_followers(towns, history_list):
                 + town.end_date.isoformat()))
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             if successor is not None:  # TODO: see Towns model.
                 old_town = old_town._replace(successors=successor.id)
             old_town = old_town._replace(modification=history.mod)
@@ -101,10 +101,10 @@ def _do_splits_leaders(towns, history_list):
         towns += recent_town
 
         # Create old record based on the initial one.
-        original_town = town._replace(end_date=history.eff)
+        original_town = town._replace(end_date=history.eff - DELTA)
         original_town = original_town._replace(id=(
             town.depcom + town.start_date.isoformat()
-            + history.eff.isoformat()))
+            + (history.eff - DELTA).isoformat()))
         original_town = original_town._replace(successors=recent_town.id)
         original_town = original_town._replace(modification=history.mod)
         original_town = original_town._replace(nccenr=history.nccanc)
@@ -134,8 +134,7 @@ def _do_splits_followers(towns, history_list):
             predecessor = parents[0]
 
             # Create new record based on the initial one.
-            new_split = town._replace(end_date=history.eff)
-            new_split = new_split._replace(id=(
+            new_split = town._replace(id=(
                 town.depcom + history.eff.isoformat()
                 + leader.end_date.isoformat()))
             new_split = new_split._replace(start_date=history.eff)
@@ -193,10 +192,10 @@ def _do_fusions_to_new_followers(towns, history_list):
                 continue
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             if successor is not None:  # TODO: see Towns model.
                 old_town = old_town._replace(successors=successor.id)
             old_town = old_town._replace(modification=history.mod)
@@ -222,10 +221,10 @@ def do_deletions(towns, history_list):
                 continue
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             old_town = old_town._replace(modification=history.mod)
             towns += old_town
 
@@ -241,10 +240,10 @@ def do_obsoletes(towns, history_list):
             successor = towns.filter(depcom=history.comech)[0]
 
             # Create old record based on the initial one.
-            old_town = town._replace(end_date=history.eff)
+            old_town = town._replace(end_date=history.eff - DELTA)
             old_town = old_town._replace(id=(
                 town.depcom + town.start_date.isoformat()
-                + history.eff.isoformat()))
+                + (history.eff - DELTA).isoformat()))
             old_town = old_town._replace(modification=history.mod)
             old_town = old_town._replace(successors=successor.id)
             towns += old_town
@@ -271,10 +270,10 @@ def do_change_county(towns, history_list):
 
             # Create the ancient record.
             town = towns.filter(depcom=history.depanc)[0]
-            ancient_town = town._replace(end_date=history.eff)
+            ancient_town = town._replace(end_date=history.eff - DELTA)
             ancient_town = ancient_town._replace(id=(
                 town.depcom + town.start_date.isoformat() +
-                history.eff.isoformat()))
+                (history.eff - DELTA).isoformat()))
             ancient_town = ancient_town._replace(modification=history.mod)
             ancient_town = ancient_town._replace(successors=recent_town.id)
             towns += ancient_town
