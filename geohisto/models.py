@@ -50,7 +50,8 @@ class Towns:
 
 Town = namedtuple('Town', [
     'id', 'actual', 'modification', 'successors', 'ancestors',
-    'start_date', 'end_date', 'depcom', 'dep', 'com', 'nccenr', 'population'
+    'start_date', 'end_date', 'start_datetime', 'end_datetime',
+    'depcom', 'dep', 'com', 'nccenr', 'population'
 ])
 
 
@@ -79,5 +80,5 @@ class HistoryList:
 
 History = namedtuple('History', [
     'depcom', 'mod', 'eff', 'nccoff', 'nccanc', 'comech', 'dep', 'com',
-    'depanc'
+    'depanc', 'effdate'
 ])
