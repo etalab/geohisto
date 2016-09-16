@@ -15,7 +15,7 @@ def write_results_on(filename, towns):
     with open(filename, 'w') as csvfile:
         fieldnames = [
             'ID', 'INSEE_CODE', 'NAME',
-            'START_DATE', 'END_DATE',
+            'START_DATETIME', 'END_DATETIME',
             'SUCCESSORS', 'ANCESTORS',
             'POPULATION', 'COMMENT'
         ]
@@ -29,8 +29,8 @@ def write_results_on(filename, towns):
                 'ID': town.id,
                 'INSEE_CODE': town.depcom,
                 'NAME': town.nccenr,
-                'START_DATE': town.start_date,
-                'END_DATE': town.end_date,
+                'START_DATETIME': town.start_datetime,
+                'END_DATETIME': town.end_datetime,
                 'SUCCESSORS': town.successors,
                 'ANCESTORS': town.ancestors,
                 'POPULATION': town.population,

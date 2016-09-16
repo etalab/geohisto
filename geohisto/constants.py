@@ -1,11 +1,17 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+
+# In use to concatenate ids.
+SEPARATOR = '@'
 
 # The first date in history records is 1942-08-01. We need these
 # boundaries to deal with ranges related to renamed towns
 # with the same INSEE (DEP+COM) codes.
-START_DATE = datetime(1942, 1, 1, 0, 0, 0)
-END_DATE = datetime(9999, 12, 31, 23, 59, 59)
+START_DATE = date(1942, 1, 1)
+START_DATETIME = datetime(1942, 1, 1, 0, 0, 0)
+END_DATE = date(9999, 12, 31)
+END_DATETIME = datetime(9999, 12, 31, 23, 59, 59)
 DELTA = timedelta(seconds=1)
+DELTADAY = timedelta(days=1)
 
 # Modification keys from INSEE/COG:
 # http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩

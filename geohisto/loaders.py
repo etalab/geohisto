@@ -1,8 +1,10 @@
 import csv
 
-from .constants import START_DATE, END_DATE
+from .constants import (
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME, SEPARATOR
+)
 from .models import Towns, Town, HistoryList, History
-from .utils import convert_date, convert_name_with_article
+from .utils import convert_date, convert_datetime, convert_name_with_article
 
 
 def load_towns(filename='sources/france2016.txt'):
@@ -37,13 +39,15 @@ def load_towns(filename='sources/france2016.txt'):
         becomes:
 
         Town(
-            id='010011942-01-012020-01-01',
+            id='01001@1942-01-01',
             actual=1,
             modification=0,
             ancestors='',
             successors='',
             start_date=datetime.date(1942, 1, 1),
-            end_date=datetime.date(2020, 1, 1),
+            end_date=datetime.date(9999, 12, 31),
+            start_datetime=datetime.datetime(1942, 1, 1, 0, 0, 0),
+            end_datetime=datetime.datetime(9999, 12, 31, 23, 59, 59),
             depcom='01001',
             dep='01',
             com='001',
@@ -58,8 +62,8 @@ def load_towns(filename='sources/france2016.txt'):
             if actual == 9:  # Cantonal fraction.
                 continue  # Skip for the moment.
             town = Town(**{
-                'id': (line['DEP'] + line['COM']
-                       + START_DATE.isoformat() + END_DATE.isoformat()),
+                'id': (line['DEP'] + line['COM'] + SEPARATOR
+                       + START_DATE.isoformat()),
                 'depcom': line['DEP'] + line['COM'],
                 'actual': actual,
                 'modification': 0,
@@ -67,6 +71,8 @@ def load_towns(filename='sources/france2016.txt'):
                 'successors': '',
                 'start_date': START_DATE,
                 'end_date': END_DATE,
+                'start_datetime': START_DATETIME,
+                'end_datetime': END_DATETIME,
                 'dep': line['DEP'],
                 'com': line['COM'],
                 'nccenr': convert_name_with_article(line),
@@ -128,7 +134,8 @@ def load_history(filename='sources/historiq2016.txt'):
             history = History(**{
                 'depcom': line['DEP'] + line['COM'],
                 'mod': int(line['MOD']),
-                'eff': convert_date(line['EFF']),
+                'eff': convert_datetime(line['EFF']),
+                'effdate': convert_date(line['EFF']),
                 'nccoff': line['NCCOFF'],
                 'nccanc': line['NCCANC'],
                 'comech': line['COMECH'],

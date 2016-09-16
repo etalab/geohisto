@@ -1,7 +1,9 @@
 import pytest
 
 from geohisto.loaders import load_towns
-from geohisto.constants import START_DATE, END_DATE
+from geohisto.constants import (
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME
+)
 
 
 @pytest.fixture
@@ -15,10 +17,13 @@ def test_initial_load(towns):
 
 def test_contains_arles(towns):
     arles = towns.filter(depcom='13004')[0]
+    assert arles.id == '13004@1942-01-01'
     assert arles.dep == '13'
     assert arles.com == '004'
     assert arles.start_date == START_DATE
     assert arles.end_date == END_DATE
+    assert arles.start_datetime == START_DATETIME
+    assert arles.end_datetime == END_DATETIME
     assert arles.successors == ''
     assert arles.actual == 1
     assert arles.nccenr == 'Arles'
