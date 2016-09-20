@@ -1,7 +1,8 @@
 from .constants import (
     RENAME_FUSION_LEADER, FUSION_FOLLOWER, SPLIT_LEADER, SPLIT_FOLLOWER,
     RENAME_SIMPLE, FUSION_TO_NEW_LEADER, FUSION_TO_NEW_FOLLOWER, DELETION,
-    OBSOLETE, CHANGE_COUNTY, DELTA, DELTADAY, SEPARATOR
+    OBSOLETE, CHANGE_COUNTY, DELTA, DELTADAY, SEPARATOR,
+    ABSORPTION_LEADER, ABSORPTION_FOLLOWER
 )
 
 
@@ -241,6 +242,38 @@ def do_change_county(towns, history_list):
     return towns, history_list
 
 
+def _do_absorptions_leaders(towns, history_list):
+    for history in history_list.filter_by_mod(ABSORPTION_LEADER):
+        for town in towns.filter(depcom=history.depcom):
+            # Update the leader with the modification type only.
+            recent_town = town._replace(modification=history.mod)
+            towns += recent_town  # Same id == update.
+
+    return towns, history_list
+
+
+def _do_absorptions_followers(towns, history_list):
+    for history in history_list.filter_by_mod(ABSORPTION_FOLLOWER):
+        for town in towns.filter(depcom=history.depcom):
+            # We need to retrieve the leader previously updated.
+            successor = towns.filter(history.comech)[0]
+
+            # Update old record based on the initial one.
+            old_town = town._replace(end_date=history.effdate - DELTADAY)
+            old_town = old_town._replace(end_datetime=history.eff - DELTA)
+            old_town = old_town._replace(successors=successor.id)
+            old_town = old_town._replace(modification=history.mod)
+            old_town = old_town._replace(nccenr=history.nccoff)
+            towns += old_town  # Same id == update.
+
+    return towns, history_list
+
+
+def do_absorptions(towns, history_list):
+    return _do_absorptions_followers(
+        *_do_absorptions_leaders(towns, history_list))
+
+
 def do_all_actions(towns, history_list):
     """
     One method to rule them all.
@@ -253,6 +286,7 @@ def do_all_actions(towns, history_list):
     towns, history_list = do_fusions(towns, history_list)
     towns, history_list = do_splits(towns, history_list)
     towns, history_list = do_fusions_to_new(towns, history_list)
+    towns, history_list = do_absorptions(towns, history_list)
     towns, history_list = do_deletions(towns, history_list)
     towns, history_list = do_obsoletes(towns, history_list)
     return towns, history_list
