@@ -3,12 +3,13 @@ from datetime import date, datetime
 
 from geohisto.actions import (
     do_renames, do_fusions, do_splits, do_fusions_to_new, do_deletions,
-    do_obsoletes, do_change_county
+    do_obsoletes, do_change_county, do_absorptions
 )
 from geohisto.constants import (
     RENAME_SIMPLE, RENAME_FUSION_LEADER, FUSION_FOLLOWER, SPLIT_LEADER,
     SPLIT_FOLLOWER, FUSION_TO_NEW_FOLLOWER, DELETION, OBSOLETE,
-    CHANGE_COUNTY, START_DATE, END_DATE, START_DATETIME, END_DATETIME
+    CHANGE_COUNTY, START_DATE, END_DATE, START_DATETIME, END_DATETIME,
+    ABSORPTION_LEADER, ABSORPTION_FOLLOWER
 )
 
 from .test_towns_load import towns  # NOQA: fixtures.
@@ -185,6 +186,32 @@ def test_obsoletes(towns, history_list):  # NOQA: fixtures.
     assert hauteville_lompnes.successors == '01185@1942-01-01'
     assert hauteville_lompnes.modification == OBSOLETE
     assert hauteville_lompnes.nccenr == 'Hauteville-Lompnés'
+
+
+def test_absorptions(towns, history_list):  # NOQA: fixtures.
+    """Deletion of a town."""
+    towns, history_list = do_absorptions(towns, history_list)
+    tours = towns.filter(depcom='37261')[0]
+    ste_radegonde = towns.filter(depcom='37235')[0]
+    st_symphorien = towns.filter(depcom='37239')[0]
+    assert tours.id == '37261@1942-01-01'
+    assert tours.successors == ''
+    assert tours.start_datetime == START_DATETIME
+    assert tours.end_datetime == END_DATETIME
+    assert tours.modification == ABSORPTION_LEADER
+    assert tours.nccenr == 'Tours'
+    assert ste_radegonde.id == '37235@1942-01-01'
+    assert ste_radegonde.successors == '37261@1942-01-01'
+    assert ste_radegonde.start_datetime == START_DATETIME
+    assert ste_radegonde.end_datetime == datetime(1964, 5, 31, 23, 59, 59)
+    assert ste_radegonde.modification == ABSORPTION_FOLLOWER
+    assert ste_radegonde.nccenr == 'Sainte-Radegonde-en-Touraine'
+    assert st_symphorien.id == '37239@1942-01-01'
+    assert st_symphorien.successors == '37261@1942-01-01'
+    assert st_symphorien.start_datetime == START_DATETIME
+    assert st_symphorien.end_datetime == datetime(1964, 5, 31, 23, 59, 59)
+    assert st_symphorien.modification == ABSORPTION_FOLLOWER
+    assert st_symphorien.nccenr == 'Saint-Symphorien'
 
 
 def test_change_county(towns, history_list):  # NOQA: fixtures.
