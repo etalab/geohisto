@@ -47,6 +47,10 @@ class Towns:
     def remove(self, town):
         del self._towns[town.id]
 
+    def valid_at(self, valid_datetime):
+        return [town for town in self._towns.values()
+                if town.start_datetime <= valid_datetime < town.end_datetime]
+
 
 Town = namedtuple('Town', [
     'id', 'actual', 'modification', 'successors', 'ancestors',
