@@ -20,7 +20,7 @@ def test_ancestors(towns, history_list):  # NOQA: fixtures.
     assert braguelogne.successors == braguelogne_beauvoir.id
     assert beauvoir_sur_sarce.successors == braguelogne_beauvoir.id
     assert (braguelogne_beauvoir.ancestors
-            == ';'.join([braguelogne.id, beauvoir_sur_sarce.id]))
+            == ';'.join([beauvoir_sur_sarce.id, braguelogne.id]))
 
 
 def test_with_ancestors_population(towns, history_list,   # NOQA: fixtures.

@@ -74,7 +74,7 @@ def test_fusion_then_split(towns, history_list):  # NOQA: fixtures.
     assert framb_saucelle.id == '28159@1972-12-22'
     assert framb_saucelle.successors == framb2.id + ';' + sauc2.id
     assert (framb_saucelle.modification
-            == '{};{}'.format(SPLIT_LEADER, SPLIT_FOLLOWER))
+            == '{};{}'.format(SPLIT_LEADER[0], SPLIT_FOLLOWER))
     assert framb.id == '28159@1942-01-01'
     assert framb.successors == framb_saucelle.id
     assert framb2.id == '28159@1987-01-01'
@@ -106,7 +106,8 @@ def test_fusion_then_reinstatement_then_split(towns, history_list):  # NOQA: fix
             == varenne2.id + ';' + champigny2.id + ';' + chezeau2.id)
     assert varenne.modification == RENAME_FUSION_LEADER
     assert (terre_natale.modification
-            == '{};{};{}'.format(SPLIT_LEADER, SPLIT_FOLLOWER, SPLIT_FOLLOWER))
+            == '{};{};{}'.format(SPLIT_LEADER[0], SPLIT_FOLLOWER,
+                                 SPLIT_FOLLOWER))
     assert champigny.modification == FUSION_FOLLOWER
     assert chezeau.modification == FUSION_FOLLOWER
 

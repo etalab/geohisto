@@ -37,11 +37,11 @@ class Towns:
     def with_successors(self):
         return [town for town in self._towns.values() if town.successors]
 
-    def current(self, depcom):
+    def latest(self, depcom):
+        """Get the most recent town for a given `depcom`."""
         towns = [town for town in self._towns.values()
-                 if town.depcom == depcom and town.end_date == END_DATE]
-        if len(towns) > 1:
-            print('TODO: {towns} should be unique.'.format(towns=towns))
+                 if town.depcom == depcom]
+        towns.sort(key=lambda t: t.end_datetime, reverse=True)
         return towns[0]
 
     def remove(self, town):

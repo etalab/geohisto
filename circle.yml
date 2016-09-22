@@ -1,0 +1,11 @@
+# The reason we use deb file directly from circle-ci is speed:
+# https://discuss.circleci.com/t/speed-up-python-3-5-1-builds/1760/7
+machine:
+  pre:
+    - wget https://s3.amazonaws.com/circle-downloads/circle-pyenv-python-3.5.1_1.0_amd64.deb
+    - sudo dpkg -i circle-pyenv-python-3.5.1_1.0_amd64.deb
+  python:
+    version: 3.5.1
+test:
+  override:
+    - python -m pytest tests
