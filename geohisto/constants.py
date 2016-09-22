@@ -14,14 +14,14 @@ DELTA = timedelta(seconds=1)
 DELTADAY = timedelta(days=1)
 
 # Modification keys from INSEE/COG:
-# http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
+# http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
 # ?page=telechargement/2016/doc/doc_variables.htm#mod
 RENAME_SIMPLE = 100
 RENAME_FUSION_LEADER = 110
 FUSION_FOLLOWER = 330
-SPLIT_LEADER = 120
+SPLIT_LEADER = (120,)  # TODO: 230.
 SPLIT_FOLLOWER = 210
-FUSION_TO_NEW_LEADER = (321, 341)
+FUSION_TO_NEW_LEADER = (321, 341)  # TODO: 340.
 FUSION_TO_NEW_FOLLOWER = (311, 331)
 CHANGE_COUNTY = 410
 DELETION = 300

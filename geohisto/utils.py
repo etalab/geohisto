@@ -2,7 +2,7 @@
 Utils in use to convert/compute historical data.
 
 Most of the cryptic keys in that script are documented here:
-http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp↩
+http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
 ?page=telechargement/2016/doc/doc_variables.htm
 """
 from datetime import date, datetime

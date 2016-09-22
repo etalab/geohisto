@@ -75,8 +75,8 @@ def do_fusions(towns, history_list):
 
 
 def _do_splits_leaders(towns, history_list):
-    for history in history_list.filter_by_mod(SPLIT_LEADER):
-        town = towns.current(depcom=history.depcom)
+    for history in history_list.filter_by_mods(SPLIT_LEADER):
+        town = towns.latest(depcom=history.depcom)
         # Create recent record based on the initial one.
         recent_town = town._replace(nccenr=history.nccoff)
         recent_town = recent_town._replace(start_date=history.effdate)
@@ -105,7 +105,7 @@ def _do_splits_leaders(towns, history_list):
 def _do_splits_followers(towns, history_list):
     for history in history_list.filter_by_mod(SPLIT_FOLLOWER):
         for town in towns.filter(depcom=history.depcom):
-            leader = towns.current(history.comech)
+            leader = towns.latest(history.comech)
             parents = towns.parents(leader.id)
             if not parents:
                 print('TODO: {leader} does not have parents, rel. 340'.format(
