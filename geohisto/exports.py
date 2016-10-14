@@ -29,7 +29,7 @@ def write_results_on(filename, towns):
                 'insee_code': town.depcom,
                 'name': town.nccenr,
                 'start_datetime': town.start_datetime,
-                'end_datetime': town.end_datetime,
+                'end_datetime': town.end_datetime.replace(microsecond=0),
                 'successors': town.successors,
                 'ancestors': town.ancestors,
                 'population': town.population,
