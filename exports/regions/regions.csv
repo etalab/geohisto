@@ -1,4 +1,4 @@
-DIRECTION,INSEE_CODE,NAME,START_DATE,END_DATE,POPULATION,SURFACE,NUTS_CODE,CHEF_LIEU,WIKIPEDIA
+direction,insee_code,name,start_date,end_date,population,surface,nuts_code,chef_lieu,wikipedia
 --,01,Guadeloupe,1970-01-09,2020-01-01,402119,1628,FRA1,Basse-Terre,https://fr.wikipedia.org/wiki/Guadeloupe
 --,02,Martinique,1970-01-09,2020-01-01,385551,1128,FRA2,Fort-de-France,https://fr.wikipedia.org/wiki/Martinique
 --,03,Guyane,1970-01-09,2020-01-01,244118,83846,FRA3,Cayenne,https://fr.wikipedia.org/wiki/Guyane
