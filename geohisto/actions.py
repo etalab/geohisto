@@ -1,292 +1,227 @@
+"""
+Perform actions on towns given the modifications' types.
+
+The modifications come from the history of changes.
+"""
+
+from functools import partial
+
 from .constants import (
-    RENAME_FUSION_LEADER, FUSION_FOLLOWER, SPLIT_LEADER, SPLIT_FOLLOWER,
-    RENAME_SIMPLE, FUSION_TO_NEW_LEADER, FUSION_TO_NEW_FOLLOWER, DELETION,
-    OBSOLETE, CHANGE_COUNTY, DELTA, DELTADAY, SEPARATOR,
-    ABSORPTION_LEADER, ABSORPTION_FOLLOWER
+    SEPARATOR, DELTA, END_DATETIME, START_DATE, START_DATETIME,
+    CHANGE_NAME, CHANGE_NAME_FUSION, CHANGE_NAME_CREATION,
+    CHANGE_NAME_REINSTATEMENT,
+    CREATION, REINSTATEMENT, SPLITING,
+    DELETION_PARTITION, DELETION_FUSION,
+    CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
+    FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
+    CREATION_DELEGATED_POLE,
+    CHANGE_COUNTY,
+    OBSOLETE
 )
 
 
-def do_renames(towns, history_list):
-    for history in history_list.filter_by_mod(RENAME_SIMPLE):
-        for town in towns.filter(depcom=history.depcom):
-            # Create recent record based on the initial one.
-            recent_town = town._replace(start_date=history.effdate)
-            recent_town = recent_town._replace(start_datetime=history.eff)
-            recent_town = recent_town._replace(id=(
-                recent_town.depcom + SEPARATOR + history.effdate.isoformat()))
-            towns += recent_town  # New id == create.
+def change_name(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
 
-            # Update the initial old record (same id).
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            old_town = old_town._replace(successors=recent_town.id)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(nccenr=history.nccanc)
-            towns += old_town  # Same id == update.
+    new_town = current_town.generate(**{
+        'id': current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        'start_datetime': record.eff,
+        'end_datetime': END_DATETIME,
+        # `nccenr` changes on fusions.
+        'nccenr': record.nccoff or current_town.nccenr,
+        'successors': '',
+    })
+    towns.create(new_town)
 
-    return towns, history_list
-
-
-def _do_fusions_leaders(towns, history_list):
-    for history in history_list.filter_by_mod(RENAME_FUSION_LEADER):
-        for town in towns.filter(depcom=history.depcom):
-            # Create recent record based on the initial one.
-            recent_town = town._replace(nccenr=history.nccoff)
-            recent_town = recent_town._replace(start_date=history.effdate)
-            recent_town = recent_town._replace(start_datetime=history.eff)
-            recent_town = recent_town._replace(id=(
-                recent_town.depcom + SEPARATOR + history.effdate.isoformat()))
-            towns += recent_town  # New id == create.
-
-            # Update the initial old record (same id).
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            old_town = old_town._replace(successors=recent_town.id)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(nccenr=history.nccanc)
-            towns += old_town  # Same id == update.
-
-    return towns, history_list
+    old_town = current_town.generate(**{
+        'nccenr': record.nccanc,
+        'end_datetime': record.eff - DELTA,
+        'modification': record.mod
+    })
+    old_town = old_town.add_successor(new_town.id)
+    towns.update(old_town, new_town)
 
 
-def _do_fusions_followers(towns, history_list):
-    for history in history_list.filter_by_mod(FUSION_FOLLOWER):
-        for town in towns.filter(depcom=history.depcom):
-            # Recent record already created during leader's fusion.
+def creation(towns, record, keep_current=False):
+    current_town = towns.get_current(record.depcom, record.eff)
 
-            # However, we need to retrieve the successor previously updated.
-            successor = towns.get((
-                history.comech + SEPARATOR + history.effdate.isoformat()))
+    new_town = current_town.generate(**{
+        'id': current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        'start_datetime': record.eff,
+        'end_datetime': END_DATETIME,
+        # `nccenr` changes on fusions.
+        'nccenr': record.nccoff or current_town.nccenr,
+        'modification': record.mod,
+        'successors': '',
+    })
+    # It happens with `Pont-d'Ouilly` for instance.
+    if new_town.id not in towns:
+        towns.create(new_town, current_town)
 
-            # Update the initial old record (same id).
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            if successor is not None:  # TODO: see Towns model.
-                old_town = old_town._replace(successors=successor.id)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(nccenr=history.nccoff)
-            towns += old_town  # Same id == update.
+    # Do not delete the initial town if all creations are not performed.
+    if record.nbcom and record.nbcom != record.rangcom:
+        return
 
-    return towns, history_list
-
-
-def do_fusions(towns, history_list):
-    return _do_fusions_followers(*_do_fusions_leaders(towns, history_list))
-
-
-def _do_splits_leaders(towns, history_list):
-    for history in history_list.filter_by_mods(SPLIT_LEADER):
-        town = towns.latest(depcom=history.depcom)
-        # Create recent record based on the initial one.
-        recent_town = town._replace(nccenr=history.nccoff)
-        recent_town = recent_town._replace(start_date=history.effdate)
-        recent_town = recent_town._replace(start_datetime=history.eff)
-        recent_town = recent_town._replace(id=(
-            recent_town.depcom + SEPARATOR + history.effdate.isoformat()))
-        towns += recent_town  # New id == create.
-
-        # Update the initial old record (same id).
-        original_town = town._replace(end_date=history.effdate - DELTADAY)
-        original_town = original_town._replace(
-            end_datetime=history.eff - DELTA)
-        original_town = original_town._replace(successors=recent_town.id)
-        original_town = original_town._replace(modification=history.mod)
-        original_town = original_town._replace(nccenr=history.nccanc)
-        towns += original_town  # Same id == update.
-
-        # Update parents references accordingly.
-        for parent in towns.parents(town.id):
-            updated_parent = parent._replace(successors=original_town.id)
-            towns += updated_parent  # Same id == update.
-
-    return towns, history_list
+    if (new_town.id != current_town.id
+            and (new_town.nccenr == current_town.nccenr or not keep_current)):
+        towns.delete(current_town)
 
 
-def _do_splits_followers(towns, history_list):
-    for history in history_list.filter_by_mod(SPLIT_FOLLOWER):
-        for town in towns.filter(depcom=history.depcom):
-            leader = towns.latest(history.comech)
-            parents = towns.parents(leader.id)
-            if not parents:
-                print('TODO: {leader} does not have parents, rel. 340'.format(
-                      leader=leader))
-                continue
-            predecessor = parents[0]
+def reinstatement(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
 
-            # Create new record based on the initial one.
-            new_split = town._replace(id=(
-                town.depcom + SEPARATOR + history.effdate.isoformat()))
-            new_split = new_split._replace(start_date=history.effdate)
-            new_split = new_split._replace(start_datetime=history.eff)
-            new_split = new_split._replace(end_date=leader.end_date)
-            new_split = new_split._replace(end_datetime=leader.end_datetime)
-            new_split = new_split._replace(
-                nccenr=history.nccanc or history.nccoff)
-            new_split = new_split._replace(successors='')
-            towns += new_split  # New id == create.
+    id = current_town.depcom + SEPARATOR + record.effdate.isoformat()
+    # It happens with `Avanchers-Valmorel` for instance
+    # where a change name is performed at the same date.
+    if id in towns:
+        return
 
-            # Update the predecessor.
-            new_predecessor = predecessor._replace(
-                successors=predecessor.successors + ';' + new_split.id)
-            new_predecessor = new_predecessor._replace(
-                modification=(
-                    '{previous_modification};{new_modification}'
-                ).format(previous_modification=predecessor.modification,
-                         new_modification=history.mod))
-            towns += new_predecessor  # Same id == update.
+    new_town = current_town.generate(**{
+        'id': id,
+        'start_datetime': record.eff,
+        'end_datetime': END_DATETIME,
+        'nccenr': record.nccoff,
+        'successors': '',
+        'modification': 0
+    })
+    towns.create(new_town)#, current_town)
 
-    return towns, history_list
+    old_town = current_town.generate(**{
+        'nccenr': record.nccanc or record.nccoff,
+        'end_datetime': min(current_town.end_datetime, record.eff - DELTA),
+        'modification': record.mod
+    })
+    old_town = old_town.add_successor(new_town.id)
+    towns.update(old_town)
 
 
-def do_splits(towns, history_list):
-    return _do_splits_followers(*_do_splits_leaders(towns, history_list))
+def spliting(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+
+    current_town = current_town.generate(**{
+        'modification': record.mod
+    })
+    towns.update(current_town)
 
 
-def _do_fusions_to_new_leaders(towns, history_list):
-    for history in history_list.filter_by_mods(FUSION_TO_NEW_LEADER):
-        for town in towns.filter(depcom=history.depcom):
-            # Create recent record based on the initial one.
-            recent_town = town._replace(start_date=history.effdate)
-            recent_town = recent_town._replace(start_datetime=history.eff)
-            recent_town = recent_town._replace(id=(
-                town.depcom + SEPARATOR + history.effdate.isoformat()))
-            towns += recent_town  # New id == create.
+def deletion(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
 
-    return towns, history_list
+    end_datetime = record.eff - DELTA
 
+    # It happens with `Lamarche-en-Woëvre` for instance
+    # because the reinstatement is at the same date of the (re)fusion,
+    # so we set the end_date just after the start_date exceptionnally.
+    if current_town.start_datetime == record.eff:
+        end_datetime = record.eff + DELTA
 
-def _do_fusions_to_new_followers(towns, history_list):
-    for history in history_list.filter_by_mods(FUSION_TO_NEW_FOLLOWER):
-        for town in towns.filter(depcom=history.depcom):
-            # Recent record already created during leader's fusion.
-
-            # Skip existing new town.
-            if history.eff == town.start_datetime:
-                continue
-
-            # However, we need to retrieve the successor previously updated.
-            successor = towns.get((
-                history.comech + SEPARATOR + history.effdate.isoformat()))
-
-            # Update old record based on the initial one.
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            if successor is not None:  # TODO: see Towns model.
-                old_town = old_town._replace(successors=successor.id)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(nccenr=history.nccoff)
-            towns += old_town  # Same id == update.
-
-    return towns, history_list
+    old_town = current_town.generate(**{
+        'nccenr': record.nccoff,
+        'end_datetime': end_datetime,
+        'modification': record.mod
+    })
+    successor = towns.get_current(record.comech, record.eff)
+    old_town = old_town.add_successor(successor.id)
+    towns.update(old_town)
 
 
-def do_fusions_to_new(towns, history_list):
-    return _do_fusions_to_new_followers(
-        *_do_fusions_to_new_leaders(towns, history_list))
+def creation_not_delegated(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+
+    # Create new town only if it doesn't exist yet
+    # (same depcom, different name).
+    if record.depcom == record.comech and current_town.nccenr != record.nccoff:
+        new_town = current_town.generate(**{
+            'id': current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+            'start_datetime': record.eff,
+            'modification': CREATION_NOT_DELEGATED_POLE
+        })
+        old_town = new_town.add_successor(current_town.id)
+        towns.create(new_town, current_town)
+
+        old_town = current_town.generate(**{
+            'nccenr': record.nccoff,
+            'end_datetime': record.eff - DELTA,
+            'modification': record.mod
+        })
+        old_town = old_town.add_successor(new_town.id)
+        towns.update(old_town)
+    else:
+        successor = towns.get_current(record.comech, record.eff)
+        old_town = current_town.generate(**{
+            'end_datetime': record.eff - DELTA,
+            'modification': record.mod
+        })
+        old_town = old_town.add_successor(successor.id)
+        towns.update(old_town)
 
 
-def do_deletions(towns, history_list):
-    for history in history_list.filter_by_mod(DELETION):
-        for town in towns.filter(depcom=history.depcom):
-            # Skip deletion if we already recorded it.
-            if town.modification == DELETION:
-                continue
+def change_county(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+    # We set the `end_datetime` explicitely for the particular case
+    # of Blamécourt where the town as fusioned before changin county.
+    new_town = current_town.generate(**{
+        'id': current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        'start_datetime': record.eff,
+        'end_datetime': max(current_town.end_datetime, record.eff + DELTA),
+    })
+    towns.create(new_town)
+    towns.delete(current_town)
 
-            # Update old record based on the initial one.
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            old_town = old_town._replace(modification=history.mod)
-            towns += old_town  # Same id == update.
-
-    return towns, history_list
-
-
-def do_obsoletes(towns, history_list):
-    for history in history_list.filter_by_mod(OBSOLETE):
-        for town in towns.filter(depcom=history.depcom):
-            successor = towns.filter(depcom=history.comech)[0]
-
-            # Update old record based on the initial one.
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(successors=successor.id)
-            towns += old_town  # Same id == update.
-
-    return towns, history_list
-
-
-def do_change_county(towns, history_list):
-    for history in history_list.filter_by_mod(CHANGE_COUNTY):
-        for town in towns.filter(depcom=history.depcom):
-
-            # Create the recent record.
-            recent_town = town._replace(start_date=history.effdate)
-            recent_town = recent_town._replace(start_datetime=history.eff)
-            recent_town = recent_town._replace(id=(
-                town.depcom + SEPARATOR + history.effdate.isoformat()))
-            towns += recent_town  # New id == create.
-
-            # Delete the old one with an incorrect id.
-            towns.remove(town)
-
-            # Update the ancient record.
-            town = towns.filter(depcom=history.depanc)[0]
-            ancient_town = town._replace(end_date=history.effdate - DELTADAY)
-            ancient_town = ancient_town._replace(
-                end_datetime=history.eff - DELTA)
-            ancient_town = ancient_town._replace(modification=history.mod)
-            ancient_town = ancient_town._replace(successors=recent_town.id)
-            towns += ancient_town  # Same id == update.
-
-    return towns, history_list
+    current_town = towns.get_current(record.depanc, record.eff)
+    if current_town.valid_at(record.eff):
+        old_town = current_town.generate(**{
+            'end_datetime': record.eff - DELTA,
+            'modification': record.mod
+        })
+        old_town = old_town.add_successor(new_town.id)
+        towns.update(old_town)
+    else:
+        # This particular case happens when there are multiple county
+        # changes, for instance with Châteaufort.
+        old_town = current_town.generate(**{
+            'id': current_town.depcom + SEPARATOR + START_DATE.isoformat(),
+            'start_datetime': START_DATETIME,
+            'end_datetime': record.eff - DELTA,
+            'modification': record.mod
+        })
+        old_town = old_town.add_successor(new_town.id)
+        towns.create(old_town)
 
 
-def _do_absorptions_leaders(towns, history_list):
-    for history in history_list.filter_by_mod(ABSORPTION_LEADER):
-        for town in towns.filter(depcom=history.depcom):
-            # Update the leader with the modification type only.
-            recent_town = town._replace(modification=history.mod)
-            towns += recent_town  # Same id == update.
+def obsolete(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
 
-    return towns, history_list
-
-
-def _do_absorptions_followers(towns, history_list):
-    for history in history_list.filter_by_mod(ABSORPTION_FOLLOWER):
-        for town in towns.filter(depcom=history.depcom):
-            # We need to retrieve the leader previously updated.
-            successor = towns.filter(history.comech)[0]
-
-            # Update old record based on the initial one.
-            old_town = town._replace(end_date=history.effdate - DELTADAY)
-            old_town = old_town._replace(end_datetime=history.eff - DELTA)
-            old_town = old_town._replace(successors=successor.id)
-            old_town = old_town._replace(modification=history.mod)
-            old_town = old_town._replace(nccenr=history.nccoff)
-            towns += old_town  # Same id == update.
-
-    return towns, history_list
+    old_town = current_town.generate(**{
+        'end_datetime': record.eff - DELTA,
+        'modification': record.mod
+    })
+    towns.update(old_town)
 
 
-def do_absorptions(towns, history_list):
-    return _do_absorptions_followers(
-        *_do_absorptions_leaders(towns, history_list))
+actions = {
+    CHANGE_NAME: change_name,
+    CHANGE_NAME_FUSION: change_name,
+    CHANGE_NAME_CREATION: creation,
+    CHANGE_NAME_REINSTATEMENT: reinstatement,
+    CREATION: creation,
+    REINSTATEMENT: reinstatement,
+    SPLITING: spliting,
+    DELETION_PARTITION: deletion,
+    DELETION_FUSION: deletion,
+    CREATION_NOT_DELEGATED: creation_not_delegated,
+    FUSION_ASSOCIATION_ASSOCIATED: deletion,
+    CREATION_DELEGATED: deletion,
+    CREATION_DELEGATED_POLE: partial(creation, keep_current=True),
+    CHANGE_COUNTY: change_county,
+    OBSOLETE: obsolete,
+}
 
 
-def do_all_actions(towns, history_list):
-    """
-    One method to rule them all.
-
-    WARNING: order matters at least for county changes which must be
-    executed at first to avoid messing up with ids.
-    """
-    towns, history_list = do_change_county(towns, history_list)
-    towns, history_list = do_renames(towns, history_list)
-    towns, history_list = do_fusions(towns, history_list)
-    towns, history_list = do_splits(towns, history_list)
-    towns, history_list = do_fusions_to_new(towns, history_list)
-    towns, history_list = do_absorptions(towns, history_list)
-    towns, history_list = do_deletions(towns, history_list)
-    towns, history_list = do_obsoletes(towns, history_list)
-    return towns, history_list
+def compute(towns, history):
+    for record in history:
+        try:
+            actions.get(record.mod, lambda a, b: a)(towns, record)
+        except Exception as e:
+            print(record)
+            raise e

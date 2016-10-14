@@ -7,14 +7,15 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 
 ## Columns
 
-* `ID`: This is the hopefully unique combination of `INSEE_CODE` + `@` `START_DATE`.
-* `INSEE_CODE`: The INSEE code for the given town.
-* `NAME`: The name of the town, including the article (`Le `, `La `, `L'` etc).
-* `START_DATETIME`: The effective start date + time for the given `NAME` + `INSEE_CODE`.
-* `END_DATETIME`: The effective end date + time for the given `NAME` + `INSEE_CODE`.
-* `SUCCESSORS`: List of IDs separated by semicolons which are successors of the current `ID`. Default is an empty string.
-* `ANCESTORS`: List of IDs separated by semicolons which are ancestors of the current `ID`. Default is an empty string.
-* `POPULATION`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
+* `id`: This is the hopefully unique combination of `insee_code` + `@` `start_date`.
+* `insee_code`: The INSEE code for the given town.
+* `name`: The name of the town, including the article (`Le `, `La `, `L'` etc).
+* `start_datetime`: The effective start date + time for the given `name` + `insee_code`.
+* `end_datetime`: The effective end date + time for the given `name` + `insee_code`.
+* `successors`: List of IDs separated by semicolons which are successors of the current `id`. Default is an empty string.
+* `ancestors`: List of IDs separated by semicolons which are ancestors of the current `id`. Default is an empty string.
+* `population`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
+* `insee_modification`: Indicate the [INSEE modification](http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp?page=telechargement/2016/doc/doc_variables.htm#mod) performed on the town.
 
 Regarding dates, the initial date + time has been set as `1942-01-01 00:00:00` given that the first date in historical data is `1942-08-01`. Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
 
@@ -57,4 +58,3 @@ As of `2016-01-01`, towns of `Arbignieu` and `Saint-Bois` has been merged to `Ar
 ```
 
 As of `1976-01-01`, town of `Afa` has moved from `20001` to `2A001` (actually the code name for the county has changed but you get the point).
-

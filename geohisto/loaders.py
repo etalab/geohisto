@@ -1,9 +1,10 @@
 import csv
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME, SEPARATOR
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  FIRST_LINE_DATE,
+    SEPARATOR
 )
-from .models import Towns, Town, HistoryList, History
+from .models import Towns, Town, Record
 from .utils import convert_date, convert_datetime, convert_name_with_article
 
 
@@ -12,48 +13,6 @@ def load_towns(filename='sources/france2016.txt'):
     Load all towns from `filename` into an OrderedDict of `Town`s namedtuples.
 
     Warning: default file contains outdated towns but NOT renamed ones.
-
-    Example:
-
-        {
-            'ARTMAJ': "(L')",
-            'CT': '08',
-            'TNCC': '5',
-            'MODIF': '0',
-            'NCC': 'ABERGEMENT-CLEMENCIAT',
-            'REG': '84',
-            'COM': '001',
-            'CHEFLIEU': '0',
-            'RANG': '',
-            'ARTICLCT': '',
-            'POLE': '',
-            'DEP': '01',
-            'CDC': '0',
-            'NCCCT': 'Châtillon-sur-Chalaronne',
-            'NCCENR': 'Abergement-Clémenciat',
-            'ARTMIN': "(L')",
-            'ACTUAL': '1',
-            'AR': '2'
-        }
-
-        becomes:
-
-        Town(
-            id='01001@1942-01-01',
-            actual=1,
-            modification=0,
-            ancestors='',
-            successors='',
-            start_date=datetime.date(1942, 1, 1),
-            end_date=datetime.date(9999, 12, 31),
-            start_datetime=datetime.datetime(1942, 1, 1, 0, 0, 0),
-            end_datetime=datetime.datetime(9999, 12, 31, 23, 59, 59),
-            depcom='01001',
-            dep='01',
-            com='001',
-            nccenr="L'Abergement-Clémenciat",
-            population=NULL
-        )
     """
     towns = Towns()
     with open(filename, encoding='cp1252') as file:
@@ -78,73 +37,32 @@ def load_towns(filename='sources/france2016.txt'):
                 'nccenr': convert_name_with_article(line),
                 'population': 'NULL'
             })
-            towns += town
+            towns[town.id] = town
     return towns
 
 
 def load_history(filename='sources/historiq2016.txt'):
-    """
-    Load all towns from `filename` into a list of `History`s namedtuples.
-
-    Example:
-
-        {
-            'DTR': '01-01-2011',
-            'JO': '',
-            'NCCOFF': 'Plaisance',
-            'DEPANC': '',
-            'NCCANC': '',
-            'DEP': '24',
-            'C-LANC': '',
-            'SUECH': '',
-            'COM': '168',
-            'CT': '19',
-            'EFF': '01-01-2011',
-            'NBCOM': '',
-            'POPECH': '',
-            'MOD': '360',
-            'AR': '1',
-            'RANGCOM': '',
-            'CTANC': '',
-            'ARRANC': '',
-            'TNCCOFF': '0',
-            'TNCCANC': '',
-            'LEG': 'A24-02-2010',
-            'C-LOFF': '',
-            'COMECH': '24173'
-        }
-
-        becomes:
-
-        History(
-            depcom='24168',
-            mod=360,
-            eff=datetime.date(2011, 1, 1),
-            nccoff='Plaisance',
-            nccanc='',
-            comech='24173',
-            dep='24',
-            com='168',
-            depanc=''
-        )
-    """
-    history_list = HistoryList()
+    """Load all towns from `filename` into a list of `Record`s."""
+    history = []
     with open(filename, encoding='cp1252') as file:
         for line in csv.DictReader(file, delimiter='\t'):
-            history = History(**{
+            effdate = convert_date(line['EFF'])
+            record = Record(**{
                 'depcom': line['DEP'] + line['COM'],
                 'mod': int(line['MOD']),
                 'eff': convert_datetime(line['EFF']),
-                'effdate': convert_date(line['EFF']),
+                'effdate': effdate,
                 'nccoff': line['NCCOFF'],
                 'nccanc': line['NCCANC'],
                 'comech': line['COMECH'],
                 'dep': line['DEP'],
                 'com': line['COM'],
-                'depanc': line['DEPANC']
+                'depanc': line['DEPANC'],
+                'nbcom': line['NBCOM'],
+                'rangcom': line['RANGCOM'],
             })
-            history_list += history
-    return history_list
+            history.append(record)
+    return history
 
 
 def load_population_from(filename):

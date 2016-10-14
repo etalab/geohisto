@@ -14,27 +14,26 @@ def write_results_on(filename, towns):
     """
     with open(filename, 'w') as csvfile:
         fieldnames = [
-            'ID', 'INSEE_CODE', 'NAME',
-            'START_DATETIME', 'END_DATETIME',
-            'SUCCESSORS', 'ANCESTORS',
-            'POPULATION', 'COMMENT'
+            'id', 'insee_code', 'name',
+            'start_datetime', 'end_datetime',
+            'successors', 'ancestors',
+            'population', 'insee_modification'
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
         writer.writeheader()
         write = writer.writerow
 
-        for id, town in towns:
-            # Main entry.
+        for id, town in towns.items():
             write({
-                'ID': town.id,
-                'INSEE_CODE': town.depcom,
-                'NAME': town.nccenr,
-                'START_DATETIME': town.start_datetime,
-                'END_DATETIME': town.end_datetime,
-                'SUCCESSORS': town.successors,
-                'ANCESTORS': town.ancestors,
-                'POPULATION': town.population,
-                'COMMENT': town.modification
+                'id': town.id,
+                'insee_code': town.depcom,
+                'name': town.nccenr,
+                'start_datetime': town.start_datetime,
+                'end_datetime': town.end_datetime,
+                'successors': town.successors,
+                'ancestors': town.ancestors,
+                'population': town.population,
+                'insee_modification': town.modification
             })
 
 

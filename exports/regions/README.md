@@ -9,18 +9,18 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 
 ## Columns
 
-* `DIRECTION`: Either `--`, `<-` or `->` if the region is unchanged, has been renamed or merged respectively.
-* `INSEE_CODE`: The 2-digits code delivered by INSEE.
-* `NAME`: The new name of the region.
-* `START_DATE`: The start date of existence, in our case either `1970-01-09` or `2016-01-01`.
-* `END_DATE`: The end date of existence, in our case always `2016-01-01` or `2020-01-01`.
-* `POPULATION`: The population as of 2013.
-* `SURFACE`: The area in km2.
-* `CHEF_LIEU`: The Chef-lieu for that new region.
-* `NUTS_CODE`: The 4-chars code delivered by Eurostat.
-* `WIKIPEDIA`: The wikipedia page for that new region (note that given how recent the change is, some links still redirect to temporary region names).
+* `direction`: Either `--`, `<-` or `->` if the region is unchanged, has been renamed or merged respectively.
+* `insee_code`: The 2-digits code delivered by INSEE.
+* `name`: The new name of the region.
+* `start_date`: The start date of existence, in our case either `1970-01-09` or `2016-01-01`.
+* `end_date`: The end date of existence, in our case always `2016-01-01` or `2020-01-01`.
+* `population`: The population as of 2013.
+* `surface`: The area in km2.
+* `chef_lieu`: The Chef-lieu for that new region.
+* `nuts_code`: The 4-chars code delivered by Eurostat.
+* `wikipedia`: The wikipedia page for that new region (note that given how recent the change is, some links still redirect to temporary region names).
 
-Given that regions have been merged, there is one line by current region and one line by ancestor. The `INSEE_CODE` column is unique, the `NUTS_CODE` one is NOT.
+Given that regions have been merged, there is one line by current region and one line by ancestor. The `insee_code` column is unique, the `nuts_code` one is NOT.
 
 ## Format
 
