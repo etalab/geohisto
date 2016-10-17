@@ -1,11 +1,8 @@
 """Tests related to counting towns in results."""
 from datetime import datetime
 
-from geohisto.actions import compute
-from geohisto.loaders import load_towns
 
-
-def test_counts(history_list):
+def test_counts(towns):
     """
     Test counting towns for a give date.
 
@@ -13,9 +10,6 @@ def test_counts(history_list):
     https://fr.wikipedia.org/wiki/Nombre_de_communes_en_France↩
     #.C3.89volution_du_nombre_de_communes
     """
-    towns = load_towns()
-    compute(towns, history_list)
-
     # If you edit these count results, be sure that it reduces the
     # difference with Wikipedia's numbers (see comments).
     assert len(towns.valid_at(datetime(1962, 3, 7, 1, 0, 0))) == 38130  # 38076

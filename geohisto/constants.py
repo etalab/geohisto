@@ -11,7 +11,6 @@ START_DATETIME = datetime.combine(START_DATE, datetime.min.time())
 END_DATE = date(9999, 12, 31)
 END_DATETIME = datetime.combine(END_DATE, datetime.max.time())
 DELTA = timedelta.resolution
-FIRST_LINE_DATE = date(2011, 1, 1)  # First line in historiq2016 file.
 
 # Modification keys from INSEE/COG:
 # http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +

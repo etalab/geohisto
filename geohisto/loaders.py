@@ -1,8 +1,7 @@
 import csv
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  FIRST_LINE_DATE,
-    SEPARATOR
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  SEPARATOR
 )
 from .models import Towns, Town, Record
 from .utils import convert_date, convert_datetime, convert_name_with_article

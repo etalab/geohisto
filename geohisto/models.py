@@ -5,57 +5,57 @@ from .constants import DELTA
 
 class Towns(OrderedDict):
 
-    def create(self, town, from_town=None):
-        if town.id in self:
-            msg = (
-                'Attempt to create an existing Town!\n'
-                'New: {new_town}\nActual: {actual_town}').format(
-                new_town=town, actual_town=self[town.id])
-            raise Exception(msg)
-        # Update successors references.
-        if from_town:
-            self.replace_successor(from_town, town)
+    def upsert(self, town):
+        """Update or insert a Town, return True in case of insertion."""
+        is_created = town.id not in self
         self[town.id] = town
+        return is_created
 
     def retrieve(self, id):
+        """Get a Town by `id`."""
         return self[id]
 
-    def update(self, town, to_town=None):
-        if town.id not in self:
-            msg = 'Attempt to update an unknown Town {town}'.format(town=town)
-            raise Exception(msg)
-        # Update successors references.
-        if to_town and to_town.valid_at(town.end_datetime + DELTA):
-            self.replace_successor(town, to_town, town.end_datetime)
-        self[town.id] = town
-
     def delete(self, town):
-        # Remove outdated references.
+        """Remove a given `town` and deletes references too."""
+        # Remove outdated references prior to delete.
+        # TODO: check if an update of successors is more appropriated.
         self.replace_successor(town, '')
         del self[town.id]
 
+    def update_successors(self, town, from_town=None, to_town=None):
+        """Update references in case of a Town rename or creation."""
+        if to_town and to_town.valid_at(town.end_datetime + DELTA):
+            self.replace_successor(town, to_town, town.end_datetime)
+        elif from_town:
+            self.replace_successor(from_town, town)
+
     def replace_successor(self, old_successor, new_successor=False,
                           valid_datetime=None):
+        """Run across all Towns and update successors."""
         if valid_datetime is None:
             is_date_valid = True
         for _, _town in self.items():
             if valid_datetime:
-                is_date_valid = (_town.valid_at(valid_datetime)
-                                 and not _town.valid_at(valid_datetime + DELTA))
+                is_date_valid = (
+                    _town.valid_at(valid_datetime)
+                    and not _town.valid_at(valid_datetime + DELTA))
             if old_successor.id in _town.successors and is_date_valid:
                 _town = _town.replace_successor(
                     old_successor.id, new_successor and new_successor.id or '')
-                self.update(_town)
+                self.upsert(_town)
 
     def parents(self, id):
+        """Return a list of parents for a given `id`."""
         return [town for town in self.values() if id in town.successors]
 
     def filter(self, depcom):
+        """Return a (sorted) list of Town with the given `depcom`."""
         _towns = [town for town in self.values() if town.depcom == depcom]
         _towns.sort()  # Useful for tests.
         return _towns
 
     def with_successors(self):
+        """Return a list of Towns having successors."""
         return [town for town in self.values() if town.successors]
 
     def latest(self, depcom):
@@ -65,6 +65,7 @@ class Towns(OrderedDict):
         return _towns[0]
 
     def valid_at(self, valid_datetime, depcom=None):
+        """Return a list of Towns existing at the given `valid_datetime`."""
         # Beware, ternary operator is tricky here, keep it explicit.
         if depcom:
             _towns = self.filter(depcom)
@@ -73,6 +74,7 @@ class Towns(OrderedDict):
         return [town for town in _towns if town.valid_at(valid_datetime)]
 
     def get_current(self, depcom, valid_datetime):
+        """Try to return the more pertinent Town given a depcom and date."""
         try:
             return self.valid_at(valid_datetime, depcom=depcom)[0]
         except IndexError:
@@ -91,6 +93,7 @@ class Town(namedtuple('Town', [
     # value on the fly, it doubles the time to filter on it later.
 
     def __repr__(self):
+        """Override the default method to be less verbose."""
         return ('<Town ({town.id}): {town.nccenr} '
                 'from {town.start_date} to {town.end_date}>').format(town=self)
 
@@ -98,7 +101,7 @@ class Town(namedtuple('Town', [
         """
         Replace the default private method with a public one.
 
-        Additionnaly, use a more explicit name given it create a new town.
+        Additionnaly, use a more explicit name given it generates a new town.
         """
         start_datetime = self.start_datetime
         end_datetime = self.end_datetime
@@ -127,6 +130,7 @@ class Town(namedtuple('Town', [
         return self._replace(**{'modification': modification})
 
     def set_population(self, population):
+        """Update the population."""
         return self._replace(**{'population': population})
 
     def add_ancestor(self, ancestor):
@@ -147,9 +151,11 @@ class Town(namedtuple('Town', [
         return self._replace(**{'successors': successors.strip(';')})
 
     def clear_successors(self):
+        """Remove all successors."""
         return self._replace(**{'successors': ''})
 
     def valid_at(self, valid_datetime):
+        """Check the existence of the Town at a given `valid_datetime`."""
         if valid_datetime is None:
             return False
         return self.start_datetime <= valid_datetime <= self.end_datetime
