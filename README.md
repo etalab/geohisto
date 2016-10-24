@@ -23,6 +23,8 @@ The project doesn’t require any dependency, you have to run it with Python 3:
 
     $ python3 -m geohisto
 
+Note that it takes about 4 minutes to generate the towns export.
+
 
 ## Tests
 
@@ -30,11 +32,12 @@ If you plan to contribute, you have to install [pytest](http://doc.pytest.org/en
 
     $ python -m pytest tests
 
-You can also run a particular test:
+Note that the duration of the whole test suite run is about 5 minutes.
+
+That's why you would probably prefer to run a particular test:
 
     $ python -m pytest tests/test_actions.py::test_change_name
 
-Note that the duration of the whole test suite run is about 5 minutes.
 
 
 ## TODO

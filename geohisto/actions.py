@@ -64,9 +64,9 @@ def creation(towns, record):
     has_new_id = new_town.id != current_town.id
     if has_new_id:
         towns.delete(current_town)
+        towns.update_successors(current_town, to_town=new_town)
 
 
-# TODO: add a test dedicated to that case (see False for deletion)
 @in_case_of(CREATION_DELEGATED_POLE)
 def creation_delegated(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
@@ -84,17 +84,22 @@ def creation_delegated(towns, record):
     is_already_registered = new_town.id in towns
     if not is_already_registered:
         towns.upsert(new_town)
-        towns.update_successors(new_town, from_town=current_town)
+    towns.update_successors(new_town, from_town=current_town)
+
+    # Update ancestors, useful for town that were created since then.
+    for ancestor in towns.valid_at(current_town.start_datetime-DELTA,
+                                   depcom=record.depcom):
+        towns.update_successors(ancestor, to_town=new_town)
 
     # Do not delete the initial town if all creations are not performed.
-    has_another_record = record.nbcom and record.nbcom != record.rangcom
-    if has_another_record:
+    if not record.last:
         return
 
     has_different_ids = new_town.id != current_town.id
     has_the_same_name = new_town.nccenr == current_town.nccenr
     if has_different_ids and has_the_same_name:
         towns.delete(current_town)
+    towns.update_successors(current_town, to_town=new_town)
 
 
 @in_case_of(CHANGE_NAME_REINSTATEMENT, REINSTATEMENT)
@@ -208,27 +213,46 @@ def change_county(towns, record):
     )
     towns.upsert(new_town)
     towns.delete(current_town)
+    towns.update_successors(current_town, to_town=new_town)
 
-    current_town = towns.get_current(record.depanc, record.eff)
-    current_town_is_valid = current_town.valid_at(record.eff)
-    if current_town_is_valid:
-        old_town = current_town.generate(
+    ancient_town = towns.get_current(record.depanc, record.eff)
+    ancient_town_is_valid = ancient_town.valid_at(record.eff)
+    if ancient_town_is_valid:
+        id = (ancient_town.depcom + SEPARATOR
+              + current_town.start_date.isoformat())
+        is_new_entry = id not in towns
+        old_town = ancient_town.generate(
+            id=id,
+            start_datetime=current_town.start_datetime,
             end_datetime=record.eff - DELTA,
             modification=record.mod
         )
-        old_town = old_town.add_successor(new_town.id)
-        towns.upsert(old_town)
+        towns.update_successors(old_town, from_town=current_town)
+        towns.delete(ancient_town)
+        towns.update_successors(ancient_town, to_town=old_town)
+        if is_new_entry:
+            # In that particular case we would like to update the initial
+            # entry that has been created with the wrong county code.
+            initial_town = towns.get_current(record.depcom, START_DATETIME)
+            initial_updated_town = initial_town.generate(
+                id=record.depanc + SEPARATOR + START_DATE.isoformat(),
+                dep=record.depanc[:2],
+                com=record.depanc[2:],
+                depcom=record.depanc
+            )
+            towns.upsert(initial_updated_town)
+            towns.delete(initial_town)
     else:
         # This particular case happens when there are multiple county
         # changes, for instance with Châteaufort.
-        old_town = current_town.generate(
-            id=current_town.depcom + SEPARATOR + START_DATE.isoformat(),
+        old_town = ancient_town.generate(
+            id=ancient_town.depcom + SEPARATOR + START_DATE.isoformat(),
             start_datetime=START_DATETIME,
             end_datetime=record.eff - DELTA,
             modification=record.mod
         )
-        old_town = old_town.add_successor(new_town.id)
-        towns.upsert(old_town)
+    old_town = old_town.add_successor(new_town.id)
+    towns.upsert(old_town)
 
 
 @in_case_of(OBSOLETE)

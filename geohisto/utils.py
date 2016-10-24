@@ -57,5 +57,8 @@ def compute_ancestors(towns):
     for town in towns.with_successors():
         for successor_id in town.successors.split(';'):
             successor = towns.retrieve(successor_id)
-            successor = successor.add_ancestor(town.id)
-            towns.upsert(successor)
+            if successor:
+                successor = successor.add_ancestor(town.id)
+                towns.upsert(successor)
+            else:
+                print('Successor not found for', town)

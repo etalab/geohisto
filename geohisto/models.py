@@ -13,18 +13,22 @@ class Towns(OrderedDict):
 
     def retrieve(self, id):
         """Get a Town by `id`."""
-        return self[id]
+        try:
+            return self[id]
+        except KeyError:
+            print('Id not found:', id)
 
     def delete(self, town):
-        """Remove a given `town` and deletes references too."""
-        # Remove outdated references prior to delete.
-        # TODO: check if an update of successors is more appropriated.
-        self.replace_successor(town, '')
+        """Remove a given `town`, do not forget to update references."""
         del self[town.id]
 
     def update_successors(self, town, from_town=None, to_town=None):
         """Update references in case of a Town rename or creation."""
-        if to_town and to_town.valid_at(town.end_datetime + DELTA):
+        try:
+            valid_datetime = town.end_datetime + DELTA
+        except OverflowError:  # Happens on END_DATETIME + DELTA
+            valid_datetime = town.end_datetime
+        if to_town and to_town.valid_at(valid_datetime):
             self.replace_successor(town, to_town, town.end_datetime)
         elif from_town:
             self.replace_successor(from_town, town)
@@ -34,11 +38,14 @@ class Towns(OrderedDict):
         """Run across all Towns and update successors."""
         if valid_datetime is None:
             is_date_valid = True
-        for _, _town in self.items():
+        for _town in self.with_successors():
             if valid_datetime:
-                is_date_valid = (
-                    _town.valid_at(valid_datetime)
-                    and not _town.valid_at(valid_datetime + DELTA))
+                try:
+                    is_date_valid = (
+                        _town.valid_at(valid_datetime)
+                        and not _town.valid_at(valid_datetime + DELTA))
+                except OverflowError:  # Happens on END_DATETIME + DELTA
+                    is_date_valid = True
             if old_successor.id in _town.successors and is_date_valid:
                 _town = _town.replace_successor(
                     old_successor.id, new_successor and new_successor.id or '')
@@ -95,7 +102,8 @@ class Town(namedtuple('Town', [
     def __repr__(self):
         """Override the default method to be less verbose."""
         return ('<Town ({town.id}): {town.nccenr} '
-                'from {town.start_date} to {town.end_date}>').format(town=self)
+                'from {town.start_date} to {town.end_date} '
+                'with successors {town.successors}>').format(town=self)
 
     def generate(self, **kwargs):
         """
@@ -163,5 +171,5 @@ class Town(namedtuple('Town', [
 
 Record = namedtuple('Record', [
     'depcom', 'mod', 'eff', 'nccoff', 'nccanc', 'comech', 'dep', 'com',
-    'depanc', 'nbcom', 'rangcom', 'effdate'
+    'depanc', 'last', 'effdate'
 ])

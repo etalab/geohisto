@@ -11,29 +11,29 @@ def test_counts(towns):
     #.C3.89volution_du_nombre_de_communes
     """
     # If you edit these count results, be sure that it reduces the
-    # difference with Wikipedia's numbers (see comments).
-    assert len(towns.valid_at(datetime(1962, 3, 7, 1, 0, 0))) == 38130  # 38076
-    assert len(towns.valid_at(datetime(1968, 3, 1, 1, 0, 0))) == 37876  # 37823
-    assert len(towns.valid_at(datetime(1975, 1, 1, 1, 0, 0))) == 36554  # 36407
-    assert len(towns.valid_at(datetime(1982, 1, 1, 1, 0, 0))) == 36596  # 36547
-    assert len(towns.valid_at(datetime(1985, 3, 1, 1, 0, 0))) == 36662  # 36614
-    assert len(towns.valid_at(datetime(1990, 3, 1, 1, 0, 0))) == 36712  # 36664
-    assert len(towns.valid_at(datetime(1994, 1, 1, 1, 0, 0))) == 36721  # 36673
-    assert len(towns.valid_at(datetime(1999, 1, 1, 1, 0, 0))) == 36727  # 36679
-    assert len(towns.valid_at(datetime(2000, 1, 1, 1, 0, 0))) == 36729  # 36680
-    assert len(towns.valid_at(datetime(2001, 1, 1, 1, 0, 0))) == 36726  # 36677
-    assert len(towns.valid_at(datetime(2002, 1, 1, 1, 0, 0))) == 36728  # 36679
-    assert len(towns.valid_at(datetime(2003, 1, 1, 1, 0, 0))) == 36727  # 36678
-    assert len(towns.valid_at(datetime(2004, 1, 1, 1, 0, 0))) == 36731  # 36682
-    assert len(towns.valid_at(datetime(2005, 1, 1, 1, 0, 0))) == 36733  # 36684
-    assert len(towns.valid_at(datetime(2006, 1, 1, 1, 0, 0))) == 36734  # 36685
-    assert len(towns.valid_at(datetime(2007, 1, 1, 1, 0, 0))) == 36732  # 36683
-    assert len(towns.valid_at(datetime(2008, 1, 1, 1, 0, 0))) == 36731  # 36681
-    assert len(towns.valid_at(datetime(2009, 1, 1, 1, 0, 0))) == 36732  # 36682
-    assert len(towns.valid_at(datetime(2010, 1, 1, 1, 0, 0))) == 36732  # 36682
-    assert len(towns.valid_at(datetime(2011, 1, 1, 1, 0, 0))) == 36730  # 36680
-    assert len(towns.valid_at(datetime(2012, 1, 1, 1, 0, 0))) == 36733  # 36700
-    assert len(towns.valid_at(datetime(2013, 1, 1, 1, 0, 0))) == 36714  # 36681
-    assert len(towns.valid_at(datetime(2014, 1, 1, 1, 0, 0))) == 36715  # 36681
-    assert len(towns.valid_at(datetime(2015, 1, 1, 1, 0, 0))) == 36691  # 36658
-    assert len(towns.valid_at(datetime(2016, 1, 1, 1, 0, 0))) == 35923  # 35885
+    # difference with Wikipedia's numbers that we make the diff from.
+    assert len(towns.valid_at(datetime(1962, 3, 7, 0, 0, 0))) - 38076 == 58
+    assert len(towns.valid_at(datetime(1968, 3, 1, 0, 0, 0))) - 37823 == 59
+    assert len(towns.valid_at(datetime(1975, 1, 1, 0, 0, 0))) - 36407 == 156
+    assert len(towns.valid_at(datetime(1982, 1, 1, 0, 0, 0))) - 36547 == 58
+    assert len(towns.valid_at(datetime(1985, 3, 1, 0, 0, 0))) - 36614 == 57
+    assert len(towns.valid_at(datetime(1990, 3, 1, 0, 0, 0))) - 36664 == 57
+    assert len(towns.valid_at(datetime(1994, 1, 1, 0, 0, 0))) - 36673 == 57
+    assert len(towns.valid_at(datetime(1999, 1, 1, 0, 0, 0))) - 36679 == 57
+    assert len(towns.valid_at(datetime(2000, 1, 1, 0, 0, 0))) - 36680 == 58
+    assert len(towns.valid_at(datetime(2001, 1, 1, 0, 0, 0))) - 36677 == 58
+    assert len(towns.valid_at(datetime(2002, 1, 1, 0, 0, 0))) - 36679 == 58
+    assert len(towns.valid_at(datetime(2003, 1, 1, 0, 0, 0))) - 36678 == 58
+    assert len(towns.valid_at(datetime(2004, 1, 1, 0, 0, 0))) - 36682 == 58
+    assert len(towns.valid_at(datetime(2005, 1, 1, 0, 0, 0))) - 36684 == 58
+    assert len(towns.valid_at(datetime(2006, 1, 1, 0, 0, 0))) - 36685 == 58
+    assert len(towns.valid_at(datetime(2007, 1, 1, 0, 0, 0))) - 36683 == 58
+    assert len(towns.valid_at(datetime(2008, 1, 1, 0, 0, 0))) - 36681 == 59
+    assert len(towns.valid_at(datetime(2009, 1, 1, 0, 0, 0))) - 36682 == 59
+    assert len(towns.valid_at(datetime(2010, 1, 1, 0, 0, 0))) - 36682 == 59
+    assert len(towns.valid_at(datetime(2011, 1, 1, 0, 0, 0))) - 36680 == 59
+    assert len(towns.valid_at(datetime(2012, 1, 1, 0, 0, 0))) - 36700 == 43
+    assert len(towns.valid_at(datetime(2013, 1, 1, 0, 0, 0))) - 36681 == 43
+    assert len(towns.valid_at(datetime(2014, 1, 1, 0, 0, 0))) - 36681 == 42
+    assert len(towns.valid_at(datetime(2015, 1, 1, 0, 0, 0))) - 36658 == 42
+    assert len(towns.valid_at(datetime(2016, 1, 1, 0, 0, 0))) - 35885 == 48

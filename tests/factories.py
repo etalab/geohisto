@@ -50,8 +50,7 @@ def record_factory(**custom):
         'comech': '',
         'depanc': '',
         'nccanc': '',
-        'nbcom': '',
-        'rangcom': '',
+        'last': None,
     }
     params['depcom'] = custom['dep'] + custom['com']
     params.update(custom)
