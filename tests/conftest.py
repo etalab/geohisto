@@ -11,8 +11,8 @@ def history_list():
     return load_history()
 
 
-@pytest.fixture(scope='module')
-def result():
+@pytest.fixture(scope='session')
+def towns():
     towns = load_towns()
     history_list = load_history()
     populations = load_populations()

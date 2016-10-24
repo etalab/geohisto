@@ -6,6 +6,23 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
 ?page=telechargement/2016/doc/doc_variables.htm
 """
 from datetime import date, datetime
+from functools import wraps
+
+ACTIONS = {}
+
+
+def in_case_of(*actions):
+    """Decorator to register links between actions and codes."""
+    def inner(func):
+        for action in actions:
+            ACTIONS[action] = func
+
+        @wraps(func)
+        def inner_func(towns, record):
+            func(towns, record)
+        return inner_func
+    return inner
+
 
 def convert_date(string):
     """Convert '01-01-2016' to a Python `datetime.date` object."""
@@ -40,5 +57,8 @@ def compute_ancestors(towns):
     for town in towns.with_successors():
         for successor_id in town.successors.split(';'):
             successor = towns.retrieve(successor_id)
-            successor = successor.add_ancestor(town.id)
-            towns.update(successor)
+            if successor:
+                successor = successor.add_ancestor(town.id)
+                towns.upsert(successor)
+            else:
+                print('Successor not found for', town)

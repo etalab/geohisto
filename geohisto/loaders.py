@@ -1,8 +1,9 @@
 import csv
+from collections import defaultdict
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  FIRST_LINE_DATE,
-    SEPARATOR
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  SEPARATOR,
+    CREATION_DELEGATED_POLE
 )
 from .models import Towns, Town, Record
 from .utils import convert_date, convert_datetime, convert_name_with_article
@@ -20,23 +21,23 @@ def load_towns(filename='sources/france2016.txt'):
             actual = int(line['ACTUAL'])
             if actual == 9:  # Cantonal fraction.
                 continue  # Skip for the moment.
-            town = Town(**{
-                'id': (line['DEP'] + line['COM'] + SEPARATOR
-                       + START_DATE.isoformat()),
-                'depcom': line['DEP'] + line['COM'],
-                'actual': actual,
-                'modification': 0,
-                'ancestors': '',
-                'successors': '',
-                'start_date': START_DATE,
-                'end_date': END_DATE,
-                'start_datetime': START_DATETIME,
-                'end_datetime': END_DATETIME,
-                'dep': line['DEP'],
-                'com': line['COM'],
-                'nccenr': convert_name_with_article(line),
-                'population': 'NULL'
-            })
+            town = Town(
+                id=(line['DEP'] + line['COM'] + SEPARATOR
+                    + START_DATE.isoformat()),
+                depcom=line['DEP'] + line['COM'],
+                actual=actual,
+                modification=0,
+                ancestors='',
+                successors='',
+                start_date=START_DATE,
+                end_date=END_DATE,
+                start_datetime=START_DATETIME,
+                end_datetime=END_DATETIME,
+                dep=line['DEP'],
+                com=line['COM'],
+                nccenr=convert_name_with_article(line),
+                population='NULL'
+            )
             towns[town.id] = town
     return towns
 
@@ -44,23 +45,36 @@ def load_towns(filename='sources/france2016.txt'):
 def load_history(filename='sources/historiq2016.txt'):
     """Load all towns from `filename` into a list of `Record`s."""
     history = []
+    last_log = defaultdict(int)
     with open(filename, encoding='cp1252') as file:
         for line in csv.DictReader(file, delimiter='\t'):
             effdate = convert_date(line['EFF'])
-            record = Record(**{
-                'depcom': line['DEP'] + line['COM'],
-                'mod': int(line['MOD']),
-                'eff': convert_datetime(line['EFF']),
-                'effdate': effdate,
-                'nccoff': line['NCCOFF'],
-                'nccanc': line['NCCANC'],
-                'comech': line['COMECH'],
-                'dep': line['DEP'],
-                'com': line['COM'],
-                'depanc': line['DEPANC'],
-                'nbcom': line['NBCOM'],
-                'rangcom': line['RANGCOM'],
-            })
+            depcom = line['DEP'] + line['COM']
+            mod = int(line['MOD'])
+            last = None
+            # We need to know which one of the record is the last in case
+            # of a `CREATION_DELEGATED_POLE` to delete the parent entry
+            # only once the last element is dealt with.
+            if mod == CREATION_DELEGATED_POLE:
+                id = depcom + effdate.isoformat()
+                last_log[id] += 1
+                if id in last_log and last_log[id] == int(line['NBCOM']):
+                    last = True
+                else:
+                    last = False
+            record = Record(
+                depcom=depcom,
+                mod=mod,
+                eff=convert_datetime(line['EFF']),
+                effdate=effdate,
+                nccoff=line['NCCOFF'],
+                nccanc=line['NCCANC'],
+                comech=line['COMECH'],
+                dep=line['DEP'],
+                com=line['COM'],
+                depanc=line['DEPANC'],
+                last=last,
+            )
             history.append(record)
     return history
 

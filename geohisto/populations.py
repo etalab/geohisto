@@ -57,5 +57,5 @@ def compute_populations(populations, towns):
         population = compute_population(
             populations, population_id, towns, town)
         town = town.set_population(population)
-        towns.update(town)
+        towns.upsert(town)
     return towns

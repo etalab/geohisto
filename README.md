@@ -23,10 +23,24 @@ The project doesn’t require any dependency, you have to run it with Python 3:
 
     $ python3 -m geohisto
 
+Note that it takes about 4 minutes to generate the towns export.
+
+
+## Tests
+
+If you plan to contribute, you have to install [pytest](http://doc.pytest.org/en/latest/) and launch the test suite:
+
+    $ python -m pytest tests
+
+Note that the duration of the whole test suite run is about 5 minutes.
+
+That's why you would probably prefer to run a particular test:
+
+    $ python -m pytest tests/test_actions.py::test_change_name
+
+
 
 ## TODO
 
-* Handle more cases of splits/merges of towns.
 * Make the export configurable through command-line options?
-* Make tests faster with subsets of data for each test.
-* Fix inconsistencies, see TODOs within the code/output.
+* Collect feedback from reusers

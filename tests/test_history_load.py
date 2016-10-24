@@ -21,7 +21,19 @@ def test_contains_first_last_items(history_list):
     assert rouget.mod == CREATION_DELEGATED_POLE
     assert rouget.nccoff == 'Rouget-Pers'
     assert rouget.comech == '15150'
-    assert rouget.nbcom == '2'
-    assert rouget.rangcom == '1'
     assert rouget.eff == datetime(2016, 1, 1, 0, 0)
     assert rouget.effdate == date(2016, 1, 1)
+
+
+def test_logic_related_to_last(history_list):
+    plaisance = history_list[0]
+    rouget = history_list[-1]
+    saint_constant1 = history_list[-6]
+    saint_constant2 = history_list[-5]
+    assert plaisance.last is None
+    assert rouget.last is not None
+    assert rouget.last
+    assert saint_constant1.last is not None
+    assert not saint_constant1.last
+    assert saint_constant2.last is not None
+    assert saint_constant2.last

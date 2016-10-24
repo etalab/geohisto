@@ -7,16 +7,16 @@ from geohisto.constants import (
 
 
 @pytest.fixture
-def towns():
+def loaded_towns():
     return load_towns()
 
 
-def test_initial_load(towns):
-    assert len(towns) == 39166
+def test_initial_load(loaded_towns):
+    assert len(loaded_towns) == 39166
 
 
-def test_contains_arles(towns):
-    arles = towns.filter(depcom='13004')[0]
+def test_contains_arles(loaded_towns):
+    arles = loaded_towns.filter(depcom='13004')[0]
     assert arles.id == '13004@1942-01-01'
     assert arles.dep == '13'
     assert arles.com == '004'
@@ -29,8 +29,8 @@ def test_contains_arles(towns):
     assert arles.nccenr == 'Arles'
 
 
-def test_convert_name(towns):
-    la_breole = towns.filter(depcom='04033')[0]
+def test_convert_name(loaded_towns):
+    la_breole = loaded_towns.filter(depcom='04033')[0]
     assert la_breole.nccenr == 'La Bréole'
-    lescale = towns.filter(depcom='04079')[0]
+    lescale = loaded_towns.filter(depcom='04079')[0]
     assert lescale.nccenr == "L'Escale"

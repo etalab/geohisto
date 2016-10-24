@@ -454,15 +454,28 @@ def test_creation_delegated():
 def test_creation_delegated_pole():
     """New town: delegated - pole."""
     grentzingen_town = town_factory(dep='68', com='108', nccenr='Grentzingen')
+    henflingen_town = town_factory(dep='68', com='133', nccenr='Henflingen')
     illtal_town = town_factory(dep='68', com='240', nccenr='Illtal')
-    towns = towns_factory(grentzingen_town, illtal_town)
+    towns = towns_factory(grentzingen_town, henflingen_town, illtal_town)
     creation_delegated_record = record_factory(
         dep='68', com='108', mod=CREATION_DELEGATED,
         effdate=date(2016, 1, 1), nccoff='Grentzingen', comech='68240')
-    creation_delegated_pole_record = record_factory(
+    creation_delegated_pole_record1 = record_factory(
         dep='68', com='240', mod=CREATION_DELEGATED_POLE,
-        effdate=date(2016, 1, 1), nccoff='Illtal', comech='68108')
-    history = [creation_delegated_record, creation_delegated_pole_record]
+        effdate=date(2016, 1, 1), nccoff='Illtal', comech='68108',
+        last=False)
+    creation_delegated_pole_record2 = record_factory(
+        dep='68', com='240', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Illtal', comech='68133',
+        last=False)
+    creation_delegated_pole_record3 = record_factory(
+        dep='68', com='240', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Illtal', comech='68240',
+        last=True)
+    history = [
+        creation_delegated_record, creation_delegated_pole_record1,
+        creation_delegated_pole_record2, creation_delegated_pole_record3
+    ]
     compute(towns, history)
     grentzingen_list = towns.filter(depcom='68108')
     assert len(grentzingen_list) == 1
@@ -674,11 +687,11 @@ def test_ancestor_not_deleted_on_fusion():
     change_name_record1 = record_factory(
         dep='89', com='334', mod=CREATION_DELEGATED_POLE,
         effdate=date(2016, 1, 1), nccoff="Val d'Ocre",
-        nbcom='2', rangcom='1', comech='89334')
+        last=False, comech='89334')
     change_name_record2 = record_factory(
         dep='89', com='334', mod=CREATION_DELEGATED_POLE,
         effdate=date(2016, 1, 1), nccoff="Val d'Ocre",
-        nbcom='2', rangcom='2', comech='89356')
+        last=True, comech='89356')
     creation_delegated_record2 = record_factory(
         dep='89', com='356', mod=CREATION_DELEGATED,
         effdate=date(2016, 1, 1), nccoff='Saint-Martin-sur-Ocre',
@@ -762,3 +775,179 @@ def test_start_end_same_moment():
     assert lamarche2.successors == nonsard.id
     assert lamarche2.start_datetime == datetime(1983, 1, 1, 0, 0, 0)
     assert lamarche2.end_datetime == datetime(1983, 1, 1, 0, 0, 0, 1)
+
+
+def test_creation_delegated_pole_not_sorted():
+    """Special case of Boischampré with rangcom not sorted."""
+    boischampre_town = town_factory(dep='61', com='375', nccenr='Boischampré')
+    vrigny_town = town_factory(dep='61', com='511', nccenr='Vrigny')
+    loyer_town = town_factory(dep='61', com='417',
+                              nccenr='Saint-Loyer-des-Champs')
+    marcei_town = town_factory(dep='61', com='249', nccenr='Marcei')
+    towns = towns_factory(
+        boischampre_town, vrigny_town, loyer_town, marcei_town)
+    creation_delegated_record1 = record_factory(
+        dep='61', com='511', mod=CREATION_DELEGATED,
+        effdate=date(2015, 1, 1), nccoff='Vrigny', comech='61375')
+    creation_delegated_record2 = record_factory(
+        dep='61', com='417', mod=CREATION_DELEGATED,
+        effdate=date(2015, 1, 1), nccoff='Saint-Loyer-des-Champs',
+        comech='61375')
+    creation_delegated_record3 = record_factory(
+        dep='61', com='249', mod=CREATION_DELEGATED,
+        effdate=date(2015, 1, 1), nccoff='Marcei', comech='61375')
+    # Here the order is very important given that `rangcom` is not sorted
+    # in the right order within the historiq file!
+    creation_delegated_pole_record1 = record_factory(
+        dep='61', com='375', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2015, 1, 1), nccoff='Boischampré', comech='61511',
+        last=False)
+    creation_delegated_pole_record2 = record_factory(
+        dep='61', com='375', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2015, 1, 1), nccoff='Boischampré', comech='61417',
+        last=False)
+    creation_delegated_pole_record3 = record_factory(
+        dep='61', com='375', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2015, 1, 1), nccoff='Boischampré', comech='61249',
+        last=False)
+    creation_delegated_pole_record4 = record_factory(
+        dep='61', com='375', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2015, 1, 1), nccoff='Boischampré', comech='61375',
+        last=True)
+    history = [
+        creation_delegated_record1, creation_delegated_record2,
+        creation_delegated_record3,
+        creation_delegated_pole_record1, creation_delegated_pole_record2,
+        creation_delegated_pole_record3, creation_delegated_pole_record4
+    ]
+    compute(towns, history)
+    boischampre_list = towns.filter(depcom='61375')
+    assert len(boischampre_list) == 1
+    boischampre = boischampre_list[0]
+    vrigny_list = towns.filter(depcom='61511')
+    assert len(vrigny_list) == 1
+    vrigny = vrigny_list[0]
+    assert boischampre.id == '61375@2015-01-01'
+    assert boischampre.successors == ''
+    assert boischampre.modification == CREATION_DELEGATED_POLE
+    assert boischampre.nccenr == 'Boischampré'
+    assert vrigny.id == '61511@1942-01-01'
+    assert vrigny.successors == boischampre.id
+    assert vrigny.modification == CREATION_DELEGATED
+    assert vrigny.nccenr == 'Vrigny'
+
+
+def test_creation_delegated_pole_without_same_name():
+    """Special case of Rouget-Pers with name changed."""
+    saint_mamet_town = town_factory(dep='15', com='196',
+                                    nccenr='Saint-Mamet-la-Salvetat')
+    rouget_pers_town = town_factory(dep='15', com='268', nccenr='Rouget-Pers')
+    pers_town = town_factory(dep='15', com='150', nccenr='Pers')
+    towns = towns_factory(saint_mamet_town, rouget_pers_town, pers_town)
+    creation_record = record_factory(
+        dep='15', com='268', mod=CREATION,
+        effdate=date(1945, 9, 17), nccoff='Rouget', comech='15196')
+    # Order is important to make the test pertinent.
+    creation_delegated_pole_record1 = record_factory(
+        dep='15', com='268', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Rouget-Pers', comech='15268',
+        last=False)
+    creation_delegated_record1 = record_factory(
+        dep='15', com='150', mod=CREATION_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Pers', comech='15268')
+    creation_delegated_record2 = record_factory(
+        dep='15', com='268', mod=CREATION_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Rouget', comech='15268')
+    creation_delegated_pole_record2 = record_factory(
+        dep='15', com='268', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Rouget-Pers', comech='15150',
+        last=True)
+    history = [
+        creation_record,
+        creation_delegated_pole_record1,
+        creation_delegated_record1,
+        creation_delegated_record2,
+        creation_delegated_pole_record2,
+    ]
+    compute(towns, history)
+    rouget, rouget_pers = towns.filter(depcom='15268')
+    pers_list = towns.filter(depcom='15150')
+    assert len(pers_list) == 1
+    pers = pers_list[0]
+    assert rouget.id == '15268@1945-09-17'
+    assert rouget.successors == rouget_pers.id
+    assert rouget.modification == CREATION_DELEGATED
+    assert rouget.nccenr == 'Rouget'
+    assert rouget.start_datetime == datetime(1945, 9, 17, 0, 0, 0)
+    assert rouget.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
+    assert pers.id == '15150@1942-01-01'
+    assert pers.successors == rouget_pers.id
+    assert pers.modification == CREATION_DELEGATED
+    assert pers.nccenr == 'Pers'
+    assert pers.start_datetime == START_DATETIME
+    assert pers.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
+    assert rouget_pers.id == '15268@2016-01-01'
+    assert rouget_pers.successors == ''
+    assert rouget_pers.modification == CREATION_DELEGATED_POLE
+    assert rouget_pers.nccenr == 'Rouget-Pers'
+    assert rouget_pers.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert rouget_pers.end_datetime == END_DATETIME
+
+
+def test_change_county_after_rename():
+    """Special case of Sainte-Lucie-de-Tallano"""
+    sainte_lucie_town1 = town_factory(dep='2A', com='308',
+                                      nccenr='Sainte-Lucie-de-Tallano')
+    sainte_lucie_town2 = town_factory(dep='20', com='308',
+                                      nccenr='Sainte-Lucie-de-Tallano')
+    poggio_town = town_factory(dep='2A', com='237',
+                                   nccenr='Poggio-di-Tallano')
+    andrea_town = town_factory(dep='2A', com='294',
+                               nccenr="Sant'Andréa-di-Tallano")
+    towns = towns_factory(
+        sainte_lucie_town1, sainte_lucie_town2, poggio_town, andrea_town)
+    deletion_fusion_record1 = record_factory(
+        dep='2A', com='237', mod=DELETION_FUSION,
+        effdate=date(1965, 1, 1), nccoff='Poggio-di-Tallano', comech='2A308')
+    deletion_fusion_record2 = record_factory(
+        dep='2A', com='294', mod=DELETION_FUSION,
+        effdate=date(1965, 1, 1), nccoff="Sant'Andréa-di-Tallano",
+        comech='2A308')
+    change_name_fusion_record = record_factory(
+        dep='2A', com='308', mod=CHANGE_NAME_FUSION, effdate=date(1965, 1, 1),
+        nccoff='Sainte-Lucie-de-Tallano', nccanc='Santa-Lucia-di-Tallano')
+    change_county_record = record_factory(
+        dep='2A', com='308', mod=CHANGE_COUNTY,
+        effdate=date(1976, 1, 1), nccoff='Sainte-Lucie-de-Tallano',
+        depanc='20308')
+    history = [deletion_fusion_record1, deletion_fusion_record2,
+               change_name_fusion_record, change_county_record]
+    compute(towns, history)
+    santa_lucia, sainte_lucie = towns.filter(depcom='20308')
+    sainte_lucie_new = towns.filter(depcom='2A308')[0]
+    poggio = towns.filter(depcom='2A237')[0]
+    andrea = towns.filter(depcom='2A294')[0]
+    assert santa_lucia.id == '20308@1942-01-01'
+    assert santa_lucia.end_date == date(1964, 12, 31)
+    assert sainte_lucie.id == '20308@1965-01-01'
+    assert sainte_lucie.end_date == date(1975, 12, 31)
+    assert santa_lucia.successors == sainte_lucie.id
+    assert poggio.successors == sainte_lucie.id
+    assert andrea.successors == sainte_lucie.id
+    assert sainte_lucie.successors == sainte_lucie_new.id
+    assert sainte_lucie_new.id == '2A308@1976-01-01'
+    assert sainte_lucie_new.end_date == END_DATE
+
+
+'''
+
+Town created after START_DATE and change county later:
+Id not found: 2B366@1976-01-01
+Successor not found for <Town (20366@1947-04-12): Chisa from 1947-04-12 to 1975-12-31 with successors 2B366@1976-01-01>
+Id not found: 95120@1968-01-01
+Successor not found for <Town (78692@1948-08-01): Butry-sur-Oise from 1948-08-01 to 1967-12-31 with successors 95120@1968-01-01>
+
+Changed county twice:
+Id not found: 78620@1969-11-29
+Successor not found for <Town (91620@1942-01-01): Toussus-le-Noble from 1942-01-01 to 1969-11-28 with successors 78620@1969-11-29>
+'''
