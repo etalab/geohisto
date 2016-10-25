@@ -2,7 +2,7 @@ import csv
 from itertools import islice
 
 
-def write_results_on(filename, towns):
+def write_results_on(filename, towns, at_datetime=None):
     """
     Write the `filename` with CSV formatted informations.
 
@@ -11,6 +11,9 @@ def write_results_on(filename, towns):
 
     Each town has an associated population, sometimes computed from
     population of ancestors.
+
+    The `at_datetime` parameter allows you to only filter valid towns at
+    that given datetime.
     """
     with open(filename, 'w') as csvfile:
         fieldnames = [
@@ -23,7 +26,12 @@ def write_results_on(filename, towns):
         writer.writeheader()
         write = writer.writerow
 
-        for id, town in towns.items():
+        if at_datetime:
+            towns = towns.valid_at(at_datetime)
+        else:
+            towns = towns.values()
+
+        for town in towns:
             write({
                 'id': town.id,
                 'insee_code': town.depcom,

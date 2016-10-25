@@ -26,6 +26,8 @@ This is a regular CSV file with value separated by commas and a header line with
 
 The `towns_head.csv` file contains the first 100 lines of the generated file for an easy preview within Github if you click on it.
 
+The `towns_{date}.csv` files contain towns valid at the given date.
+
 
 ## Examples
 

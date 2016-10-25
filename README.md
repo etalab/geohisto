@@ -19,11 +19,17 @@ Additionaly, files containing the population for almost all towns has been compu
 
 ## Development
 
-The project doesn’t require any dependency, you have to run it with Python 3:
+The project only requires [click](http://click.pocoo.org/5/) dependency (you can install it with `pip install -r requirements.txt` within a virtualenv but YMMV), you have to run it with Python 3 though:
 
-    $ python3 -m geohisto
+    $ python -m geohisto
 
 Note that it takes about 4 minutes to generate the towns export.
+
+Optionally, you can specify a date to only export towns valid at that given date:
+
+    $ python -m geohisto --at-date 2016-01-01
+
+It will be generated within the `exports/towns/` folder with an explicit name.
 
 
 ## Tests
@@ -42,5 +48,4 @@ That's why you would probably prefer to run a particular test:
 
 ## TODO
 
-* Make the export configurable through command-line options?
 * Collect feedback from reusers
