@@ -7,13 +7,13 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 
 ## Columns
 
-* `id`: This is the hopefully unique combination of `insee_code` + `@` `start_date`.
+* `id`: This is the hopefully unique combination of `insee_code` + `@` `start_date` (using ISO format `YYYY-MM-DD`).
 * `insee_code`: The INSEE code for the given town which is county code (two-letters digit except for Corsica) + town code (3-letters digits). As a result it's a 5-letters string.
 * `name`: The name of the town, including the article (`Le `, `La `, `L'` etc).
-* `start_datetime`: The effective start date + time for the given `name` + `insee_code`.
-* `end_datetime`: The effective end date + time for the given `name` + `insee_code`.
-* `successors`: List of IDs separated by semicolons which are successors of the current `id`. Default is an empty string.
-* `ancestors`: List of IDs separated by semicolons which are ancestors of the current `id`. Default is an empty string.
+* `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
+* `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
+* `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
+* `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `population`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
 * `insee_modification`: Indicate the [INSEE modification](http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp?page=telechargement/2016/doc/doc_variables.htm#mod) performed on the town.
 

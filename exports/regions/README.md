@@ -9,18 +9,23 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 
 ## Columns
 
-* `direction`: Either `--`, `<-` or `->` if the region is unchanged, has been renamed or merged respectively.
+* `id`: This is the hopefully unique combination of `insee_code` + `@` `start_date` (using ISO format `YYYY-MM-DD`).
 * `insee_code`: The 2-digits code delivered by INSEE.
 * `name`: The new name of the region.
-* `start_date`: The start date of existence, in our case either `1970-01-09` or `2016-01-01`.
-* `end_date`: The end date of existence, in our case always `2016-01-01` or `2020-01-01`.
+* `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
+* `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
+* `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
+* `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `population`: The population as of 2013.
 * `surface`: The area in km2.
 * `chef_lieu`: The Chef-lieu for that new region.
 * `nuts_code`: The 4-chars code delivered by Eurostat.
 * `wikipedia`: The wikipedia page for that new region (note that given how recent the change is, some links still redirect to temporary region names).
 
-Given that regions have been merged, there is one line by current region and one line by ancestor. The `insee_code` column is unique, the `nuts_code` one is NOT.
+Given that regions have been merged, there is one line by current region and one line by ancestor. The `id` and `insee_code` columns are unique, the `nuts_code` one is NOT.
+
+Regarding dates, the initial date + time has been set as `1970-01-09 00:00:00` given the date of the related [décret n° 70-18](https://fr.wikipedia.org/wiki/R%C3%A9gion_fran%C3%A7aise#R.C3.A9gions.2C_.C3.A9tablissements_publics). Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
+
 
 ## Format
 
