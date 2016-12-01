@@ -8,6 +8,8 @@ http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
 from datetime import date, datetime
 from functools import wraps
 
+from .constants import SEPARATOR
+
 ACTIONS = {}
 
 
@@ -46,6 +48,12 @@ def convert_name_with_article(town):
         )
     else:
         return town['NCCENR']
+
+
+def compute_id(depcom, start_date):
+    """Return the unique string id for a given `depcom` + `start_date`."""
+    return 'C{depcom}{separator}{start_date}'.format(
+        depcom=depcom, separator=SEPARATOR, start_date=start_date.isoformat())
 
 
 def compute_ancestors(towns):

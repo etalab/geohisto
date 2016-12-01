@@ -5,8 +5,9 @@ Sane defaults are set for the generated namedtuples.
 """
 from datetime import datetime
 
-from geohisto.constants import START_DATE, END_DATE, SEPARATOR
+from geohisto.constants import START_DATE, END_DATE
 from geohisto.models import Towns, Town, Record
+from geohisto.utils import compute_id
 
 
 def towns_factory(*town_factories):
@@ -32,8 +33,7 @@ def town_factory(**custom):
     }
     custom['depcom'] = custom['dep'] + custom['com']
     params.update(custom)
-    params['id'] = (params['depcom'] + SEPARATOR
-                    + params['start_date'].isoformat())
+    params['id'] = compute_id(params['depcom'], params['start_date'])
     params['start_datetime'] = datetime.combine(params['start_date'],
                                                 datetime.min.time())
     params['end_datetime'] = datetime.combine(params['end_date'],

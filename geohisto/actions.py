@@ -4,7 +4,7 @@ Perform actions on towns given the modifications' types.
 The modifications come from the history of changes.
 """
 from .constants import (
-    SEPARATOR, DELTA, END_DATETIME, START_DATE, START_DATETIME,
+    DELTA, END_DATETIME, START_DATE, START_DATETIME,
     CHANGE_NAME, CHANGE_NAME_FUSION, CHANGE_NAME_CREATION,
     CHANGE_NAME_REINSTATEMENT,
     CREATION, REINSTATEMENT, SPLITING,
@@ -15,7 +15,7 @@ from .constants import (
     CHANGE_COUNTY,
     OBSOLETE
 )
-from .utils import in_case_of, ACTIONS
+from .utils import compute_id, in_case_of, ACTIONS
 
 
 @in_case_of(CHANGE_NAME, CHANGE_NAME_FUSION)
@@ -23,7 +23,7 @@ def change_name(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
     new_town = current_town.generate(
-        id=current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
         end_datetime=END_DATETIME,
         # `nccenr` changes on fusions.
@@ -47,7 +47,7 @@ def creation(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
     new_town = current_town.generate(
-        id=current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
         end_datetime=END_DATETIME,
         # `nccenr` changes on fusions.
@@ -72,7 +72,7 @@ def creation_delegated(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
     new_town = current_town.generate(
-        id=current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
         end_datetime=END_DATETIME,
         # `nccenr` changes on fusions.
@@ -106,7 +106,7 @@ def creation_delegated(towns, record):
 def reinstatement(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
-    id = current_town.depcom + SEPARATOR + record.effdate.isoformat()
+    id = compute_id(current_town.depcom, record.effdate)
     # It happens with `Avanchers-Valmorel` for instance
     # where a change name is performed at the same date.
     is_already_registered = id in towns
@@ -176,7 +176,7 @@ def creation_not_delegated(towns, record):
     has_different_name = current_town.nccenr != record.nccoff
     if has_same_depcom and has_different_name:
         new_town = current_town.generate(
-            id=current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+            id=compute_id(current_town.depcom, record.effdate),
             start_datetime=record.eff,
             modification=CREATION_NOT_DELEGATED_POLE
         )
@@ -207,7 +207,7 @@ def change_county(towns, record):
     # We set the `end_datetime` explicitely for the particular case
     # of Blamécourt where the town as fusioned before changin county.
     new_town = current_town.generate(
-        id=current_town.depcom + SEPARATOR + record.effdate.isoformat(),
+        id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
         end_datetime=max(current_town.end_datetime, record.eff + DELTA)
     )
@@ -218,8 +218,7 @@ def change_county(towns, record):
     ancient_town = towns.get_current(record.depanc, record.eff)
     ancient_town_is_valid = ancient_town.valid_at(record.eff)
     if ancient_town_is_valid:
-        id = (ancient_town.depcom + SEPARATOR
-              + current_town.start_date.isoformat())
+        id = compute_id(ancient_town.depcom, current_town.start_date)
         is_new_entry = id not in towns
         old_town = ancient_town.generate(
             id=id,
@@ -235,7 +234,7 @@ def change_county(towns, record):
             # entry that has been created with the wrong county code.
             initial_town = towns.get_current(record.depcom, START_DATETIME)
             initial_updated_town = initial_town.generate(
-                id=record.depanc + SEPARATOR + START_DATE.isoformat(),
+                id=compute_id(record.depanc, START_DATE),
                 dep=record.depanc[:2],
                 com=record.depanc[2:],
                 depcom=record.depanc
@@ -246,7 +245,7 @@ def change_county(towns, record):
         # This particular case happens when there are multiple county
         # changes, for instance with Châteaufort.
         old_town = ancient_town.generate(
-            id=ancient_town.depcom + SEPARATOR + START_DATE.isoformat(),
+            id=compute_id(ancient_town.depcom, START_DATE),
             start_datetime=START_DATETIME,
             end_datetime=record.eff - DELTA,
             modification=record.mod

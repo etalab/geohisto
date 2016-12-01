@@ -2,11 +2,12 @@ import csv
 from collections import defaultdict
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME,  SEPARATOR,
-    CREATION_DELEGATED_POLE
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME, CREATION_DELEGATED_POLE
 )
 from .models import Towns, Town, Record
-from .utils import convert_date, convert_datetime, convert_name_with_article
+from .utils import (
+    convert_date, convert_datetime, convert_name_with_article, compute_id
+)
 
 
 def load_towns(filename='sources/france2016.txt'):
@@ -22,8 +23,7 @@ def load_towns(filename='sources/france2016.txt'):
             if actual == 9:  # Cantonal fraction.
                 continue  # Skip for the moment.
             town = Town(
-                id=(line['DEP'] + line['COM'] + SEPARATOR
-                    + START_DATE.isoformat()),
+                id=compute_id(line['DEP'] + line['COM'], START_DATE),
                 depcom=line['DEP'] + line['COM'],
                 actual=actual,
                 modification=0,

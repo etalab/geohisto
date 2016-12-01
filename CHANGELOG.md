@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.0.0 — 2016-12-01
+
+* Change ids for towns and regions for uniqueness with counties.
+
+
 ## 2.0.0 — 2016-11-18
 
 * Export format of regions has changed to be consistent with towns.
