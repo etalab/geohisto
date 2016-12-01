@@ -2,8 +2,7 @@
 Utils in use to convert/compute historical data.
 
 Most of the cryptic keys in that script are documented here:
-http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
-?page=telechargement/2016/doc/doc_variables.htm
+https://www.insee.fr/fr/information/2114819#titre-bloc-10
 """
 from datetime import date, datetime
 from functools import wraps
@@ -52,7 +51,7 @@ def convert_name_with_article(town):
 
 def compute_id(depcom, start_date):
     """Return the unique string id for a given `depcom` + `start_date`."""
-    return 'C{depcom}{separator}{start_date}'.format(
+    return 'COM{depcom}{separator}{start_date}'.format(
         depcom=depcom, separator=SEPARATOR, start_date=start_date.isoformat())
 
 

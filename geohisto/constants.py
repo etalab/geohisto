@@ -13,8 +13,7 @@ END_DATETIME = datetime.combine(END_DATE, datetime.max.time())
 DELTA = timedelta.resolution
 
 # Modification keys from INSEE/COG:
-# http://www.insee.fr/fr/methodes/nomenclatures/cog/documentation.asp +
-# ?page=telechargement/2016/doc/doc_variables.htm#mod
+# https://www.insee.fr/fr/information/2114773#mod
 CHANGE_NAME = 100
 CHANGE_NAME_FUSION = 110
 CHANGE_NAME_CREATION = 111

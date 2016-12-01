@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.0.0 — 2016-12-01
+
+* Change ids for towns and regions (again) for consistency with INSEE.
+
+
 ## 3.0.0 — 2016-12-01
 
 * Change ids for towns and regions for uniqueness with counties.

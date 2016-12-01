@@ -9,7 +9,7 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 
 ## Columns
 
-* `id`: This is the unique combination of `R` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
+* `id`: This is the unique combination of `REG` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
 * `insee_code`: The 2-digits code delivered by INSEE.
 * `name`: The new name of the region.
 * `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).

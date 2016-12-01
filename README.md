@@ -12,7 +12,7 @@ If you’re only interested in generated data, check out the `exports` folder wh
 
 ## Sources
 
-Source files are coming from the [INSEE downloads page](http://www.insee.fr/fr/methodes/nomenclatures/cog/telechargement.asp) which allows to retrieve information related to the “Code officiel géographique”. We’re using the list of existing towns and their history which are both available within the `sources` folder.
+Source files are coming from the [INSEE downloads page](https://www.insee.fr/fr/information/2114819) which allows to retrieve information related to the “Code officiel géographique”. We’re using the list of existing towns and their history which are both available within the `sources` folder.
 
 Additionaly, files containing the population for almost all towns has been computed too in the `sources` folder. They are coming from [a XLS dataset](http://www.insee.fr/fr/ppp/bases-de-donnees/recensement/populations-legales/pages2015/zip/HIST_POP_COM_RP13.zip) provided by  [INSEE](http://www.insee.fr/fr/ppp/bases-de-donnees/recensement/populations-legales/), manually completed with Wikipedia data for [Lyon](https://fr.wikipedia.org/wiki/Arrondissements_de_Lyon) and [Marseille](https://fr.wikipedia.org/wiki/Secteurs_et_arrondissements_de_Marseille) districts, and converted into CSV.
 

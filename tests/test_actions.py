@@ -33,7 +33,7 @@ def test_change_name():
     history = [change_name_record]
     compute(towns, history)
     neuville_s, neuville = towns.filter(depcom='10263')
-    assert neuville_s.id == 'C10263@1942-01-01'
+    assert neuville_s.id == 'COM10263@1942-01-01'
     assert neuville_s.nccenr == 'Neuville-sur-Vannes'
     assert neuville_s.start_date == START_DATE
     assert neuville_s.start_datetime == START_DATETIME
@@ -41,7 +41,7 @@ def test_change_name():
     assert neuville_s.end_datetime == datetime(2008, 10, 5, 23, 59, 59, 999999)
     assert neuville_s.modification == CHANGE_NAME
     assert neuville_s.successors == neuville.id
-    assert neuville.id == 'C10263@2008-10-06'
+    assert neuville.id == 'COM10263@2008-10-06'
     assert neuville.nccenr == 'Neuville-sur-Vanne'
     assert neuville.start_date == date(2008, 10, 6)
     assert neuville.start_datetime == datetime(2008, 10, 6, 0, 0, 0)
@@ -66,7 +66,7 @@ def test_change_name_many():
     history = [change_name_record1, change_name_record2, change_name_record3]
     compute(towns, history)
     marne, champ, marne2, champ2 = towns.filter(depcom='51108')
-    assert marne.id == 'C51108@1942-01-01'
+    assert marne.id == 'COM51108@1942-01-01'
     assert marne.nccenr == 'Châlons-sur-Marne'
     assert marne.start_date == START_DATE
     assert marne.start_datetime == START_DATETIME
@@ -74,14 +74,14 @@ def test_change_name_many():
     assert marne.end_datetime == datetime(1995, 11, 16, 23, 59, 59, 999999)
     assert marne.modification == CHANGE_NAME
     assert marne.successors == champ.id
-    assert champ.id == 'C51108@1995-11-17'
+    assert champ.id == 'COM51108@1995-11-17'
     assert champ.nccenr == 'Châlons-en-Champagne'
     assert champ.start_date == date(1995, 11, 17)
     assert champ.start_datetime == datetime(1995, 11, 17, 0, 0, 0)
     assert champ.end_date == date(1997, 4, 30)
     assert champ.end_datetime == datetime(1997, 4, 30, 23, 59, 59, 999999)
     assert champ.successors == marne2.id
-    assert marne2.id == 'C51108@1997-05-01'
+    assert marne2.id == 'COM51108@1997-05-01'
     assert marne2.nccenr == 'Châlons-sur-Marne'
     assert marne2.start_date == date(1997, 5, 1)
     assert marne2.start_datetime == datetime(1997, 5, 1, 0, 0, 0)
@@ -89,7 +89,7 @@ def test_change_name_many():
     assert marne2.end_datetime == datetime(1998, 1, 3, 23, 59, 59, 999999)
     assert marne2.modification == CHANGE_NAME
     assert marne2.successors == champ2.id
-    assert champ2.id == 'C51108@1998-01-04'
+    assert champ2.id == 'COM51108@1998-01-04'
     assert champ2.nccenr == 'Châlons-en-Champagne'
     assert champ2.start_date == date(1998, 1, 4)
     assert champ2.start_datetime == datetime(1998, 1, 4, 0, 0, 0)
@@ -108,11 +108,11 @@ def test_change_name_fusion():
     history = [change_name_fusion_record]
     compute(towns, history)
     braguelogne, braguelogne_beauvoir = towns.filter(depcom='10058')
-    assert braguelogne.id == 'C10058@1942-01-01'
+    assert braguelogne.id == 'COM10058@1942-01-01'
     assert braguelogne.successors == braguelogne_beauvoir.id
     assert braguelogne.modification == CHANGE_NAME_FUSION
     assert braguelogne.nccenr == 'Bragelogne'
-    assert braguelogne_beauvoir.id == 'C10058@1973-05-01'
+    assert braguelogne_beauvoir.id == 'COM10058@1973-05-01'
     assert braguelogne_beauvoir.nccenr == 'Bragelogne-Beauvoir'
 
 
@@ -128,7 +128,7 @@ def test_change_name_creation():
     clefs_list = towns.filter(depcom='49101')
     assert len(clefs_list) == 1
     clefs = clefs_list[0]
-    assert clefs.id == 'C49101@2016-01-01'
+    assert clefs.id == 'COM49101@2016-01-01'
     assert clefs.successors == ''
     assert clefs.modification == CHANGE_NAME_CREATION
     assert clefs.nccenr == 'Clefs'
@@ -163,12 +163,12 @@ def test_change_name_reinstatement_after_fusion():
     ]
     compute(towns, history)
     framb, framb_saucelle, framb2 = towns.filter(depcom='28159')
-    assert framb_saucelle.id == 'C28159@1972-12-22'
+    assert framb_saucelle.id == 'COM28159@1972-12-22'
     assert framb_saucelle.successors == framb2.id
     assert framb_saucelle.modification == CHANGE_NAME_REINSTATEMENT
-    assert framb.id == 'C28159@1942-01-01'
+    assert framb.id == 'COM28159@1942-01-01'
     assert framb.successors == framb_saucelle.id
-    assert framb2.id == 'C28159@1987-01-01'
+    assert framb2.id == 'COM28159@1987-01-01'
     assert framb2.successors == ''
 
 
@@ -184,7 +184,7 @@ def test_creation():
     curan_list = towns.filter(depcom='12307')
     assert len(curan_list) == 1
     curan = curan_list[0]
-    assert curan.id == 'C12307@1952-12-03'
+    assert curan.id == 'COM12307@1952-12-03'
     assert curan.successors == ''
     assert curan.modification == CREATION
     assert curan.nccenr == 'Curan'
@@ -204,7 +204,7 @@ def test_reinstatement():
     history = [reinstatement_record]
     compute(towns, history)
     old_brageac, new_brageac = towns.filter(depcom='15024')
-    assert old_brageac.id == 'C15024@1942-01-01'
+    assert old_brageac.id == 'COM15024@1942-01-01'
     assert old_brageac.successors == new_brageac.id
     assert old_brageac.modification == REINSTATEMENT
     assert old_brageac.nccenr == 'Brageac'
@@ -213,7 +213,7 @@ def test_reinstatement():
     assert old_brageac.end_date == date(1985, 9, 30)
     assert (old_brageac.end_datetime
             == datetime(1985, 9, 30, 23, 59, 59, 999999))
-    assert new_brageac.id == 'C15024@1985-10-01'
+    assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
     assert new_brageac.nccenr == 'Brageac'
@@ -244,7 +244,7 @@ def test_fusion_then_reinstatement():
     ally = ally_list[0]
     old_brageac, new_brageac = towns.filter(depcom='15024')
     assert ally.successors == ''
-    assert old_brageac.id == 'C15024@1942-01-01'
+    assert old_brageac.id == 'COM15024@1942-01-01'
     assert old_brageac.successors == ally.id + ';' + new_brageac.id
     assert old_brageac.modification == REINSTATEMENT
     assert old_brageac.nccenr == 'Brageac'
@@ -253,7 +253,7 @@ def test_fusion_then_reinstatement():
     assert old_brageac.end_date == date(1972, 12, 31)
     assert (old_brageac.end_datetime
             == datetime(1972, 12, 31, 23, 59, 59, 999999))
-    assert new_brageac.id == 'C15024@1985-10-01'
+    assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
     assert new_brageac.nccenr == 'Brageac'
@@ -280,8 +280,8 @@ def test_deletion_partition():
     creusy_list = towns.filter(depcom='45117')
     assert len(creusy_list) == 1
     creusy = creusy_list[0]
-    assert creusy.id == 'C45117@1942-01-01'
-    assert creusy.successors == 'C45093@1942-01-01;C45313@1942-01-01'
+    assert creusy.id == 'COM45117@1942-01-01'
+    assert creusy.successors == 'COM45093@1942-01-01;COM45313@1942-01-01'
     assert creusy.modification == DELETION_PARTITION
     assert creusy.nccenr == 'Creusy'
     assert creusy.start_date == START_DATE
@@ -305,8 +305,8 @@ def test_deletion_fusion():
     eyvignes_list = towns.filter(depcom='24169')
     assert len(eyvignes_list) == 1
     eyvignes = eyvignes_list[0]
-    assert eyvignes.id == 'C24169@1942-01-01'
-    assert eyvignes.successors == 'C24516@1942-01-01'
+    assert eyvignes.id == 'COM24169@1942-01-01'
+    assert eyvignes.successors == 'COM24516@1942-01-01'
     assert eyvignes.modification == DELETION_FUSION
     assert eyvignes.nccenr == 'Eyvignes-et-Eybènes'
     assert eyvignes.start_date == START_DATE
@@ -331,7 +331,7 @@ def test_fusion_absorption():
     castilly_list = towns.filter(depcom='14142')
     assert len(castilly_list) == 1
     castilly = castilly_list[0]
-    assert castilly.id == 'C14142@1942-01-01'
+    assert castilly.id == 'COM14142@1942-01-01'
     assert castilly.successors == ''
     assert castilly.modification == 0
     assert castilly.nccenr == 'Castilly'
@@ -342,7 +342,7 @@ def test_fusion_absorption():
     mestry_list = towns.filter(depcom='14428')
     assert len(mestry_list) == 1
     mestry = mestry_list[0]
-    assert mestry.id == 'C14428@1942-01-01'
+    assert mestry.id == 'COM14428@1942-01-01'
     assert mestry.successors == castilly.id
     assert mestry.modification == DELETION_FUSION
     assert mestry.nccenr == 'Mestry'
@@ -377,7 +377,7 @@ def test_creation_not_delegated():
     compute(towns, history)
     fragnes, fragnes_loyere = towns.filter(depcom='71204')
     loyere = towns.filter(depcom='71265')[0]
-    assert fragnes.id == 'C71204@1942-01-01'
+    assert fragnes.id == 'COM71204@1942-01-01'
     assert fragnes.modification == CREATION_NOT_DELEGATED
     assert fragnes.successors == fragnes_loyere.id
     assert fragnes.nccenr == 'Fragnes'
@@ -385,7 +385,7 @@ def test_creation_not_delegated():
     assert fragnes.start_datetime == START_DATETIME
     assert fragnes.end_date == date(2015, 12, 31)
     assert fragnes.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
-    assert loyere.id == 'C71265@1942-01-01'
+    assert loyere.id == 'COM71265@1942-01-01'
     assert loyere.modification == CREATION_NOT_DELEGATED
     assert loyere.successors == fragnes_loyere.id
     assert loyere.nccenr == 'Loyère'
@@ -393,7 +393,7 @@ def test_creation_not_delegated():
     assert loyere.start_datetime == START_DATETIME
     assert loyere.end_date == date(2015, 12, 31)
     assert loyere.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
-    assert fragnes_loyere.id == 'C71204@2016-01-01'
+    assert fragnes_loyere.id == 'COM71204@2016-01-01'
     assert fragnes_loyere.modification == CREATION_NOT_DELEGATED_POLE
     assert fragnes_loyere.successors == ''
     assert fragnes_loyere.nccenr == 'Fragnes-La Loyère'
@@ -416,8 +416,8 @@ def test_fusion_association_associated():
     falgueyrat_list = towns.filter(depcom='24173')
     assert len(falgueyrat_list) == 1
     falgueyrat = falgueyrat_list[0]
-    assert falgueyrat.id == 'C24173@1942-01-01'
-    assert falgueyrat.successors == 'C24168@1942-01-01'
+    assert falgueyrat.id == 'COM24173@1942-01-01'
+    assert falgueyrat.successors == 'COM24168@1942-01-01'
     assert falgueyrat.modification == FUSION_ASSOCIATION_ASSOCIATED
     assert falgueyrat.nccenr == 'Falgueyrat'
     assert falgueyrat.start_date == START_DATE
@@ -440,8 +440,8 @@ def test_creation_delegated():
     grentzingen_list = towns.filter(depcom='68108')
     assert len(grentzingen_list) == 1
     grentzingen = grentzingen_list[0]
-    assert grentzingen.id == 'C68108@1942-01-01'
-    assert grentzingen.successors == 'C68240@1942-01-01'
+    assert grentzingen.id == 'COM68108@1942-01-01'
+    assert grentzingen.successors == 'COM68240@1942-01-01'
     assert grentzingen.modification == CREATION_DELEGATED
     assert grentzingen.nccenr == 'Grentzingen'
     assert grentzingen.start_date == START_DATE
@@ -483,7 +483,7 @@ def test_creation_delegated_pole():
     illtal_list = towns.filter(depcom='68240')
     assert len(illtal_list) == 1
     illtal = illtal_list[0]
-    assert grentzingen.id == 'C68108@1942-01-01'
+    assert grentzingen.id == 'COM68108@1942-01-01'
     assert grentzingen.successors == illtal.id
     assert grentzingen.modification == CREATION_DELEGATED
     assert grentzingen.nccenr == 'Grentzingen'
@@ -492,7 +492,7 @@ def test_creation_delegated_pole():
     assert grentzingen.end_date == date(2015, 12, 31)
     assert (grentzingen.end_datetime
             == datetime(2015, 12, 31, 23, 59, 59, 999999))
-    assert illtal.id == 'C68240@2016-01-01'
+    assert illtal.id == 'COM68240@2016-01-01'
     assert illtal.successors == ''
     assert illtal.modification == CREATION_DELEGATED_POLE
     assert illtal.nccenr == 'Illtal'
@@ -515,7 +515,7 @@ def test_change_county():
     afa_list = towns.filter(depcom='2A001')
     assert len(afa_list) == 1
     afa = afa_list[0]
-    assert afa.id == 'C2A001@1976-01-01'
+    assert afa.id == 'COM2A001@1976-01-01'
     assert afa.successors == ''
     assert afa.modification == 0
     assert afa.nccenr == 'Afa'
@@ -526,8 +526,8 @@ def test_change_county():
     old_afa_list = towns.filter(depcom='20001')
     assert len(old_afa_list) == 1
     old_afa = old_afa_list[0]
-    assert old_afa.id == 'C20001@1942-01-01'
-    assert old_afa.successors == 'C2A001@1976-01-01'
+    assert old_afa.id == 'COM20001@1942-01-01'
+    assert old_afa.successors == 'COM2A001@1976-01-01'
     assert old_afa.modification == CHANGE_COUNTY
     assert old_afa.nccenr == 'Afa'
     assert old_afa.start_date == START_DATE
@@ -554,7 +554,7 @@ def test_change_county_twice():
     tmp_chateaufort_list = towns.filter(depcom='91143')
     assert len(tmp_chateaufort_list) == 1
     tmp_chateaufort = tmp_chateaufort_list[0]
-    assert chateaufort.id == 'C78143@1969-11-29'
+    assert chateaufort.id == 'COM78143@1969-11-29'
     assert chateaufort.successors == ''
     assert chateaufort.modification == 0
     assert chateaufort.nccenr == 'Châteaufort'
@@ -562,7 +562,7 @@ def test_change_county_twice():
     assert chateaufort.start_datetime == datetime(1969, 11, 29, 0, 0, 0)
     assert chateaufort.end_date == END_DATE
     assert chateaufort.end_datetime == END_DATETIME
-    assert old_chateaufort.id == 'C78143@1942-01-01'
+    assert old_chateaufort.id == 'COM78143@1942-01-01'
     assert old_chateaufort.successors == tmp_chateaufort.id
     assert old_chateaufort.modification == CHANGE_COUNTY
     assert old_chateaufort.nccenr == 'Châteaufort'
@@ -571,7 +571,7 @@ def test_change_county_twice():
     assert old_chateaufort.end_date == date(1967, 12, 31)
     assert (old_chateaufort.end_datetime
             == datetime(1967, 12, 31, 23, 59, 59, 999999))
-    assert tmp_chateaufort.id == 'C91143@1968-01-01'
+    assert tmp_chateaufort.id == 'COM91143@1968-01-01'
     assert tmp_chateaufort.successors == chateaufort.id
     assert tmp_chateaufort.modification == CHANGE_COUNTY
     assert tmp_chateaufort.nccenr == 'Châteaufort'
@@ -605,7 +605,7 @@ def test_fusion_then_change_county():
     blamecourt_list = towns.filter(depcom='95065')
     assert len(blamecourt_list) == 1
     blamecourt = blamecourt_list[0]
-    assert blamecourt.id == 'C95065@1968-01-01'
+    assert blamecourt.id == 'COM95065@1968-01-01'
     assert blamecourt.successors == towns.filter(depcom='95355')[0].id
     assert blamecourt.modification == DELETION_FUSION
     assert blamecourt.nccenr == 'Blamécourt'
@@ -616,8 +616,8 @@ def test_fusion_then_change_county():
     old_blamecourt_list = towns.filter(depcom='78065')
     assert len(old_blamecourt_list) == 1
     old_blamecourt = old_blamecourt_list[0]
-    assert old_blamecourt.id == 'C78065@1942-01-01'
-    assert old_blamecourt.successors == 'C95065@1968-01-01'
+    assert old_blamecourt.id == 'COM78065@1942-01-01'
+    assert old_blamecourt.successors == 'COM95065@1968-01-01'
     assert old_blamecourt.modification == CHANGE_COUNTY
     assert old_blamecourt.nccenr == 'Blamécourt'
     assert old_blamecourt.start_date == START_DATE
@@ -640,7 +640,7 @@ def test_obsolete():
     hauteville_list = towns.filter(depcom='01459')
     assert len(hauteville_list) == 1
     hauteville = hauteville_list[0]
-    assert hauteville.id == 'C01459@1942-01-01'
+    assert hauteville.id == 'COM01459@1942-01-01'
     assert hauteville.successors == ''
     assert hauteville.modification == OBSOLETE
     assert hauteville.nccenr == 'Hauteville-Lompnés'
@@ -703,13 +703,13 @@ def test_ancestor_not_deleted_on_fusion():
     saint_martin_list = towns.filter(depcom='89356')
     assert len(saint_martin_list) == 1
     saint_martin = saint_martin_list[0]
-    assert saint_aubin.id == 'C89334@1942-01-01'
+    assert saint_aubin.id == 'COM89334@1942-01-01'
     assert saint_aubin.nccenr == 'Saint-Aubin-Château-Neuf'
     assert saint_aubin.successors == val_ocre.id
-    assert saint_martin.id == 'C89356@1942-01-01'
+    assert saint_martin.id == 'COM89356@1942-01-01'
     assert saint_martin.nccenr == 'Saint-Martin-sur-Ocre'
     assert saint_martin.successors == val_ocre.id
-    assert val_ocre.id == 'C89334@2016-01-01'
+    assert val_ocre.id == 'COM89334@2016-01-01'
     assert val_ocre.nccenr == "Val d'Ocre"
     assert val_ocre.successors == ''
 
@@ -827,11 +827,11 @@ def test_creation_delegated_pole_not_sorted():
     vrigny_list = towns.filter(depcom='61511')
     assert len(vrigny_list) == 1
     vrigny = vrigny_list[0]
-    assert boischampre.id == 'C61375@2015-01-01'
+    assert boischampre.id == 'COM61375@2015-01-01'
     assert boischampre.successors == ''
     assert boischampre.modification == CREATION_DELEGATED_POLE
     assert boischampre.nccenr == 'Boischampré'
-    assert vrigny.id == 'C61511@1942-01-01'
+    assert vrigny.id == 'COM61511@1942-01-01'
     assert vrigny.successors == boischampre.id
     assert vrigny.modification == CREATION_DELEGATED
     assert vrigny.nccenr == 'Vrigny'
@@ -874,19 +874,19 @@ def test_creation_delegated_pole_without_same_name():
     pers_list = towns.filter(depcom='15150')
     assert len(pers_list) == 1
     pers = pers_list[0]
-    assert rouget.id == 'C15268@1945-09-17'
+    assert rouget.id == 'COM15268@1945-09-17'
     assert rouget.successors == rouget_pers.id
     assert rouget.modification == CREATION_DELEGATED
     assert rouget.nccenr == 'Rouget'
     assert rouget.start_datetime == datetime(1945, 9, 17, 0, 0, 0)
     assert rouget.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
-    assert pers.id == 'C15150@1942-01-01'
+    assert pers.id == 'COM15150@1942-01-01'
     assert pers.successors == rouget_pers.id
     assert pers.modification == CREATION_DELEGATED
     assert pers.nccenr == 'Pers'
     assert pers.start_datetime == START_DATETIME
     assert pers.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
-    assert rouget_pers.id == 'C15268@2016-01-01'
+    assert rouget_pers.id == 'COM15268@2016-01-01'
     assert rouget_pers.successors == ''
     assert rouget_pers.modification == CREATION_DELEGATED_POLE
     assert rouget_pers.nccenr == 'Rouget-Pers'
@@ -927,27 +927,27 @@ def test_change_county_after_rename():
     sainte_lucie_new = towns.filter(depcom='2A308')[0]
     poggio = towns.filter(depcom='2A237')[0]
     andrea = towns.filter(depcom='2A294')[0]
-    assert santa_lucia.id == 'C20308@1942-01-01'
+    assert santa_lucia.id == 'COM20308@1942-01-01'
     assert santa_lucia.end_date == date(1964, 12, 31)
-    assert sainte_lucie.id == 'C20308@1965-01-01'
+    assert sainte_lucie.id == 'COM20308@1965-01-01'
     assert sainte_lucie.end_date == date(1975, 12, 31)
     assert santa_lucia.successors == sainte_lucie.id
     assert poggio.successors == sainte_lucie.id
     assert andrea.successors == sainte_lucie.id
     assert sainte_lucie.successors == sainte_lucie_new.id
-    assert sainte_lucie_new.id == 'C2A308@1976-01-01'
+    assert sainte_lucie_new.id == 'COM2A308@1976-01-01'
     assert sainte_lucie_new.end_date == END_DATE
 
 
 '''
 
 Town created after START_DATE and change county later:
-Id not found: C2B366@1976-01-01
-Successor not found for <Town (C20366@1947-04-12): Chisa from 1947-04-12 to 1975-12-31 with successors C2B366@1976-01-01>
-Id not found: C95120@1968-01-01
-Successor not found for <Town (C78692@1948-08-01): Butry-sur-Oise from 1948-08-01 to 1967-12-31 with successors C95120@1968-01-01>
+Id not found: COM2B366@1976-01-01
+Successor not found for <Town (COM20366@1947-04-12): Chisa from 1947-04-12 to 1975-12-31 with successors COM2B366@1976-01-01>
+Id not found: COM95120@1968-01-01
+Successor not found for <Town (COM78692@1948-08-01): Butry-sur-Oise from 1948-08-01 to 1967-12-31 with successors COM95120@1968-01-01>
 
 Changed county twice:
-Id not found: C78620@1969-11-29
-Successor not found for <Town (C91620@1942-01-01): Toussus-le-Noble from 1942-01-01 to 1969-11-28 with successors C78620@1969-11-29>
+Id not found: COM78620@1969-11-29
+Successor not found for <Town (COM91620@1942-01-01): Toussus-le-Noble from 1942-01-01 to 1969-11-28 with successors COM78620@1969-11-29>
 '''

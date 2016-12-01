@@ -10,5 +10,5 @@
 <!-- Please provide the awaited result for the given town(s) -->
 
 ## Link to INSEE page
-<!-- Link to the relevant page: http://www.insee.fr/fr/methodes/nomenclatures/cog/fichecommunale.asp?codedep={DEP}&codecom={COM} -->
+<!-- Link to the relevant page: https://www.insee.fr/fr/metadonnees/cog/commune/COM{DEPCOM}-{NAME} -->
 
