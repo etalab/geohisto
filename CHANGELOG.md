@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.0.0 — 2016-12-01
+
+* Switch the name column in exports for CSV readability.
+* Use ids for Chef-lieux in regions export.
+
+
 ## 4.0.0 — 2016-12-01
 
 * Change ids for towns and regions (again) for consistency with INSEE.

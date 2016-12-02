@@ -17,8 +17,9 @@ def write_results_on(filename, towns, at_datetime=None):
     """
     with open(filename, 'w') as csvfile:
         fieldnames = [
-            'id', 'insee_code', 'name',
+            'id', 'insee_code',
             'start_datetime', 'end_datetime',
+            'name',
             'successors', 'ancestors',
             'population', 'insee_modification'
         ]
@@ -35,9 +36,9 @@ def write_results_on(filename, towns, at_datetime=None):
             write({
                 'id': town.id,
                 'insee_code': town.depcom,
-                'name': town.nccenr,
                 'start_datetime': town.start_datetime,
                 'end_datetime': town.end_datetime.replace(microsecond=0),
+                'name': town.nccenr,
                 'successors': town.successors,
                 'ancestors': town.ancestors,
                 'population': town.population,

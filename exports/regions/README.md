@@ -11,16 +11,16 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 
 * `id`: This is the unique combination of `REG` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
 * `insee_code`: The 2-digits code delivered by INSEE.
-* `name`: The new name of the region.
 * `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
 * `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
+* `name`: The name of the region.
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `population`: The population as of 2013.
 * `surface`: The area in km2.
-* `chef_lieu`: The Chef-lieu for that new region.
+* `chef_lieu`: The `id` of the Chef-lieu for that region, as found in `towns.csv`.
 * `nuts_code`: The 4-chars code delivered by Eurostat.
-* `wikipedia`: The wikipedia page for that new region (note that given how recent the change is, some links still redirect to temporary region names).
+* `wikipedia`: The wikipedia page for that region (note that given how recent the change is, some links still redirect to temporary region names).
 
 Given that regions have been merged, there is one line by current region and one line by ancestor. The `id` and `insee_code` columns are unique, the `nuts_code` one is NOT.
 
