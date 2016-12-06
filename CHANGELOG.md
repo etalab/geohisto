@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 6.0.0 — 2016-12-06
+
+* French counties export.
+* Add parents for towns.
+
+
 ## 5.0.0 — 2016-12-01
 
 * Switch the name column in exports for CSV readability.

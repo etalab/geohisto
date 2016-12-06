@@ -55,9 +55,16 @@ class Towns(OrderedDict):
         """Return a list of parents for a given `id`."""
         return [town for town in self.values() if id in town.successors]
 
-    def filter(self, depcom):
-        """Return a (sorted) list of Town with the given `depcom`."""
-        _towns = [town for town in self.values() if town.depcom == depcom]
+    def filter(self, **filters):
+        """
+        Return a (sorted) list of Town with the given filters applied.
+
+        Useful to look up by `depcom`, `nccenr` and so on.
+        """
+        _towns = [town
+                  for town in self.values()
+                  for k, v in filters.items()
+                  if getattr(town, k) == v]
         _towns.sort()  # Useful for tests.
         return _towns
 
@@ -67,7 +74,7 @@ class Towns(OrderedDict):
 
     def latest(self, depcom):
         """Get the most recent town for a given `depcom`."""
-        _towns = self.filter(depcom)
+        _towns = self.filter(depcom=depcom)
         _towns.sort(key=lambda town: town.end_datetime, reverse=True)
         return _towns[0]
 
@@ -75,7 +82,7 @@ class Towns(OrderedDict):
         """Return a list of Towns existing at the given `valid_datetime`."""
         # Beware, ternary operator is tricky here, keep it explicit.
         if depcom:
-            _towns = self.filter(depcom)
+            _towns = self.filter(depcom=depcom)
         else:
             _towns = self.values()
         return [town for town in _towns if town.valid_at(valid_datetime)]
@@ -92,7 +99,7 @@ class Town(namedtuple('Town', [
                       'id', 'actual', 'modification', 'successors',
                       'ancestors', 'start_date', 'end_date', 'start_datetime',
                       'end_datetime', 'dep', 'com', 'nccenr', 'depcom',
-                      'population'])):
+                      'population', 'parents'])):
     """Inherit from a namedtuple with empty slots for performances."""
     __slots__ = ()
 
@@ -140,6 +147,10 @@ class Town(namedtuple('Town', [
     def set_population(self, population):
         """Update the population."""
         return self._replace(**{'population': population})
+
+    def set_parents(self, parents):
+        """Update the parents."""
+        return self._replace(**{'parents': parents})
 
     def add_ancestor(self, ancestor):
         """Append the given ancestor to the current list if any."""

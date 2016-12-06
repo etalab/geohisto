@@ -2,9 +2,10 @@ from datetime import date, datetime
 
 import click
 
-from .loaders import load_towns, load_history, load_populations
+from .loaders import load_counties, load_towns, load_history, load_populations
 from .actions import compute
 from .utils import compute_ancestors
+from .parents import compute_parents
 from .populations import compute_populations
 from .exports import write_results_on, generate_head_results_from
 
@@ -21,6 +22,7 @@ def main(at_date):
     towns = load_towns()
     history_list = load_history()
     populations = load_populations()
+    counties = load_counties()
 
     # The order of the different computations is important:
     # ancestors before populations in order to fallback on
@@ -28,6 +30,7 @@ def main(at_date):
     compute(towns, history_list)
     compute_ancestors(towns)
     compute_populations(populations, towns)
+    compute_parents(counties, towns)
 
     # Finally write files.
     if at_date:

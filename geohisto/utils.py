@@ -4,12 +4,20 @@ Utils in use to convert/compute historical data.
 Most of the cryptic keys in that script are documented here:
 https://www.insee.fr/fr/information/2114819#titre-bloc-10
 """
+import csv
 from datetime import date, datetime
 from functools import wraps
 
 from .constants import SEPARATOR
 
 ACTIONS = {}
+
+
+def iter_over_insee_csv_file(csv_filepath):
+    """Open and enumerate over a CSV file located at `csv_filepath`."""
+    with open(csv_filepath, encoding='cp1252') as csv_file:
+        for i, data in enumerate(csv.DictReader(csv_file, delimiter='\t')):
+            yield i, data
 
 
 def in_case_of(*actions):

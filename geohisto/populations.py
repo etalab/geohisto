@@ -52,6 +52,7 @@ def compute_population(populations, population_id,
 
 
 def compute_populations(populations, towns):
+    """Update the population for each town."""
     for _, town in towns.items():
         population_id = town.depcom + town.nccenr
         population = compute_population(

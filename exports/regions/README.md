@@ -18,7 +18,7 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `population`: The population as of 2013.
 * `surface`: The area in km2.
-* `chef_lieu`: The `id` of the Chef-lieu for that region, as found in `towns.csv`.
+* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that region, as found in `towns.csv`. Default is an empty string.
 * `nuts_code`: The 4-chars code delivered by Eurostat.
 * `wikipedia`: The wikipedia page for that region (note that given how recent the change is, some links still redirect to temporary region names).
 

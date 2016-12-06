@@ -1,13 +1,13 @@
 # GeoHisto
 
-**Historic information for French regions and towns based on INSEE data, exported as a (re)usable CSV file.**
+**Historic information for French regions, counties and towns based on INSEE and Wikipedia data, exported as (re)usable CSV files.**
 
 It might be useful if you have to deal with redirections and is in use by the [geozones](https://github.com/etalab/geozones) project to feed [data.gouv.fr](http://www.data.gouv.fr/fr/).
 
 
 ## Usage
 
-If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/) and [towns](exports/towns/). There is a dedicated documentation at these places.
+If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/counties/) and [towns](exports/towns/). There is a dedicated documentation at these places.
 
 
 ## Sources
@@ -23,7 +23,7 @@ The project only requires [click](http://click.pocoo.org/5/) dependency (you can
 
     $ python -m geohisto
 
-Note that it takes about 4 minutes to generate the towns export.
+Note that it takes about 7 minutes to generate the towns export.
 
 Optionally, you can specify a date to only export towns valid at that given date:
 

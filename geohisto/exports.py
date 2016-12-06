@@ -20,7 +20,7 @@ def write_results_on(filename, towns, at_datetime=None):
             'id', 'insee_code',
             'start_datetime', 'end_datetime',
             'name',
-            'successors', 'ancestors',
+            'successors', 'ancestors', 'parents',
             'population', 'insee_modification'
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
@@ -41,6 +41,7 @@ def write_results_on(filename, towns, at_datetime=None):
                 'name': town.nccenr,
                 'successors': town.successors,
                 'ancestors': town.ancestors,
+                'parents': town.parents,
                 'population': town.population,
                 'insee_modification': town.modification
             })
