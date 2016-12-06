@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 6.2.0 — 2016-12-06
+
+* Newly generated towns files for previous bug.
+
+
 ## 6.1.0 — 2016-12-06
 
 * Wrong INSEE codes for Ardèche and Ardennes.
