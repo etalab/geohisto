@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 6.1.0 — 2016-12-06
+
+* Wrong INSEE codes for Ardèche and Ardennes.
+
+
 ## 6.0.0 — 2016-12-06
 
 * French counties export.
