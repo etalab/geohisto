@@ -29,7 +29,8 @@ def town_factory(**custom):
         'successors': '',
         'start_date': START_DATE,
         'end_date': END_DATE,
-        'population': 'NULL'
+        'population': 'NULL',
+        'parents': ''
     }
     custom['depcom'] = custom['dep'] + custom['com']
     params.update(custom)
