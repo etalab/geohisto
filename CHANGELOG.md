@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 6.3.0 — 2016-12-12
+
+* Wrong start dates for 11 counties.
+
+
 ## 6.2.0 — 2016-12-06
 
 * Newly generated towns files for previous bug.
