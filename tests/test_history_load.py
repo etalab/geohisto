@@ -19,7 +19,7 @@ def test_contains_first_last_items(history_list):
     assert plaisance.eff == datetime(2011, 1, 1, 0, 0)
     assert plaisance.effdate == date(2011, 1, 1)
     assert rouget.mod == CREATION_DELEGATED_POLE
-    assert rouget.nccoff == 'Rouget-Pers'
+    assert rouget.nccoff == 'Le Rouget-Pers'
     assert rouget.comech == '15150'
     assert rouget.eff == datetime(2016, 1, 1, 0, 0)
     assert rouget.effdate == date(2016, 1, 1)
