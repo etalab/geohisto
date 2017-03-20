@@ -8,7 +8,7 @@ import csv
 from datetime import date, datetime
 from functools import wraps
 
-from .constants import SEPARATOR
+from .constants import SEPARATOR, TNCC2ARTICLE
 
 ACTIONS = {}
 
@@ -43,18 +43,20 @@ def convert_datetime(string):
     return datetime.combine(convert_date(string), datetime.min.time())
 
 
-def convert_name_with_article(town):
-    """Return the `town` name with optional article."""
-    if town['ARTMIN']:
-        # Special `L'` case, all other articles require a space.
-        extra_space = int(town['TNCC']) != 5
+def convert_name_with_article(source, ncc_key='NCCENR', tncc_key='TNCC'):
+    """Return the `source` name with optional article.
+
+    You can set custom NCC and TNCC keys to deal with historiq data.
+    """
+    if source[tncc_key] and int(source[tncc_key]) > 1:
+        is_l_apostrophe = int(source[tncc_key]) == 5
         return '{article}{extra_space}{name}'.format(
-            article=town['ARTMIN'][1:-1],
-            extra_space=' ' if extra_space else '',
-            name=town['NCCENR']
+            article=TNCC2ARTICLE[int(source[tncc_key])],
+            extra_space='' if is_l_apostrophe else ' ',
+            name=source[ncc_key]
         )
     else:
-        return town['NCCENR']
+        return source[ncc_key]
 
 
 def compute_id(depcom, start_date):

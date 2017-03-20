@@ -12,6 +12,19 @@ END_DATE = date(9999, 12, 31)
 END_DATETIME = datetime.combine(END_DATE, datetime.max.time())
 DELTA = timedelta.resolution
 
+# Conversion required because historiq file does not contain `ARTMIN`.
+TNCC2ARTICLE = {
+    0: '',
+    1: '',
+    2: 'Le',
+    3: 'La',
+    4: 'Les',
+    5: "L'",
+    6: 'Aux',
+    7: 'Las',
+    8: 'Los',
+}
+
 # Modification keys from INSEE/COG:
 # https://www.insee.fr/fr/information/2114773#mod
 CHANGE_NAME = 100
