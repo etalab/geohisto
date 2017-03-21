@@ -7,8 +7,8 @@ def test_ancestors(towns):
     beauvoir_sur_sarce = towns.filter(depcom='10036')[0]
     assert bragelogne.successors == bragelogne_beauvoir.id
     assert beauvoir_sur_sarce.successors == bragelogne_beauvoir.id
-    assert (bragelogne_beauvoir.ancestors
-            == ';'.join([beauvoir_sur_sarce.id, bragelogne.id]))
+    assert (bragelogne_beauvoir.ancestors ==
+            ';'.join([beauvoir_sur_sarce.id, bragelogne.id]))
 
 
 def test_with_ancestors_population(towns):

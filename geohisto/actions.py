@@ -87,7 +87,7 @@ def creation_delegated(towns, record):
     towns.update_successors(new_town, from_town=current_town)
 
     # Update ancestors, useful for town that were created since then.
-    for ancestor in towns.valid_at(current_town.start_datetime-DELTA,
+    for ancestor in towns.valid_at(current_town.start_datetime - DELTA,
                                    depcom=record.depcom):
         towns.update_successors(ancestor, to_town=new_town)
 

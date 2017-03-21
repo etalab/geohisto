@@ -42,8 +42,8 @@ class Towns(OrderedDict):
             if valid_datetime:
                 try:
                     is_date_valid = (
-                        _town.valid_at(valid_datetime)
-                        and not _town.valid_at(valid_datetime + DELTA))
+                        _town.valid_at(valid_datetime) and
+                        not _town.valid_at(valid_datetime + DELTA))
                 except OverflowError:  # Happens on END_DATETIME + DELTA
                     is_date_valid = True
             if old_successor.id in _town.successors and is_date_valid:

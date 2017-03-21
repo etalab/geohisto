@@ -211,8 +211,8 @@ def test_reinstatement():
     assert old_brageac.start_date == START_DATE
     assert old_brageac.start_datetime == START_DATETIME
     assert old_brageac.end_date == date(1985, 9, 30)
-    assert (old_brageac.end_datetime
-            == datetime(1985, 9, 30, 23, 59, 59, 999999))
+    assert (old_brageac.end_datetime ==
+            datetime(1985, 9, 30, 23, 59, 59, 999999))
     assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
@@ -251,8 +251,8 @@ def test_fusion_then_reinstatement():
     assert old_brageac.start_date == START_DATE
     assert old_brageac.start_datetime == START_DATETIME
     assert old_brageac.end_date == date(1972, 12, 31)
-    assert (old_brageac.end_datetime
-            == datetime(1972, 12, 31, 23, 59, 59, 999999))
+    assert (old_brageac.end_datetime ==
+            datetime(1972, 12, 31, 23, 59, 59, 999999))
     assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
@@ -423,8 +423,8 @@ def test_fusion_association_associated():
     assert falgueyrat.start_date == START_DATE
     assert falgueyrat.start_datetime == START_DATETIME
     assert falgueyrat.end_date == date(1972, 12, 31)
-    assert (falgueyrat.end_datetime
-            == datetime(1972, 12, 31, 23, 59, 59, 999999))
+    assert (falgueyrat.end_datetime ==
+            datetime(1972, 12, 31, 23, 59, 59, 999999))
 
 
 def test_creation_delegated():
@@ -447,8 +447,8 @@ def test_creation_delegated():
     assert grentzingen.start_date == START_DATE
     assert grentzingen.start_datetime == START_DATETIME
     assert grentzingen.end_date == date(2015, 12, 31)
-    assert (grentzingen.end_datetime
-            == datetime(2015, 12, 31, 23, 59, 59, 999999))
+    assert (grentzingen.end_datetime ==
+            datetime(2015, 12, 31, 23, 59, 59, 999999))
 
 
 def test_creation_delegated_pole():
@@ -490,8 +490,8 @@ def test_creation_delegated_pole():
     assert grentzingen.start_date == START_DATE
     assert grentzingen.start_datetime == START_DATETIME
     assert grentzingen.end_date == date(2015, 12, 31)
-    assert (grentzingen.end_datetime
-            == datetime(2015, 12, 31, 23, 59, 59, 999999))
+    assert (grentzingen.end_datetime ==
+            datetime(2015, 12, 31, 23, 59, 59, 999999))
     assert illtal.id == 'COM68240@2016-01-01'
     assert illtal.successors == ''
     assert illtal.modification == CREATION_DELEGATED_POLE
@@ -569,8 +569,8 @@ def test_change_county_twice():
     assert old_chateaufort.start_date == START_DATE
     assert old_chateaufort.start_datetime == START_DATETIME
     assert old_chateaufort.end_date == date(1967, 12, 31)
-    assert (old_chateaufort.end_datetime
-            == datetime(1967, 12, 31, 23, 59, 59, 999999))
+    assert (old_chateaufort.end_datetime ==
+            datetime(1967, 12, 31, 23, 59, 59, 999999))
     assert tmp_chateaufort.id == 'COM91143@1968-01-01'
     assert tmp_chateaufort.successors == chateaufort.id
     assert tmp_chateaufort.modification == CHANGE_COUNTY
@@ -578,8 +578,8 @@ def test_change_county_twice():
     assert tmp_chateaufort.start_date == date(1968, 1, 1)
     assert tmp_chateaufort.start_datetime == datetime(1968, 1, 1, 0, 0, 0)
     assert tmp_chateaufort.end_date == date(1969, 11, 28)
-    assert (tmp_chateaufort.end_datetime
-            == datetime(1969, 11, 28, 23, 59, 59, 999999))
+    assert (tmp_chateaufort.end_datetime ==
+            datetime(1969, 11, 28, 23, 59, 59, 999999))
 
 
 def test_fusion_then_change_county():
@@ -623,8 +623,8 @@ def test_fusion_then_change_county():
     assert old_blamecourt.start_date == START_DATE
     assert old_blamecourt.start_datetime == START_DATETIME
     assert old_blamecourt.end_date == date(1967, 12, 31)
-    assert (old_blamecourt.end_datetime
-            == datetime(1967, 12, 31, 23, 59, 59, 999999))
+    assert (old_blamecourt.end_datetime ==
+            datetime(1967, 12, 31, 23, 59, 59, 999999))
 
 
 def test_obsolete():
@@ -740,8 +740,8 @@ def test_reinstatement_with_existing_town():
     assert len(aigueblanche_list) == 1
     aigueblanche = aigueblanche_list[0]
     assert avanchers.nccenr == 'Avanchers'
-    assert (avanchers.successors
-            == aigueblanche.id + ';' + avanchers_valmorel.id)
+    assert (avanchers.successors ==
+            aigueblanche.id + ';' + avanchers_valmorel.id)
     assert avanchers_valmorel.nccenr == 'Avanchers-Valmorel'
     assert avanchers_valmorel.successors == ''
 
@@ -940,14 +940,19 @@ def test_change_county_after_rename():
 
 
 '''
-
 Town created after START_DATE and change county later:
 Id not found: COM2B366@1976-01-01
-Successor not found for <Town (COM20366@1947-04-12): Chisa from 1947-04-12 to 1975-12-31 with successors COM2B366@1976-01-01>
+Successor not found for <Town (COM20366@1947-04-12):
+Chisa from 1947-04-12 to 1975-12-31
+with successors COM2B366@1976-01-01>
 Id not found: COM95120@1968-01-01
-Successor not found for <Town (COM78692@1948-08-01): Butry-sur-Oise from 1948-08-01 to 1967-12-31 with successors COM95120@1968-01-01>
+Successor not found for <Town (COM78692@1948-08-01):
+Butry-sur-Oise from 1948-08-01 to 1967-12-31
+with successors COM95120@1968-01-01>
 
 Changed county twice:
 Id not found: COM78620@1969-11-29
-Successor not found for <Town (COM91620@1942-01-01): Toussus-le-Noble from 1942-01-01 to 1969-11-28 with successors COM78620@1969-11-29>
+Successor not found for <Town (COM91620@1942-01-01):
+Toussus-le-Noble from 1942-01-01 to 1969-11-28
+with successors COM78620@1969-11-29>
 '''
