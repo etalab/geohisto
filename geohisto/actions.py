@@ -6,14 +6,11 @@ The modifications come from the history of changes.
 from .constants import (
     DELTA, END_DATETIME, START_DATE, START_DATETIME,
     CHANGE_NAME, CHANGE_NAME_FUSION, CHANGE_NAME_CREATION,
-    CHANGE_NAME_REINSTATEMENT,
-    CREATION, REINSTATEMENT, SPLITING,
+    CHANGE_NAME_REINSTATEMENT, CREATION, REINSTATEMENT, SPLITING,
     DELETION_PARTITION, DELETION_FUSION,
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
-    CREATION_DELEGATED_POLE,
-    CHANGE_COUNTY,
-    OBSOLETE
+    CREATION_DELEGATED_POLE, CHANGE_COUNTY, OBSOLETE
 )
 from .utils import compute_id, in_case_of, ACTIONS
 
@@ -22,13 +19,25 @@ from .utils import compute_id, in_case_of, ACTIONS
 def change_name(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
+    successors = ''
+    end_datetime = END_DATETIME
+    # In case the change name is referenced in historiq after the split.
+    if (current_town.end_datetime != END_DATETIME and
+            current_town.end_datetime > record.eff):
+        end_datetime = current_town.end_datetime
+        # Check for already existing successors.
+        successors = ';'.join(
+            successor.id
+            for successor in towns.valid_at(end_datetime + DELTA,
+                                            depcom=record.depcom))
+
     new_town = current_town.generate(
         id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
-        end_datetime=END_DATETIME,
+        end_datetime=end_datetime,
         # `nccenr` changes on fusions.
         nccenr=record.nccoff or current_town.nccenr,
-        successors=''
+        successors=successors
     )
     towns.upsert(new_town)
 

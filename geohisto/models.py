@@ -51,10 +51,6 @@ class Towns(OrderedDict):
                     old_successor.id, new_successor and new_successor.id or '')
                 self.upsert(_town)
 
-    def parents(self, id):
-        """Return a list of parents for a given `id`."""
-        return [town for town in self.values() if id in town.successors]
-
     def filter(self, **filters):
         """
         Return a (sorted) list of Town with the given filters applied.
@@ -69,8 +65,8 @@ class Towns(OrderedDict):
         return _towns
 
     def with_successors(self):
-        """Return a list of Towns having successors."""
-        return [town for town in self.values() if town.successors]
+        """Return a generator of Towns having successors."""
+        return (town for town in self.values() if town.successors)
 
     def latest(self, depcom):
         """Get the most recent town for a given `depcom`."""

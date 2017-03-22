@@ -939,6 +939,55 @@ def test_change_county_after_rename():
     assert sainte_lucie_new.end_date == END_DATE
 
 
+def test_change_name_reinstatement_before_change_name_fusion():
+    """Special case of Rocquefort-sur-Héricourt with name changed."""
+    rocquefort_town = town_factory(dep='35', com='355',
+                                   nccenr='Rocquefort-sur-Héricour')
+    hericourt_town = town_factory(dep='35', com='355',
+                                  nccenr='Héricourt-en-Caux')
+    towns = towns_factory(rocquefort_town, hericourt_town)
+
+    # Order is important to make the test pertinent.
+    change_name_reinstatement_record = record_factory(
+        dep='35', com='355', mod=CHANGE_NAME_REINSTATEMENT,
+        effdate=date(1976, 10, 29),
+        nccoff='Héricourt-en-Caux', nccanc='Rocquefort-sur-Héricourt')
+    spliting_record = record_factory(
+        dep='35', com='355', mod=SPLITING,
+        effdate=date(1976, 10, 29),
+        nccoff='Héricourt-en-Caux', comech='76531')
+    change_name_fusion_record = record_factory(
+        dep='35', com='355', mod=CHANGE_NAME_FUSION,
+        effdate=date(1973, 4, 10),
+        nccoff='Rocquefort-sur-Héricourt', nccanc='Héricourt-en-Caux')
+    history = [
+        change_name_reinstatement_record,
+        spliting_record,
+        change_name_fusion_record,
+    ]
+    compute(towns, history)
+    hericourt1, rocquefort, hericourt2 = towns.filter(depcom='35355')
+    assert hericourt1.id == 'COM35355@1942-01-01'
+    assert hericourt1.successors == hericourt2.id + ';' + rocquefort.id
+    assert hericourt1.modification == CHANGE_NAME_FUSION
+    assert hericourt1.nccenr == 'Héricourt-en-Caux'
+    assert hericourt1.start_datetime == START_DATETIME
+    assert hericourt1.end_datetime == datetime(1973, 4, 9, 23, 59, 59, 999999)
+    assert rocquefort.id == 'COM35355@1973-04-10'
+    assert rocquefort.successors == hericourt2.id
+    assert rocquefort.modification == CHANGE_NAME_REINSTATEMENT
+    assert rocquefort.nccenr == 'Rocquefort-sur-Héricourt'
+    assert rocquefort.start_datetime == datetime(1973, 4, 10, 0, 0, 0)
+    assert (rocquefort.end_datetime ==
+            datetime(1976, 10, 28, 23, 59, 59, 999999))
+    assert hericourt2.id == 'COM35355@1976-10-29'
+    assert hericourt2.successors == ''
+    assert hericourt2.modification == SPLITING
+    assert hericourt2.nccenr == 'Héricourt-en-Caux'
+    assert hericourt2.start_datetime == datetime(1976, 10, 29, 0, 0, 0)
+    assert hericourt2.end_datetime == END_DATETIME
+
+
 '''
 Town created after START_DATE and change county later:
 Id not found: COM2B366@1976-01-01
