@@ -16,8 +16,7 @@ from geohisto.constants import (
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
     CREATION_DELEGATED_POLE,
-    CHANGE_COUNTY,
-    OBSOLETE
+    CHANGE_COUNTY, OBSOLETE
 )
 from .factories import towns_factory, town_factory, record_factory
 
@@ -987,6 +986,49 @@ def test_change_name_reinstatement_before_change_name_fusion():
     assert hericourt2.start_datetime == datetime(1976, 10, 29, 0, 0, 0)
     assert hericourt2.end_datetime == END_DATETIME
 
+
+def test_fusion_then_change_name_on_successor():
+    """Special case of Arlod/Bellegarde(-sur-Valserine) and many."""
+    arlod_town = town_factory(dep='01', com='018', nccenr='Arlod')
+    bellegarde_town = town_factory(dep='01', com='033', nccenr='Bellegarde')
+    towns = towns_factory(arlod_town, bellegarde_town)
+
+    # Order is important to make the test pertinent.
+    delete_fusion_record = record_factory(
+        dep='01', com='018', mod=DELETION_FUSION,
+        effdate=date(1971, 1, 1),
+        nccoff='Arlod', comech='01033')
+    change_name_record = record_factory(
+        dep='01', com='033', mod=CHANGE_NAME,
+        effdate=date(1956, 10, 19),
+        nccoff='Bellegarde-sur-Valserine', nccanc='Bellegarde')
+    history = [
+        delete_fusion_record,
+        change_name_record,
+    ]
+    compute(towns, history)
+    arlod = towns.filter(depcom='01018')[0]
+    bellegarde, bellegarde_valserine = towns.filter(depcom='01033')
+    assert arlod.id == 'COM01018@1942-01-01'
+    assert arlod.successors == bellegarde_valserine.id
+    assert arlod.modification == DELETION_FUSION
+    assert arlod.nccenr == 'Arlod'
+    assert arlod.start_datetime == START_DATETIME
+    assert arlod.end_datetime == datetime(1970, 12, 31, 23, 59, 59, 999999)
+    assert bellegarde.id == 'COM01033@1942-01-01'
+    assert bellegarde.successors == bellegarde_valserine.id
+    assert bellegarde.modification == CHANGE_NAME
+    assert bellegarde.nccenr == 'Bellegarde'
+    assert bellegarde.start_datetime == START_DATETIME
+    assert (bellegarde.end_datetime ==
+            datetime(1956, 10, 18, 23, 59, 59, 999999))
+    assert bellegarde_valserine.id == 'COM01033@1956-10-19'
+    assert bellegarde_valserine.successors == ''
+    assert bellegarde_valserine.modification == 0
+    assert bellegarde_valserine.nccenr == 'Bellegarde-sur-Valserine'
+    assert (bellegarde_valserine.start_datetime ==
+            datetime(1956, 10, 19, 0, 0, 0))
+    assert bellegarde_valserine.end_datetime == END_DATETIME
 
 '''
 Town created after START_DATE and change county later:
