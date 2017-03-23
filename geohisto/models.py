@@ -1,6 +1,6 @@
 from collections import namedtuple, OrderedDict
 
-from .constants import DELTA
+from .constants import DELTA, START_DATETIME
 
 
 class Towns(OrderedDict):
@@ -33,7 +33,7 @@ class Towns(OrderedDict):
         elif from_town:
             self.replace_successor(from_town, town)
 
-    def replace_successor(self, old_successor, new_successor=False,
+    def replace_successor(self, old_successor, new_successor,
                           valid_datetime=None):
         """Run across all Towns and update successors."""
         if valid_datetime is None:
@@ -44,9 +44,11 @@ class Towns(OrderedDict):
                     is_date_valid = _town.valid_at(valid_datetime)
                 except OverflowError:  # Happens on END_DATETIME + DELTA
                     is_date_valid = True
-            if old_successor.id in _town.successors and is_date_valid:
-                _town = _town.replace_successor(
-                    old_successor.id, new_successor and new_successor.id or '')
+            if (old_successor.id in _town.successors and
+                    is_date_valid and
+                    new_successor.start_datetime != START_DATETIME):
+                _town = _town.replace_successor(old_successor.id,
+                                                new_successor.id)
                 self.upsert(_town)
 
     def filter(self, **filters):

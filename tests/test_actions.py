@@ -15,7 +15,7 @@ from geohisto.constants import (
     DELETION_PARTITION, DELETION_FUSION, FUSION_ABSORPTION,
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
-    CREATION_DELEGATED_POLE,
+    CREATION_DELEGATED_POLE, CREATION_PREEXISTING_ASSOCIATED,
     CHANGE_COUNTY, OBSOLETE
 )
 from .factories import towns_factory, town_factory, record_factory
@@ -695,8 +695,12 @@ def test_ancestor_not_deleted_on_fusion():
         dep='89', com='356', mod=CREATION_DELEGATED,
         effdate=date(2016, 1, 1), nccoff='Saint-Martin-sur-Ocre',
         comech='89334')
-    history = [creation_delegated_record1, change_name_record1,
-               change_name_record2, creation_delegated_record2]
+    history = [
+        creation_delegated_record1,
+        change_name_record1,
+        change_name_record2,
+        creation_delegated_record2,
+    ]
     compute(towns, history)
     saint_aubin, val_ocre = towns.filter(depcom='89334')
     saint_martin_list = towns.filter(depcom='89356')
@@ -919,8 +923,12 @@ def test_change_county_after_rename():
         dep='2A', com='308', mod=CHANGE_COUNTY,
         effdate=date(1976, 1, 1), nccoff='Sainte-Lucie-de-Tallano',
         depanc='20308')
-    history = [deletion_fusion_record1, deletion_fusion_record2,
-               change_name_fusion_record, change_county_record]
+    history = [
+        deletion_fusion_record1,
+        deletion_fusion_record2,
+        change_name_fusion_record,
+        change_county_record,
+    ]
     compute(towns, history)
     santa_lucia, sainte_lucie = towns.filter(depcom='20308')
     sainte_lucie_new = towns.filter(depcom='2A308')[0]
@@ -1029,6 +1037,131 @@ def test_fusion_then_change_name_on_successor():
     assert (bellegarde_valserine.start_datetime ==
             datetime(1956, 10, 19, 0, 0, 0))
     assert bellegarde_valserine.end_datetime == END_DATETIME
+
+
+def test_fusion_then_delegated_with_intermediate_successor():
+    """Special case of Cuisiat/Treffort-Cuisiat/Val-Revermont."""
+    cuisiat_town = town_factory(dep='01', com='137', nccenr='Cuisiat')
+    pressiat_town = town_factory(dep='01', com='312', nccenr='Pressiat')
+    val_revermont_town = town_factory(dep='01', com='426',
+                                      nccenr='Val-Revermont')
+    towns = towns_factory(cuisiat_town, pressiat_town, val_revermont_town)
+
+    # Order is important to make the test pertinent.
+    fusion_association_associated_record = record_factory(
+        dep='01', com='137', mod=FUSION_ASSOCIATION_ASSOCIATED,
+        effdate=date(1972, 12, 1),
+        nccoff='Cuisiat', comech='01426')
+    change_name_record = record_factory(
+        dep='01', com='426', mod=CHANGE_NAME_FUSION,
+        effdate=date(1972, 12, 1),
+        nccoff='Treffort-Cuisiat', nccanc='Treffort')
+    creation_delegated_pole_record1 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01312',
+        last=False)
+    creation_preexisting_associated_record = record_factory(
+        dep='01', com='137', mod=CREATION_PREEXISTING_ASSOCIATED,
+        effdate=date(2016, 1, 1), nccoff='Cuisiat', comech='01426')
+    creation_delegated_record = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Treffort', comech='01426')
+    creation_delegated_pole_record2 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01426',
+        last=False)
+    creation_delegated_pole_record3 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01137',
+        last=True)
+    history = [
+        fusion_association_associated_record,
+        change_name_record,
+        creation_delegated_pole_record1,
+        creation_preexisting_associated_record,
+        creation_delegated_record,
+        creation_delegated_pole_record2,
+        creation_delegated_pole_record3,
+    ]
+    compute(towns, history)
+    cuisiat1, cuisiat2 = towns.filter(depcom='01137')
+    treffort, treffort_cuisiat, val_revermont = towns.filter(depcom='01426')
+    assert cuisiat1.id == 'COM01137@1942-01-01'
+    assert cuisiat1.successors == treffort_cuisiat.id
+    assert cuisiat1.modification == FUSION_ASSOCIATION_ASSOCIATED
+    assert cuisiat1.nccenr == 'Cuisiat'
+    assert cuisiat1.start_datetime == START_DATETIME
+    assert cuisiat1.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
+    assert cuisiat2.id == 'COM01137@2016-01-01'
+    assert cuisiat2.successors == ''
+    assert cuisiat2.modification == CREATION_PREEXISTING_ASSOCIATED
+    assert cuisiat2.nccenr == 'Cuisiat'
+    assert cuisiat2.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert cuisiat2.end_datetime == END_DATETIME
+    assert treffort.id == 'COM01426@1942-01-01'
+    assert treffort.successors == treffort_cuisiat.id
+    assert treffort.modification == CHANGE_NAME_FUSION
+    assert treffort.nccenr == 'Treffort'
+    assert treffort.start_datetime == START_DATETIME
+    assert treffort.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
+    assert treffort_cuisiat.id == 'COM01426@1972-12-01'
+    assert treffort_cuisiat.successors == val_revermont.id
+    assert treffort_cuisiat.modification == CREATION_DELEGATED
+    # assert treffort_cuisiat.nccenr == 'Treffort-Cuisiat'  # Bug in historiq?
+    assert treffort_cuisiat.start_datetime == datetime(1972, 12, 1, 0, 0, 0)
+    assert (treffort_cuisiat.end_datetime ==
+            datetime(2015, 12, 31, 23, 59, 59, 999999))
+    assert val_revermont.id == 'COM01426@2016-01-01'
+    assert val_revermont.successors == ''
+    assert val_revermont.modification == CREATION_DELEGATED_POLE
+    assert val_revermont.nccenr == 'Val-Revermont'
+    assert val_revermont.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert val_revermont.end_datetime == END_DATETIME
+
+'''
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,COM08115@2016-01-01,,DEP08@1860-07-01,NULL,310
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,COM08115@1959-04-26,,DEP08@1860-07-01,NULL,310
+
+3               44  08  270         1   08115   0       MALMY       Malmy
+1   0   0       44  08  115 3   19  1       0       CHEMERY-CHEHERY     Chémery-Chéhéry     Vouziers
+
+08  3   19  115 D24-04-1959 25-04-1959  26-04-1959  26-04-1959  100
+                             0   Chémery-sur-Bar 0   Chémery
+08          270 D27-07-1966 06-08-1966  07-08-1966  07-08-1966  310
+08115                       0   Malmy
+08  3   19  115 A17-10-1964 08-12-1964  01-11-1964  01-11-1964  320         1
+ 1   08129                       0   Chémery-sur-Bar
+08  3   19  115 D27-07-1966 06-08-1966  07-08-1966  07-08-1966  320         1
+ 1   08270                       0   Chémery-sur-Bar
+
+08      19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  331
+     08115                       0   Chémery-sur-Bar
+08      19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  331
+     08115                       0   Chémery-sur-Bar
+08  3   19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  341         2
+ 1   08114                       0   Chémery-Chéhéry
+08  3   19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  341         2
+ 2   08115                       0   Chémery-Chéhéry
+
+'''
+
+'''
+1   0   0       32  02  524 1   02  1       0       MONT-SAINT-PERE     Mont-Saint-Père     Château-Thierry
+1   0   0       32  02  166 1   04  1       0       CHARTEVES       Chartèves       Essômes-sur-Marne
+
+02  1   04  166 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  330
+     02524                       0   Chartèves
+02  1   04  166 A10-11-1977 07-12-1977  01-01-1978  01-01-1978  210
+     02524                       0   Chartèves
+02  1   02  524 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  110
+                             0   Charmont-sur-Marne  0   Mont-Saint-Père
+02  1   02  524 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  340         1
+ 1   02166                       0   Charmont-sur-Marne
+02  1   02  524 A10-11-1977 07-12-1977  01-01-1978  01-01-1978  230
+     02166                       0   Charmont-sur-Marne
+02  1   02  524 D11-06-1979 14-06-1979  15-06-1979  15-06-1979  100
+                             0   Mont-Saint-Père 0   Charmont-sur-Marne
+'''
 
 '''
 Town created after START_DATE and change county later:

@@ -36,4 +36,4 @@ def test_counts(towns):
     assert len(towns.valid_at(datetime(2013, 1, 1, 0, 0, 0))) - 36681 == 42
     assert len(towns.valid_at(datetime(2014, 1, 1, 0, 0, 0))) - 36681 == 41
     assert len(towns.valid_at(datetime(2015, 1, 1, 0, 0, 0))) - 36658 == 41
-    assert len(towns.valid_at(datetime(2016, 1, 1, 0, 0, 0))) - 35885 == 47
+    assert len(towns.valid_at(datetime(2016, 1, 1, 0, 0, 0))) - 35885 == 50
