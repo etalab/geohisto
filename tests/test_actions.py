@@ -242,9 +242,8 @@ def test_fusion_then_reinstatement():
     assert len(ally_list) == 1
     ally = ally_list[0]
     old_brageac, new_brageac = towns.filter(depcom='15024')
-    assert ally.successors == ''
     assert old_brageac.id == 'COM15024@1942-01-01'
-    assert old_brageac.successors == ally.id + ';' + new_brageac.id
+    assert old_brageac.successors == ally.id
     assert old_brageac.modification == REINSTATEMENT
     assert old_brageac.nccenr == 'Brageac'
     assert old_brageac.start_date == START_DATE
@@ -252,6 +251,7 @@ def test_fusion_then_reinstatement():
     assert old_brageac.end_date == date(1972, 12, 31)
     assert (old_brageac.end_datetime ==
             datetime(1972, 12, 31, 23, 59, 59, 999999))
+    assert ally.successors == ''
     assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
@@ -773,7 +773,7 @@ def test_start_end_same_moment():
     heudicourt = towns.filter(depcom='55245')[0]
     nonsard = towns.filter(depcom='55386')[0]
     assert lamarche1.nccenr == 'Lamarche-en-Woëvre'
-    assert lamarche1.successors == heudicourt.id + ';' + lamarche2.id
+    assert lamarche1.successors == heudicourt.id
     assert lamarche2.nccenr == 'Lamarche-en-Woëvre'
     assert lamarche2.successors == nonsard.id
     assert lamarche2.start_datetime == datetime(1983, 1, 1, 0, 0, 0)
@@ -850,7 +850,7 @@ def test_creation_delegated_pole_without_same_name():
     creation_record = record_factory(
         dep='15', com='268', mod=CREATION,
         effdate=date(1945, 9, 17), nccoff='Rouget', comech='15196')
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     creation_delegated_pole_record1 = record_factory(
         dep='15', com='268', mod=CREATION_DELEGATED_POLE,
         effdate=date(2016, 1, 1), nccoff='Rouget-Pers', comech='15268',
@@ -954,7 +954,7 @@ def test_change_name_reinstatement_before_change_name_fusion():
                                   nccenr='Héricourt-en-Caux')
     towns = towns_factory(rocquefort_town, hericourt_town)
 
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     change_name_reinstatement_record = record_factory(
         dep='35', com='355', mod=CHANGE_NAME_REINSTATEMENT,
         effdate=date(1976, 10, 29),
@@ -1001,7 +1001,7 @@ def test_fusion_then_change_name_on_successor():
     bellegarde_town = town_factory(dep='01', com='033', nccenr='Bellegarde')
     towns = towns_factory(arlod_town, bellegarde_town)
 
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     delete_fusion_record = record_factory(
         dep='01', com='018', mod=DELETION_FUSION,
         effdate=date(1971, 1, 1),
@@ -1047,7 +1047,7 @@ def test_fusion_then_delegated_with_intermediate_successor():
                                       nccenr='Val-Revermont')
     towns = towns_factory(cuisiat_town, pressiat_town, val_revermont_town)
 
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     fusion_association_associated_record = record_factory(
         dep='01', com='137', mod=FUSION_ASSOCIATION_ASSOCIATED,
         effdate=date(1972, 12, 1),
@@ -1118,12 +1118,78 @@ def test_fusion_then_delegated_with_intermediate_successor():
     assert val_revermont.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
     assert val_revermont.end_datetime == END_DATETIME
 
+
+def test_fusion_then_split_then_change_name():
+    """Special case of Chartèves/Mont-Saint-Père/Charmont-sur-Marne."""
+    towns = towns_factory(
+        town_factory(dep='02', com='166', nccenr='Chartèves'),
+        town_factory(dep='02', com='524', nccenr='Mont-Saint-Père')
+    )
+
+    # Order is important to make the test relevant.
+    fusion_association_record = record_factory(
+        dep='02', com='166', mod=FUSION_ASSOCIATION_ASSOCIATED,
+        effdate=date(1974, 10, 1),
+        nccoff='Chartèves', comech='02524')
+    reinstatement_record = record_factory(
+        dep='02', com='166', mod=REINSTATEMENT,
+        effdate=date(1978, 1, 1),
+        nccoff='Chartèves', comech='02254')
+    change_name_fusion_record = record_factory(
+        dep='02', com='524', mod=CHANGE_NAME_FUSION,
+        effdate=date(1974, 10, 1),
+        nccoff='Charmont-sur-Marne', nccanc='Mont-Saint-Père')
+    spliting_record = record_factory(
+        dep='02', com='524', mod=SPLITING,
+        effdate=date(1978, 1, 1),
+        nccoff='Charmont-sur-Marne', comech='02166')
+    change_name_record = record_factory(
+        dep='02', com='524', mod=CHANGE_NAME,
+        effdate=date(1979, 6, 15),
+        nccoff='Mont-Saint-Père', nccanc='Charmont-sur-Marne')
+    history = [
+        fusion_association_record,
+        reinstatement_record,
+        change_name_fusion_record,
+        spliting_record,
+        change_name_record,
+    ]
+    compute(towns, history)
+    charteves1, charteves2 = towns.filter(depcom='02166')
+    mt_st_pere1, charmont_sur_marne, mt_st_pere2 = towns.filter(depcom='02524')
+    assert charteves1.id == 'COM02166@1942-01-01'
+    assert charteves1.nccenr == 'Chartèves'
+    assert charteves1.successors == charmont_sur_marne.id
+    assert charteves1.end_datetime == datetime(1974, 9, 30, 23, 59, 59, 999999)
+    assert charteves2.id == 'COM02166@1978-01-01'
+    assert charteves2.nccenr == 'Chartèves'
+    assert charteves2.successors == ''
+    assert charteves2.end_datetime == END_DATETIME
+    assert mt_st_pere1.id == 'COM02524@1942-01-01'
+    assert mt_st_pere1.nccenr == 'Mont-Saint-Père'
+    assert mt_st_pere1.successors == charmont_sur_marne.id
+    assert (mt_st_pere1.end_datetime ==
+            datetime(1974, 9, 30, 23, 59, 59, 999999))
+    assert charmont_sur_marne.id == 'COM02524@1974-10-01'
+    assert charmont_sur_marne.nccenr == 'Charmont-sur-Marne'
+    assert charmont_sur_marne.successors == mt_st_pere2.id
+    assert (charmont_sur_marne.end_datetime ==
+            datetime(1979, 6, 14, 23, 59, 59, 999999))
+    assert mt_st_pere2.id == 'COM02524@1979-06-15'
+    assert mt_st_pere2.nccenr == 'Mont-Saint-Père'
+    assert mt_st_pere2.successors == ''
+    assert mt_st_pere2.end_datetime == END_DATETIME
+
+
 '''
-COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,COM08115@2016-01-01,,DEP08@1860-07-01,NULL,310
-COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,COM08115@1959-04-26,,DEP08@1860-07-01,NULL,310
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,
+COM08115@2016-01-01,,DEP08@1860-07-01,NULL,310
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,
+COM08115@1959-04-26,,DEP08@1860-07-01,NULL,310
 
 3               44  08  270         1   08115   0       MALMY       Malmy
-1   0   0       44  08  115 3   19  1       0       CHEMERY-CHEHERY     Chémery-Chéhéry     Vouziers
+1   0   0       44  08  115 3   19  1       0       CHEMERY-CHEHERY
+Chémery-Chéhéry     Vouziers
 
 08  3   19  115 D24-04-1959 25-04-1959  26-04-1959  26-04-1959  100
                              0   Chémery-sur-Bar 0   Chémery
@@ -1145,23 +1211,6 @@ COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,COM08115
 
 '''
 
-'''
-1   0   0       32  02  524 1   02  1       0       MONT-SAINT-PERE     Mont-Saint-Père     Château-Thierry
-1   0   0       32  02  166 1   04  1       0       CHARTEVES       Chartèves       Essômes-sur-Marne
-
-02  1   04  166 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  330
-     02524                       0   Chartèves
-02  1   04  166 A10-11-1977 07-12-1977  01-01-1978  01-01-1978  210
-     02524                       0   Chartèves
-02  1   02  524 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  110
-                             0   Charmont-sur-Marne  0   Mont-Saint-Père
-02  1   02  524 A06-09-1974 03-10-1974  01-10-1974  01-10-1974  340         1
- 1   02166                       0   Charmont-sur-Marne
-02  1   02  524 A10-11-1977 07-12-1977  01-01-1978  01-01-1978  230
-     02166                       0   Charmont-sur-Marne
-02  1   02  524 D11-06-1979 14-06-1979  15-06-1979  15-06-1979  100
-                             0   Mont-Saint-Père 0   Charmont-sur-Marne
-'''
 
 '''
 Town created after START_DATE and change county later:

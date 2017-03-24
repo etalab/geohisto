@@ -155,7 +155,8 @@ def reinstatement(towns, record):
         end_datetime=min(current_town.end_datetime, record.eff - DELTA),
         modification=record.mod
     )
-    old_town = old_town.add_successor(new_town.id)
+    if new_town.valid_at(old_town.end_datetime + DELTA):
+        old_town = old_town.add_successor(new_town.id)
     towns.upsert(old_town)
 
 
