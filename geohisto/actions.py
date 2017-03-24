@@ -10,7 +10,8 @@ from .constants import (
     DELETION_PARTITION, DELETION_FUSION,
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
-    CREATION_DELEGATED_POLE, CHANGE_COUNTY, OBSOLETE
+    CREATION_DELEGATED_POLE, CHANGE_COUNTY, OBSOLETE,
+    CREATION_PREEXISTING_ASSOCIATED
 )
 from .utils import compute_id, in_case_of, ACTIONS
 
@@ -93,7 +94,8 @@ def creation_delegated(towns, record):
     is_already_registered = new_town.id in towns
     if not is_already_registered:
         towns.upsert(new_town)
-    towns.update_successors(new_town, from_town=current_town)
+    if record.last:
+        towns.update_successors(new_town, from_town=current_town)
 
     # Update ancestors, useful for town that were created since then.
     for ancestor in towns.valid_at(current_town.start_datetime - DELTA,
@@ -108,6 +110,22 @@ def creation_delegated(towns, record):
     has_the_same_name = new_town.nccenr == current_town.nccenr
     if has_different_ids and has_the_same_name:
         towns.delete(current_town)
+
+
+@in_case_of(CREATION_PREEXISTING_ASSOCIATED)
+def creation_preexisting(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+    new_town = current_town.generate(
+        id=compute_id(current_town.depcom, record.effdate),
+        start_datetime=record.eff,
+        end_datetime=END_DATETIME,
+        # `nccenr` changes on fusions.
+        nccenr=record.nccoff or current_town.nccenr,
+        modification=record.mod,
+        successors=''
+    )
+    towns.upsert(new_town)
+    towns.update_successors(new_town, from_town=current_town)
     towns.update_successors(current_town, to_town=new_town)
 
 
@@ -115,15 +133,15 @@ def creation_delegated(towns, record):
 def reinstatement(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
-    id = compute_id(current_town.depcom, record.effdate)
+    id_ = compute_id(current_town.depcom, record.effdate)
     # It happens with `Avanchers-Valmorel` for instance
     # where a change name is performed at the same date.
-    is_already_registered = id in towns
+    is_already_registered = id_ in towns
     if is_already_registered:
         return
 
     new_town = current_town.generate(
-        id=id,
+        id=id_,
         start_datetime=record.eff,
         end_datetime=END_DATETIME,
         nccenr=record.nccoff,
@@ -137,7 +155,8 @@ def reinstatement(towns, record):
         end_datetime=min(current_town.end_datetime, record.eff - DELTA),
         modification=record.mod
     )
-    old_town = old_town.add_successor(new_town.id)
+    if new_town.valid_at(old_town.end_datetime + DELTA):
+        old_town = old_town.add_successor(new_town.id)
     towns.upsert(old_town)
 
 
@@ -214,7 +233,7 @@ def creation_not_delegated(towns, record):
 def change_county(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
     # We set the `end_datetime` explicitely for the particular case
-    # of Blamécourt where the town as fusioned before changin county.
+    # of Blamécourt where the town as fusioned before changing county.
     new_town = current_town.generate(
         id=compute_id(current_town.depcom, record.effdate),
         start_datetime=record.eff,
@@ -227,10 +246,10 @@ def change_county(towns, record):
     ancient_town = towns.get_current(record.depanc, record.eff)
     ancient_town_is_valid = ancient_town.valid_at(record.eff)
     if ancient_town_is_valid:
-        id = compute_id(ancient_town.depcom, current_town.start_date)
-        is_new_entry = id not in towns
+        id_ = compute_id(ancient_town.depcom, current_town.start_date)
+        is_new_entry = id_ not in towns
         old_town = ancient_town.generate(
-            id=id,
+            id=id_,
             start_datetime=current_town.start_datetime,
             end_datetime=record.eff - DELTA,
             modification=record.mod

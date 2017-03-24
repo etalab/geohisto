@@ -15,9 +15,8 @@ from geohisto.constants import (
     DELETION_PARTITION, DELETION_FUSION, FUSION_ABSORPTION,
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
-    CREATION_DELEGATED_POLE,
-    CHANGE_COUNTY,
-    OBSOLETE
+    CREATION_DELEGATED_POLE, CREATION_PREEXISTING_ASSOCIATED,
+    CHANGE_COUNTY, OBSOLETE
 )
 from .factories import towns_factory, town_factory, record_factory
 
@@ -243,9 +242,8 @@ def test_fusion_then_reinstatement():
     assert len(ally_list) == 1
     ally = ally_list[0]
     old_brageac, new_brageac = towns.filter(depcom='15024')
-    assert ally.successors == ''
     assert old_brageac.id == 'COM15024@1942-01-01'
-    assert old_brageac.successors == ally.id + ';' + new_brageac.id
+    assert old_brageac.successors == ally.id
     assert old_brageac.modification == REINSTATEMENT
     assert old_brageac.nccenr == 'Brageac'
     assert old_brageac.start_date == START_DATE
@@ -253,6 +251,7 @@ def test_fusion_then_reinstatement():
     assert old_brageac.end_date == date(1972, 12, 31)
     assert (old_brageac.end_datetime ==
             datetime(1972, 12, 31, 23, 59, 59, 999999))
+    assert ally.successors == ''
     assert new_brageac.id == 'COM15024@1985-10-01'
     assert new_brageac.successors == ''
     assert new_brageac.modification == 0
@@ -696,8 +695,12 @@ def test_ancestor_not_deleted_on_fusion():
         dep='89', com='356', mod=CREATION_DELEGATED,
         effdate=date(2016, 1, 1), nccoff='Saint-Martin-sur-Ocre',
         comech='89334')
-    history = [creation_delegated_record1, change_name_record1,
-               change_name_record2, creation_delegated_record2]
+    history = [
+        creation_delegated_record1,
+        change_name_record1,
+        change_name_record2,
+        creation_delegated_record2,
+    ]
     compute(towns, history)
     saint_aubin, val_ocre = towns.filter(depcom='89334')
     saint_martin_list = towns.filter(depcom='89356')
@@ -770,7 +773,7 @@ def test_start_end_same_moment():
     heudicourt = towns.filter(depcom='55245')[0]
     nonsard = towns.filter(depcom='55386')[0]
     assert lamarche1.nccenr == 'Lamarche-en-Woëvre'
-    assert lamarche1.successors == heudicourt.id + ';' + lamarche2.id
+    assert lamarche1.successors == heudicourt.id
     assert lamarche2.nccenr == 'Lamarche-en-Woëvre'
     assert lamarche2.successors == nonsard.id
     assert lamarche2.start_datetime == datetime(1983, 1, 1, 0, 0, 0)
@@ -847,7 +850,7 @@ def test_creation_delegated_pole_without_same_name():
     creation_record = record_factory(
         dep='15', com='268', mod=CREATION,
         effdate=date(1945, 9, 17), nccoff='Rouget', comech='15196')
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     creation_delegated_pole_record1 = record_factory(
         dep='15', com='268', mod=CREATION_DELEGATED_POLE,
         effdate=date(2016, 1, 1), nccoff='Rouget-Pers', comech='15268',
@@ -920,8 +923,12 @@ def test_change_county_after_rename():
         dep='2A', com='308', mod=CHANGE_COUNTY,
         effdate=date(1976, 1, 1), nccoff='Sainte-Lucie-de-Tallano',
         depanc='20308')
-    history = [deletion_fusion_record1, deletion_fusion_record2,
-               change_name_fusion_record, change_county_record]
+    history = [
+        deletion_fusion_record1,
+        deletion_fusion_record2,
+        change_name_fusion_record,
+        change_county_record,
+    ]
     compute(towns, history)
     santa_lucia, sainte_lucie = towns.filter(depcom='20308')
     sainte_lucie_new = towns.filter(depcom='2A308')[0]
@@ -947,7 +954,7 @@ def test_change_name_reinstatement_before_change_name_fusion():
                                   nccenr='Héricourt-en-Caux')
     towns = towns_factory(rocquefort_town, hericourt_town)
 
-    # Order is important to make the test pertinent.
+    # Order is important to make the test relevant.
     change_name_reinstatement_record = record_factory(
         dep='35', com='355', mod=CHANGE_NAME_REINSTATEMENT,
         effdate=date(1976, 10, 29),
@@ -986,6 +993,223 @@ def test_change_name_reinstatement_before_change_name_fusion():
     assert hericourt2.nccenr == 'Héricourt-en-Caux'
     assert hericourt2.start_datetime == datetime(1976, 10, 29, 0, 0, 0)
     assert hericourt2.end_datetime == END_DATETIME
+
+
+def test_fusion_then_change_name_on_successor():
+    """Special case of Arlod/Bellegarde(-sur-Valserine) and many."""
+    arlod_town = town_factory(dep='01', com='018', nccenr='Arlod')
+    bellegarde_town = town_factory(dep='01', com='033', nccenr='Bellegarde')
+    towns = towns_factory(arlod_town, bellegarde_town)
+
+    # Order is important to make the test relevant.
+    delete_fusion_record = record_factory(
+        dep='01', com='018', mod=DELETION_FUSION,
+        effdate=date(1971, 1, 1),
+        nccoff='Arlod', comech='01033')
+    change_name_record = record_factory(
+        dep='01', com='033', mod=CHANGE_NAME,
+        effdate=date(1956, 10, 19),
+        nccoff='Bellegarde-sur-Valserine', nccanc='Bellegarde')
+    history = [
+        delete_fusion_record,
+        change_name_record,
+    ]
+    compute(towns, history)
+    arlod = towns.filter(depcom='01018')[0]
+    bellegarde, bellegarde_valserine = towns.filter(depcom='01033')
+    assert arlod.id == 'COM01018@1942-01-01'
+    assert arlod.successors == bellegarde_valserine.id
+    assert arlod.modification == DELETION_FUSION
+    assert arlod.nccenr == 'Arlod'
+    assert arlod.start_datetime == START_DATETIME
+    assert arlod.end_datetime == datetime(1970, 12, 31, 23, 59, 59, 999999)
+    assert bellegarde.id == 'COM01033@1942-01-01'
+    assert bellegarde.successors == bellegarde_valserine.id
+    assert bellegarde.modification == CHANGE_NAME
+    assert bellegarde.nccenr == 'Bellegarde'
+    assert bellegarde.start_datetime == START_DATETIME
+    assert (bellegarde.end_datetime ==
+            datetime(1956, 10, 18, 23, 59, 59, 999999))
+    assert bellegarde_valserine.id == 'COM01033@1956-10-19'
+    assert bellegarde_valserine.successors == ''
+    assert bellegarde_valserine.modification == 0
+    assert bellegarde_valserine.nccenr == 'Bellegarde-sur-Valserine'
+    assert (bellegarde_valserine.start_datetime ==
+            datetime(1956, 10, 19, 0, 0, 0))
+    assert bellegarde_valserine.end_datetime == END_DATETIME
+
+
+def test_fusion_then_delegated_with_intermediate_successor():
+    """Special case of Cuisiat/Treffort-Cuisiat/Val-Revermont."""
+    cuisiat_town = town_factory(dep='01', com='137', nccenr='Cuisiat')
+    pressiat_town = town_factory(dep='01', com='312', nccenr='Pressiat')
+    val_revermont_town = town_factory(dep='01', com='426',
+                                      nccenr='Val-Revermont')
+    towns = towns_factory(cuisiat_town, pressiat_town, val_revermont_town)
+
+    # Order is important to make the test relevant.
+    fusion_association_associated_record = record_factory(
+        dep='01', com='137', mod=FUSION_ASSOCIATION_ASSOCIATED,
+        effdate=date(1972, 12, 1),
+        nccoff='Cuisiat', comech='01426')
+    change_name_record = record_factory(
+        dep='01', com='426', mod=CHANGE_NAME_FUSION,
+        effdate=date(1972, 12, 1),
+        nccoff='Treffort-Cuisiat', nccanc='Treffort')
+    creation_delegated_pole_record1 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01312',
+        last=False)
+    creation_preexisting_associated_record = record_factory(
+        dep='01', com='137', mod=CREATION_PREEXISTING_ASSOCIATED,
+        effdate=date(2016, 1, 1), nccoff='Cuisiat', comech='01426')
+    creation_delegated_record = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Treffort', comech='01426')
+    creation_delegated_pole_record2 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01426',
+        last=False)
+    creation_delegated_pole_record3 = record_factory(
+        dep='01', com='426', mod=CREATION_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Val-Revermont', comech='01137',
+        last=True)
+    history = [
+        fusion_association_associated_record,
+        change_name_record,
+        creation_delegated_pole_record1,
+        creation_preexisting_associated_record,
+        creation_delegated_record,
+        creation_delegated_pole_record2,
+        creation_delegated_pole_record3,
+    ]
+    compute(towns, history)
+    cuisiat1, cuisiat2 = towns.filter(depcom='01137')
+    treffort, treffort_cuisiat, val_revermont = towns.filter(depcom='01426')
+    assert cuisiat1.id == 'COM01137@1942-01-01'
+    assert cuisiat1.successors == treffort_cuisiat.id
+    assert cuisiat1.modification == FUSION_ASSOCIATION_ASSOCIATED
+    assert cuisiat1.nccenr == 'Cuisiat'
+    assert cuisiat1.start_datetime == START_DATETIME
+    assert cuisiat1.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
+    assert cuisiat2.id == 'COM01137@2016-01-01'
+    assert cuisiat2.successors == ''
+    assert cuisiat2.modification == CREATION_PREEXISTING_ASSOCIATED
+    assert cuisiat2.nccenr == 'Cuisiat'
+    assert cuisiat2.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert cuisiat2.end_datetime == END_DATETIME
+    assert treffort.id == 'COM01426@1942-01-01'
+    assert treffort.successors == treffort_cuisiat.id
+    assert treffort.modification == CHANGE_NAME_FUSION
+    assert treffort.nccenr == 'Treffort'
+    assert treffort.start_datetime == START_DATETIME
+    assert treffort.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
+    assert treffort_cuisiat.id == 'COM01426@1972-12-01'
+    assert treffort_cuisiat.successors == val_revermont.id
+    assert treffort_cuisiat.modification == CREATION_DELEGATED
+    # assert treffort_cuisiat.nccenr == 'Treffort-Cuisiat'  # Bug in historiq?
+    assert treffort_cuisiat.start_datetime == datetime(1972, 12, 1, 0, 0, 0)
+    assert (treffort_cuisiat.end_datetime ==
+            datetime(2015, 12, 31, 23, 59, 59, 999999))
+    assert val_revermont.id == 'COM01426@2016-01-01'
+    assert val_revermont.successors == ''
+    assert val_revermont.modification == CREATION_DELEGATED_POLE
+    assert val_revermont.nccenr == 'Val-Revermont'
+    assert val_revermont.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert val_revermont.end_datetime == END_DATETIME
+
+
+def test_fusion_then_split_then_change_name():
+    """Special case of Chartèves/Mont-Saint-Père/Charmont-sur-Marne."""
+    towns = towns_factory(
+        town_factory(dep='02', com='166', nccenr='Chartèves'),
+        town_factory(dep='02', com='524', nccenr='Mont-Saint-Père')
+    )
+
+    # Order is important to make the test relevant.
+    fusion_association_record = record_factory(
+        dep='02', com='166', mod=FUSION_ASSOCIATION_ASSOCIATED,
+        effdate=date(1974, 10, 1),
+        nccoff='Chartèves', comech='02524')
+    reinstatement_record = record_factory(
+        dep='02', com='166', mod=REINSTATEMENT,
+        effdate=date(1978, 1, 1),
+        nccoff='Chartèves', comech='02254')
+    change_name_fusion_record = record_factory(
+        dep='02', com='524', mod=CHANGE_NAME_FUSION,
+        effdate=date(1974, 10, 1),
+        nccoff='Charmont-sur-Marne', nccanc='Mont-Saint-Père')
+    spliting_record = record_factory(
+        dep='02', com='524', mod=SPLITING,
+        effdate=date(1978, 1, 1),
+        nccoff='Charmont-sur-Marne', comech='02166')
+    change_name_record = record_factory(
+        dep='02', com='524', mod=CHANGE_NAME,
+        effdate=date(1979, 6, 15),
+        nccoff='Mont-Saint-Père', nccanc='Charmont-sur-Marne')
+    history = [
+        fusion_association_record,
+        reinstatement_record,
+        change_name_fusion_record,
+        spliting_record,
+        change_name_record,
+    ]
+    compute(towns, history)
+    charteves1, charteves2 = towns.filter(depcom='02166')
+    mt_st_pere1, charmont_sur_marne, mt_st_pere2 = towns.filter(depcom='02524')
+    assert charteves1.id == 'COM02166@1942-01-01'
+    assert charteves1.nccenr == 'Chartèves'
+    assert charteves1.successors == charmont_sur_marne.id
+    assert charteves1.end_datetime == datetime(1974, 9, 30, 23, 59, 59, 999999)
+    assert charteves2.id == 'COM02166@1978-01-01'
+    assert charteves2.nccenr == 'Chartèves'
+    assert charteves2.successors == ''
+    assert charteves2.end_datetime == END_DATETIME
+    assert mt_st_pere1.id == 'COM02524@1942-01-01'
+    assert mt_st_pere1.nccenr == 'Mont-Saint-Père'
+    assert mt_st_pere1.successors == charmont_sur_marne.id
+    assert (mt_st_pere1.end_datetime ==
+            datetime(1974, 9, 30, 23, 59, 59, 999999))
+    assert charmont_sur_marne.id == 'COM02524@1974-10-01'
+    assert charmont_sur_marne.nccenr == 'Charmont-sur-Marne'
+    assert charmont_sur_marne.successors == mt_st_pere2.id
+    assert (charmont_sur_marne.end_datetime ==
+            datetime(1979, 6, 14, 23, 59, 59, 999999))
+    assert mt_st_pere2.id == 'COM02524@1979-06-15'
+    assert mt_st_pere2.nccenr == 'Mont-Saint-Père'
+    assert mt_st_pere2.successors == ''
+    assert mt_st_pere2.end_datetime == END_DATETIME
+
+
+'''
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,
+COM08115@2016-01-01,,DEP08@1860-07-01,NULL,310
+COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,
+COM08115@1959-04-26,,DEP08@1860-07-01,NULL,310
+
+3               44  08  270         1   08115   0       MALMY       Malmy
+1   0   0       44  08  115 3   19  1       0       CHEMERY-CHEHERY
+Chémery-Chéhéry     Vouziers
+
+08  3   19  115 D24-04-1959 25-04-1959  26-04-1959  26-04-1959  100
+                             0   Chémery-sur-Bar 0   Chémery
+08          270 D27-07-1966 06-08-1966  07-08-1966  07-08-1966  310
+08115                       0   Malmy
+08  3   19  115 A17-10-1964 08-12-1964  01-11-1964  01-11-1964  320         1
+ 1   08129                       0   Chémery-sur-Bar
+08  3   19  115 D27-07-1966 06-08-1966  07-08-1966  07-08-1966  320         1
+ 1   08270                       0   Chémery-sur-Bar
+
+08      19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  331
+     08115                       0   Chémery-sur-Bar
+08      19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  331
+     08115                       0   Chémery-sur-Bar
+08  3   19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  341         2
+ 1   08114                       0   Chémery-Chéhéry
+08  3   19  115 A29-12-2015 30-01-2016  01-01-2016  01-01-2016  341         2
+ 2   08115                       0   Chémery-Chéhéry
+
+'''
 
 
 '''
