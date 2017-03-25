@@ -229,6 +229,36 @@ def creation_not_delegated(towns, record):
         towns.upsert(old_town)
 
 
+@in_case_of(CREATION_NOT_DELEGATED_POLE)
+def creation_not_delegated_pole(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+    end_datetime = END_DATETIME
+    if current_town.start_datetime < record.eff:
+        end_datetime = record.eff - DELTA
+    old_town = current_town.generate(
+        end_datetime=end_datetime,
+        modification=record.mod,
+        successors=''
+    )
+    towns.upsert(old_town)
+
+    if not record.last:
+        return
+
+    new_town = current_town.generate(
+        id=compute_id(current_town.depcom, record.effdate),
+        start_datetime=record.eff,
+        end_datetime=END_DATETIME,
+        nccenr=record.nccoff,
+        modification=CREATION_NOT_DELEGATED_POLE
+    )
+    old_town = old_town.add_successor(new_town.id)
+    towns.upsert(old_town)
+    new_town.add_successor(current_town.id)
+    towns.upsert(new_town)
+    towns.update_successors(new_town, from_town=current_town)
+
+
 @in_case_of(CHANGE_COUNTY)
 def change_county(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)

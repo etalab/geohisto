@@ -22,7 +22,7 @@ def test_successors_are_valid(towns):
             successor = successor_id and towns.retrieve(successor_id) or None
             if successor and not successor.valid_at(town.end_datetime + DELTA):
                 nb_of_invalid_successors += 1
-    assert (nb_of_invalid_successors - 27) == 0  # Goal: reduce that score!
+    assert (nb_of_invalid_successors - 25) == 0  # Goal: reduce that score!
 
 
 def test_successors_are_valid2(towns):
@@ -32,4 +32,4 @@ def test_successors_are_valid2(towns):
         for successor_id in town.successors.split(';'):
             if successor_id.endswith(str(START_DATE)):
                 nb_of_invalid_successors += 1
-    assert (nb_of_invalid_successors - 872) == 0  # Goal: reduce that score!
+    assert (nb_of_invalid_successors - 871) == 0  # Goal: reduce that score!
