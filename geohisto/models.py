@@ -30,7 +30,7 @@ class Towns(OrderedDict):
             valid_datetime = town.end_datetime
         if to_town and to_town.valid_at(valid_datetime):
             self.replace_successor(town, to_town, town.end_datetime)
-        elif from_town:
+        elif from_town and from_town.valid_at(valid_datetime):
             self.replace_successor(from_town, town)
 
     def replace_successor(self, old_successor, new_successor,

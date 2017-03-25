@@ -2,7 +2,8 @@ import csv
 from collections import defaultdict
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME, CREATION_DELEGATED_POLE
+    START_DATE, END_DATE, START_DATETIME, END_DATETIME,
+    CREATION_DELEGATED_POLE, CREATION_NOT_DELEGATED_POLE
 )
 from .models import Towns, Town, Record
 from .utils import (
@@ -53,15 +54,11 @@ def load_history(filename='sources/historiq2016.txt'):
         mod = int(line['MOD'])
         last = None
         # We need to know which one of the record is the last in case
-        # of a `CREATION_DELEGATED_POLE` to delete the parent entry
-        # only once the last element is dealt with.
-        if mod == CREATION_DELEGATED_POLE:
-            id = depcom + effdate.isoformat()
-            last_log[id] += 1
-            if id in last_log and last_log[id] == int(line['NBCOM']):
-                last = True
-            else:
-                last = False
+        # of `CREATION_*_POLE` to perform clean up only on the last one.
+        if mod in (CREATION_DELEGATED_POLE, CREATION_NOT_DELEGATED_POLE):
+            id_ = depcom + effdate.isoformat()
+            last_log[id_] += 1
+            last = id_ in last_log and last_log[id_] == int(line['NBCOM'])
         record = Record(
             depcom=depcom,
             mod=mod,

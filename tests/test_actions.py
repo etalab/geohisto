@@ -1181,6 +1181,73 @@ def test_fusion_then_split_then_change_name():
     assert mt_st_pere2.end_datetime == END_DATETIME
 
 
+def test_creation_not_delegated_pole():
+    """Special case of Sylvains-les-Moulins."""
+    towns = towns_factory(
+        town_factory(dep='27', com='178', nccenr='Coulonges'),
+        town_factory(dep='27', com='688', nccenr='Villalet'),
+        town_factory(dep='27', com='693', nccenr='Sylvains-Lès-Moulins')
+    )
+
+    # Order is important to make the test relevant.
+    change_name_fusion_record = record_factory(
+        dep='27', com='693', mod=CHANGE_NAME_FUSION,
+        effdate=date(1972, 10, 1),
+        nccoff='Sylvains-les-Moulins', nccanc='Villez-Champ-Dominel')
+    delete_fusion_record = record_factory(
+        dep='27', com='178', mod=DELETION_FUSION,
+        effdate=date(1972, 10, 1),
+        nccoff='Coulonges', comech='27693')
+    creation_not_delegated_record1 = record_factory(
+        dep='27', com='688', mod=CREATION_NOT_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Villalet', comech='27693')
+    creation_not_delegated_record2 = record_factory(
+        dep='27', com='693', mod=CREATION_NOT_DELEGATED,
+        effdate=date(2016, 1, 1), nccoff='Sylvains-les-Moulins',
+        comech='27693')
+    creation_not_delegated_pole_record1 = record_factory(
+        dep='27', com='693', mod=CREATION_NOT_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Sylvains-Lès-Moulins',
+        comech='27688')
+    creation_not_delegated_pole_record2 = record_factory(
+        dep='27', com='693', mod=CREATION_NOT_DELEGATED_POLE,
+        effdate=date(2016, 1, 1), nccoff='Sylvains-Lès-Moulins',
+        comech='27693', last=True)
+
+    history = [
+        change_name_fusion_record,
+        delete_fusion_record,
+        creation_not_delegated_record1,
+        creation_not_delegated_record2,
+        creation_not_delegated_pole_record1,
+        creation_not_delegated_pole_record2,
+    ]
+    compute(towns, history)
+    villez, sylvains, sylvains_lais = towns.filter(depcom='27693')
+    coulonges = towns.filter(depcom='27178')[0]
+    villalet = towns.filter(depcom='27688')[0]
+    assert coulonges.id == 'COM27178@1942-01-01'
+    assert coulonges.start_datetime == START_DATETIME
+    assert coulonges.end_datetime == datetime(1972, 9, 30, 23, 59, 59, 999999)
+    assert coulonges.successors == sylvains.id
+    assert villez.id == 'COM27693@1942-01-01'
+    assert villez.start_datetime == START_DATETIME
+    assert villez.end_datetime == datetime(1972, 9, 30, 23, 59, 59, 999999)
+    assert villez.successors == sylvains.id
+    assert villalet.id == 'COM27688@1942-01-01'
+    assert villalet.start_datetime == START_DATETIME
+    assert villalet.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
+    # assert villalet.successors == sylvains_lais.id  # To be investigated.
+    assert sylvains.id == 'COM27693@1972-10-01'
+    assert sylvains.start_datetime == datetime(1972, 10, 1, 0, 0, 0)
+    assert sylvains.end_datetime == datetime(2015, 12, 31, 23, 59, 59, 999999)
+    assert sylvains.successors == sylvains_lais.id
+    assert sylvains_lais.id == 'COM27693@2016-01-01'
+    assert sylvains_lais.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
+    assert sylvains_lais.end_datetime == END_DATETIME
+    assert sylvains_lais.successors == ''
+
+
 '''
 COM08270@1942-01-01,08270,1942-01-01 00:00:00,1966-08-06 23:59:59,Malmy,
 COM08115@2016-01-01,,DEP08@1860-07-01,NULL,310
