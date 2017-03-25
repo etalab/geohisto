@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 6.4.0 — 2017-03-24
+
+* Fixed #29: Handle creation not delegated pole case.
+* Fixed #28: Ensure successors are updated correctly.
+* Fixed #25: Ensure end date/successors are correctly set.
+* Fixed #26: Handle articles for towns from history file.
+
+
 ## 6.3.0 — 2016-12-12
 
 * Wrong start dates for 11 counties.
