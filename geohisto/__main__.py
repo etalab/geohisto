@@ -12,13 +12,9 @@ from .utils import compute_ancestors
 
 
 @click.command()
-@click.option('--at-date', default=None,
+@click.option('--at-date', default=None, multiple=True,
               help='Filter only towns valid at that `YYYY-MM-DD` date.')
 def main(at_date):
-    if at_date:
-        at_date = date(*[int(part) for part in at_date.split('-')])
-        at_datetime = datetime.combine(at_date, datetime.min.time())
-
     # Load data from files.
     towns = load_towns()
     history_list = load_history()
@@ -35,13 +31,15 @@ def main(at_date):
     compute_parents(counties, towns)
 
     # Finally write files.
+    write_results_on('exports/towns/towns.csv', towns)
+    generate_head_results_from('exports/towns/towns.csv')
     if at_date:
-        export_path = 'exports/towns/towns_{at_date}.csv'.format(
-            at_date=at_date.isoformat())
-        write_results_on(export_path, towns, at_datetime)
-    else:
-        write_results_on('exports/towns/towns.csv', towns)
-        generate_head_results_from('exports/towns/towns.csv')
+        for date_ in at_date:
+            date_ = date(*[int(part) for part in date_.split('-')])
+            datetime_ = datetime.combine(date_, datetime.min.time())
+            export_path = 'exports/towns/towns_{date_}.csv'.format(
+                date_=date_.isoformat())
+            write_results_on(export_path, towns, datetime_)
 
 
 main()
