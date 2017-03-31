@@ -33,6 +33,17 @@ def in_case_of(*actions):
     return inner
 
 
+def only_if_depcom(depcom):
+    """Decorator to execute special only if depcom is present in data."""
+    def inner(func):
+        @wraps(func)
+        def inner_func(towns):
+            if towns.filter(depcom=depcom):
+                func(towns)
+        return inner_func
+    return inner
+
+
 def convert_date(string):
     """Convert '01-01-2016' to a Python `datetime.date` object."""
     return date(*reversed([int(i) for i in string.split('-')]))
@@ -78,4 +89,4 @@ def compute_ancestors(towns):
                 successor = successor.add_ancestor(town.id)
                 towns.upsert(successor)
             else:
-                print('Successor not found for', town)
+                print('Successor not found for', town.repr_insee)
