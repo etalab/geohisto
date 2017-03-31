@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.5.0 — 2017-03-31
+
+* Handle special cases manually, fixed #27 and #34.
+
 ## 6.4.0 — 2017-03-24
 
 * Fixed #29: Handle creation not delegated pole case.
