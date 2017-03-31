@@ -33,7 +33,7 @@ def test_counts(towns):
     assert len(towns.valid_at(datetime(2010, 1, 1, 0, 0, 0))) - 36682 == 58
     assert len(towns.valid_at(datetime(2011, 1, 1, 0, 0, 0))) - 36680 == 58
     assert len(towns.valid_at(datetime(2012, 1, 1, 0, 0, 0))) - 36700 == 42
-    assert len(towns.valid_at(datetime(2013, 1, 1, 0, 0, 0))) - 36681 == 42
-    assert len(towns.valid_at(datetime(2014, 1, 1, 0, 0, 0))) - 36681 == 41
-    assert len(towns.valid_at(datetime(2015, 1, 1, 0, 0, 0))) - 36658 == 41
+    assert len(towns.valid_at(datetime(2013, 1, 1, 0, 0, 0))) - 36681 == 43
+    assert len(towns.valid_at(datetime(2014, 1, 1, 0, 0, 0))) - 36681 == 42
+    assert len(towns.valid_at(datetime(2015, 1, 1, 0, 0, 0))) - 36658 == 42
     assert len(towns.valid_at(datetime(2016, 1, 1, 0, 0, 0))) - 35885 == 52

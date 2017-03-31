@@ -4,10 +4,11 @@ import click
 
 from .loaders import load_counties, load_towns, load_history, load_populations
 from .actions import compute
-from .utils import compute_ancestors
+from .exports import write_results_on, generate_head_results_from
 from .parents import compute_parents
 from .populations import compute_populations
-from .exports import write_results_on, generate_head_results_from
+from .specials import compute_specials
+from .utils import compute_ancestors
 
 
 @click.command()
@@ -28,6 +29,7 @@ def main(at_date):
     # ancestors before populations in order to fallback on
     # ancestors' populations sum.
     compute(towns, history_list)
+    compute_specials(towns)
     compute_ancestors(towns)
     compute_populations(populations, towns)
     compute_parents(counties, towns)

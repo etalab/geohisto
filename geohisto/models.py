@@ -108,6 +108,16 @@ class Town(namedtuple('Town', [
                 'from {town.start_date} to {town.end_date} '
                 'with successors {town.successors}>').format(town=self)
 
+    @property
+    def repr_insee(self):
+        """Prepend the INSEE URL (useful for debugging)."""
+        insee_base = 'https://www.insee.fr/fr/metadonnees/cog/commune/'
+        insee_id = self.id.split('@')[0] + '-' + self.nccenr
+        return '{repr} {insee_url}'.format(
+            repr=self.__repr__(),
+            insee_url='{insee_base}{insee_id}'.format(insee_base=insee_base,
+                                                      insee_id=insee_id))
+
     def generate(self, **kwargs):
         """
         Replace the default private method with a public one.

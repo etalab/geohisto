@@ -1,7 +1,7 @@
 """Tests related to output validity (duplicity, missing ancestors, etc)."""
 from itertools import groupby
 
-from geohisto.constants import DELTA, START_DATE
+from geohisto.constants import DELTA
 
 
 def test_unicity_per_boundaries(towns):
@@ -22,14 +22,4 @@ def test_successors_are_valid(towns):
             successor = successor_id and towns.retrieve(successor_id) or None
             if successor and not successor.valid_at(town.end_datetime + DELTA):
                 nb_of_invalid_successors += 1
-    assert (nb_of_invalid_successors - 25) == 0  # Goal: reduce that score!
-
-
-def test_successors_are_valid2(towns):
-    """Ensure no successors are starting at START_DATE."""
-    nb_of_invalid_successors = 0
-    for town in towns.values():
-        for successor_id in town.successors.split(';'):
-            if successor_id.endswith(str(START_DATE)):
-                nb_of_invalid_successors += 1
-    assert (nb_of_invalid_successors - 871) == 0  # Goal: reduce that score!
+    assert (nb_of_invalid_successors - 20) == 0  # Goal: reduce that score!
