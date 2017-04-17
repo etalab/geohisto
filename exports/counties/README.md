@@ -7,7 +7,7 @@ The initial date (1860-07-01) has been chosen given that:
 * we do not want to deal with the complexity of the Napoleonian period with a lot of annexation of european territories
 * we want stable INSEE codes and as such the creation of Alpes-Maritimes as of 1860-06-23 and Haute-Savoie/Savoie as of 1860-06-15 are required
 
-We do not handle counties out of occidental europe. (yet?)
+Recent (since 1946-03-19) overseas counties are listed too with their respective regions.
 
 
 ## Sources

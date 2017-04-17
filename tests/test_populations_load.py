@@ -15,7 +15,7 @@ def test_arrondissements_load():
 
 def test_dom_load():
     dom_populations = load_population_from('sources/population_dom.csv')
-    assert len(dom_populations) == 113
+    assert len(dom_populations) == 112
 
 
 def test_mortes_load():

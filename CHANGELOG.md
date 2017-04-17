@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.6.0 — 2017-04-17
+
+* Handle overseas counties.
+
 ## 6.5.0 — 2017-03-31
 
 * Handle special cases manually, fixed #27 and #34.
