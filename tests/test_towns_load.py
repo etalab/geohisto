@@ -12,7 +12,7 @@ def loaded_towns():
 
 
 def test_initial_load(loaded_towns):
-    assert len(loaded_towns) == 39166
+    assert len(loaded_towns) == 39167
 
 
 def test_contains_arles(loaded_towns):
@@ -30,7 +30,7 @@ def test_contains_arles(loaded_towns):
 
 
 def test_convert_name(loaded_towns):
-    la_breole = loaded_towns.filter(depcom='04033')[0]
-    assert la_breole.nccenr == 'La Bréole'
+    la_batie_neuve = loaded_towns.filter(depcom='05017')[0]
+    assert la_batie_neuve.nccenr == 'La Bâtie-Neuve'
     lescale = loaded_towns.filter(depcom='04079')[0]
     assert lescale.nccenr == "L'Escale"

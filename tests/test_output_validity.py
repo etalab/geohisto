@@ -16,10 +16,8 @@ def test_unicity_per_boundaries(towns):
 
 def test_successors_are_valid(towns):
     """Ensure all successors are valid at the end date."""
-    nb_of_invalid_successors = 0
     for town in towns.values():
         for successor_id in town.successors.split(';'):
             successor = successor_id and towns.retrieve(successor_id) or None
-            if successor and not successor.valid_at(town.end_datetime + DELTA):
-                nb_of_invalid_successors += 1
-    assert (nb_of_invalid_successors - 20) == 0  # Goal: reduce that score!
+            if successor:
+                assert successor.valid_at(town.end_datetime + DELTA)

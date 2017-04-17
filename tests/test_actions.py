@@ -1,8 +1,8 @@
 """
 Tests related to actions performed on towns given the history.
 
-All fixtures are extracted from real cases located in france2016
-and historiq2016 files.
+All fixtures are extracted from real cases located in France2017
+and historiq2017 files.
 """
 from datetime import date, datetime
 
