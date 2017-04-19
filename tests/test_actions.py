@@ -1084,20 +1084,14 @@ def test_fusion_then_delegated_with_intermediate_successor():
         creation_delegated_pole_record3,
     ]
     compute(towns, history)
-    cuisiat1, cuisiat2 = towns.filter(depcom='01137')
+    cuisiat = towns.filter(depcom='01137')[0]
     treffort, treffort_cuisiat, val_revermont = towns.filter(depcom='01426')
-    assert cuisiat1.id == 'COM01137@1942-01-01'
-    assert cuisiat1.successors == treffort_cuisiat.id
-    assert cuisiat1.modification == FUSION_ASSOCIATION_ASSOCIATED
-    assert cuisiat1.nccenr == 'Cuisiat'
-    assert cuisiat1.start_datetime == START_DATETIME
-    assert cuisiat1.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
-    assert cuisiat2.id == 'COM01137@2016-01-01'
-    assert cuisiat2.successors == ''
-    assert cuisiat2.modification == CREATION_PREEXISTING_ASSOCIATED
-    assert cuisiat2.nccenr == 'Cuisiat'
-    assert cuisiat2.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
-    assert cuisiat2.end_datetime == END_DATETIME
+    assert cuisiat.id == 'COM01137@1942-01-01'
+    assert cuisiat.successors == treffort_cuisiat.id
+    assert cuisiat.modification == FUSION_ASSOCIATION_ASSOCIATED
+    assert cuisiat.nccenr == 'Cuisiat'
+    assert cuisiat.start_datetime == START_DATETIME
+    assert cuisiat.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
     assert treffort.id == 'COM01426@1942-01-01'
     assert treffort.successors == treffort_cuisiat.id
     assert treffort.modification == CHANGE_NAME_FUSION

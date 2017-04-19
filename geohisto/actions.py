@@ -10,8 +10,7 @@ from .constants import (
     DELETION_PARTITION, DELETION_FUSION,
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
-    CREATION_DELEGATED_POLE, CHANGE_COUNTY, OBSOLETE,
-    CREATION_PREEXISTING_ASSOCIATED
+    CREATION_DELEGATED_POLE, CHANGE_COUNTY, OBSOLETE
 )
 from .utils import compute_id, in_case_of, ACTIONS
 
@@ -123,23 +122,6 @@ def creation_delegated(towns, record):
     has_the_same_name = new_town.nccenr == current_town.nccenr
     if has_different_ids and has_the_same_name:
         towns.delete(current_town)
-
-
-@in_case_of(CREATION_PREEXISTING_ASSOCIATED)
-def creation_preexisting(towns, record):
-    current_town = towns.get_current(record.depcom, record.eff)
-    new_town = current_town.generate(
-        id=compute_id(current_town.depcom, record.effdate),
-        start_datetime=record.eff,
-        end_datetime=END_DATETIME,
-        # `nccenr` changes on fusions.
-        nccenr=record.nccoff or current_town.nccenr,
-        modification=record.mod,
-        successors=''
-    )
-    towns.upsert(new_town)
-    towns.update_successors(new_town, from_town=current_town)
-    towns.update_successors(current_town, to_town=new_town)
 
 
 @in_case_of(CHANGE_NAME_REINSTATEMENT, REINSTATEMENT)

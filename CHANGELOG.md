@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## 7.0.0 — 2017-04-18
+## 7.0.1 — 2017-04-20
+
+* Fixed #24: Misunderstanding of modification code 332
+             + special case of Lamarche-en-Woëvre.
+
+## 7.0.0 — 2017-04-19
 
 * Use COG 2017 (previously 2016) from INSEE as source.
 

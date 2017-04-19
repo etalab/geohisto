@@ -200,24 +200,6 @@ def _special_case_langrolay(towns):
     towns.upsert(langrolay_rance)
 
 
-@only_if_depcom('91620')
-def _special_case_toussus_noble(towns):
-    """Special case: inexisting entry.
-
-    Even bugged on INSEE website:
-    * https://www.insee.fr/fr/metadonnees/cog/commune/COM91620-Toussus-le-Noble
-    * https://www.insee.fr/fr/metadonnees/cog/commune/COM78620-Toussus-le-Noble
-    """
-    toussus_noble_old = towns.filter(depcom='91620')[0]
-    toussus_noble_new = toussus_noble_old.generate(
-        id='COM78620@1969-11-29',
-        start_datetime=toussus_noble_old.end_datetime + DELTA,
-        end_datetime=END_DATETIME,
-        successors=''
-    )
-    towns.upsert(toussus_noble_new)
-
-
 @only_if_depcom('77316')
 def _special_case_orvanne(towns):
     """Special case: too many modifications.
@@ -330,10 +312,7 @@ def _special_case_madine(towns):
         successors=madine.id
     )
     towns.upsert(nonsard_new)
-    lamarche2_new = lamarche2.generate(
-        end_datetime=END_DATETIME,
-        successors=''
-    )
+    lamarche2_new = lamarche2.generate(successors=nonsard_lamarche.id)
     towns.upsert(lamarche2_new)
 
 
