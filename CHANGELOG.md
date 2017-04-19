@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 7.0.0 — 2017-04-18
+
+* Use COG 2017 (previously 2016) from INSEE as source.
+
 ## 6.6.0 — 2017-04-17
 
 * Handle overseas counties.

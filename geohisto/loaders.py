@@ -12,7 +12,7 @@ from .utils import (
 )
 
 
-def load_towns(filename='sources/france2016.txt'):
+def load_towns(filename='sources/France2017.txt'):
     """
     Load all towns from `filename` into an OrderedDict of `Town`s namedtuples.
 
@@ -44,7 +44,7 @@ def load_towns(filename='sources/france2016.txt'):
     return towns
 
 
-def load_history(filename='sources/historiq2016.txt'):
+def load_history(filename='sources/historiq2017.txt'):
     """Load all towns from `filename` into a list of `Record`s."""
     history = []
     last_log = defaultdict(int)

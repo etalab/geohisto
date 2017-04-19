@@ -106,7 +106,8 @@ class Town(namedtuple('Town', [
         """Override the default method to be less verbose."""
         return ('<Town ({town.id}): {town.nccenr} '
                 'from {town.start_date} to {town.end_date} '
-                'with successors {town.successors}>').format(town=self)
+                'with successors {town.successors} '
+                'and mod {town.modification}>').format(town=self)
 
     @property
     def repr_insee(self):

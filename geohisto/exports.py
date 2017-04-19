@@ -47,16 +47,15 @@ def write_results_on(filename, towns, at_datetime=None):
             })
 
 
-def generate_head_results_from(filename, nb_of_lines=100):
+def generate_head_results_from(filename_in, nb_of_lines=100):
     """
-    Equivalent of `head` using Python.
+    Equivalent of `head` shell command using Python.
 
-    The passed `filename` will have a `_head` suffix added for the
+    The passed `filename_in` will have a `_head` suffix added for the
     newly generated extract.
     """
-    filepath, extension = filename.split('.')
+    filepath, extension = filename_in.split('.')
     filename_out = filepath + '_head.' + extension
-    with open(filename) as csvfile, \
-            open(filename_out, 'w') as csvfileout:
-        head = islice(csvfile, nb_of_lines)
-        csvfileout.write(''.join(head))
+    with open(filename_in) as file_in, open(filename_out, 'w') as file_out:
+        head = islice(file_in, nb_of_lines)
+        file_out.write(''.join(head))
