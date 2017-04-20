@@ -2,7 +2,7 @@
 import inspect
 
 from geohisto import specials
-from .constants import DELTA, END_DATETIME
+from .constants import DELTA
 from .utils import compute_id, only_if_depcom
 
 
@@ -132,7 +132,11 @@ def _special_case_arthieul(towns):
 def _special_case_chisa(towns):
     """Special case: county changed and id not updated."""
     chisa_wrong, chisa_old = towns.filter(depcom='20366')
-    chisa_new = chisa_wrong.generate(id='COM2B366@1976-01-01')
+    chisa_new = chisa_wrong.generate(
+        id='COM2B366@1976-01-01',
+        dep='2B',
+        com='366',
+        depcom='2B366')
     towns.upsert(chisa_new)
     towns.delete(chisa_wrong)
 
@@ -141,7 +145,11 @@ def _special_case_chisa(towns):
 def _special_case_butry_oise(towns):
     """Special case: county changed and id not updated."""
     butry_oise_wrong, butry_oise_old = towns.filter(depcom='78692')
-    butry_oise_new = butry_oise_wrong.generate(id='COM95120@1968-01-01')
+    butry_oise_new = butry_oise_wrong.generate(
+        id='COM95120@1968-01-01',
+        dep='95',
+        com='120',
+        depcom='95120')
     towns.upsert(butry_oise_new)
     towns.delete(butry_oise_wrong)
 
