@@ -16,7 +16,7 @@ from geohisto.constants import (
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
     CREATION_DELEGATED_POLE, CREATION_PREEXISTING_ASSOCIATED,
-    CHANGE_COUNTY, OBSOLETE
+    CHANGE_COUNTY, CHANGE_COUNTY_CREATION, OBSOLETE
 )
 from .factories import towns_factory, town_factory, record_factory
 
@@ -1240,3 +1240,28 @@ def test_creation_not_delegated_pole():
     assert sylvains_lais.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
     assert sylvains_lais.end_datetime == END_DATETIME
     assert sylvains_lais.successors == ''
+
+
+def test_change_county_creation():
+    """Only for Gernicourt and Fresne-sur-Loire."""
+    towns = towns_factory(
+        town_factory(dep='02', com='344', nccenr='Gernicourt')
+    )
+    change_county_creation_record = record_factory(
+        dep='51', com='664', mod=CHANGE_COUNTY_CREATION,
+        effdate=date(2016, 12, 31),
+        nccoff='Gernicourt', depanc='02344')
+
+    history = [change_county_creation_record]
+    compute(towns, history)
+    gernicourt_old = towns.filter(depcom='02344')[0]
+    gernicourt_new = towns.filter(depcom='51664')[0]
+    assert gernicourt_old.id == 'COM02344@1942-01-01'
+    assert gernicourt_old.start_datetime == START_DATETIME
+    assert (gernicourt_old.end_datetime ==
+            datetime(2016, 12, 30, 23, 59, 59, 999999))
+    assert gernicourt_old.successors == gernicourt_new.id
+    assert gernicourt_new.id == 'COM51664@2016-12-31'
+    assert gernicourt_new.start_datetime == datetime(2016, 12, 31, 0, 0)
+    assert gernicourt_new.end_datetime == datetime(2016, 12, 31, 0, 0, 0, 1)
+    assert gernicourt_new.successors == ''

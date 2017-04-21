@@ -2,7 +2,7 @@
 import inspect
 
 from geohisto import specials
-from .constants import DELTA
+from .constants import CREATION_DELEGATED_POLE, DELTA
 from .utils import compute_id, only_if_depcom
 
 
@@ -343,6 +343,75 @@ def _special_case_saint_alvere(towns):
         successors=val_louyre.id
     )
     towns.upsert(st_laurent_new)
+
+
+@only_if_depcom('49101')
+def _special_case_clefs(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49101-Clefs
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49380-Vaulandry
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49101-Clefs-val-d-anjou
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49018-Bauge-en-anjou
+    """
+    clefs1, clefs2 = towns.filter(depcom='49101')
+    volandry, vaulandry = towns.filter(depcom='49380')
+    bauge, bauge_anjou = towns.filter(depcom='49018')
+    clefs_val_anjou = clefs1.generate(
+        id=compute_id(clefs1.depcom, clefs1.end_date + DELTA),
+        start_datetime=clefs1.end_datetime + DELTA,
+        end_datetime=clefs2.start_datetime - DELTA,
+        successors=clefs2.id,
+        nccenr="Clefs-Val d'Anjou",
+        modification=CREATION_DELEGATED_POLE
+    )
+    towns.upsert(clefs_val_anjou)
+    clefs1_new = clefs1.generate(successors=clefs_val_anjou.id)
+    towns.upsert(clefs1_new)
+    clefs2_new = clefs2.generate(
+        successors=bauge_anjou.id,
+        end_datetime=clefs2.start_datetime + DELTA
+    )
+    towns.upsert(clefs2_new)
+    vaulandry_new = vaulandry.generate(successors=clefs_val_anjou.id)
+    towns.upsert(vaulandry_new)
+
+
+@only_if_depcom('28042')
+def _special_case_bleury(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28042-Bleury
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28361-Bleury-saint-symphorien
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28361-Saint-symphorien-le-chateau
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau-bleury-saint-symphorien
+
+    """
+    bleury = towns.filter(depcom='28042')[0]
+    _, st_sympho_chateau1, st_sympho_chateau2 = towns.filter(depcom='28361')
+    auneau, auneau_bleury = towns.filter(depcom='28015')
+    bleury_st_sympho = st_sympho_chateau1.generate(
+        id=compute_id(st_sympho_chateau1.depcom,
+                      st_sympho_chateau1.end_date + DELTA),
+        start_datetime=st_sympho_chateau1.end_datetime + DELTA,
+        end_datetime=st_sympho_chateau2.start_datetime - DELTA,
+        successors=st_sympho_chateau2.id,
+        nccenr='Bleury-Saint-Symphorien',
+        modification=CREATION_DELEGATED_POLE
+    )
+    towns.upsert(bleury_st_sympho)
+    bleury_new = bleury.generate(successors=bleury_st_sympho.id)
+    towns.upsert(bleury_new)
+    st_sympho_chateau1_new = st_sympho_chateau1.generate(
+        successors=bleury_st_sympho.id
+    )
+    towns.upsert(st_sympho_chateau1_new)
+    st_sympho_chateau2_new = st_sympho_chateau2.generate(
+        end_datetime=st_sympho_chateau2.start_datetime + DELTA,
+        successors=auneau_bleury.id
+    )
+    towns.upsert(st_sympho_chateau2_new)
 
 
 def compute_specials(towns):
