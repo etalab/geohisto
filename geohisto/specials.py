@@ -283,7 +283,7 @@ def _special_case_morannes(towns):
     """
     morannes, morannes_daumeray = towns.filter(depcom='49220')
     sur_sarthe = morannes.generate(
-        id=compute_id(morannes.depcom, morannes.end_date + DELTA),
+        id=compute_id(morannes.depcom, morannes.end_datetime + DELTA),
         start_datetime=morannes.end_datetime + DELTA,
         end_datetime=morannes_daumeray.start_datetime - DELTA,
         successors=morannes_daumeray.id
@@ -358,7 +358,7 @@ def _special_case_clefs(towns):
     volandry, vaulandry = towns.filter(depcom='49380')
     bauge, bauge_anjou = towns.filter(depcom='49018')
     clefs_val_anjou = clefs1.generate(
-        id=compute_id(clefs1.depcom, clefs1.end_date + DELTA),
+        id=compute_id(clefs1.depcom, clefs1.end_datetime + DELTA),
         start_datetime=clefs1.end_datetime + DELTA,
         end_datetime=clefs2.start_datetime - DELTA,
         successors=clefs2.id,
@@ -386,14 +386,13 @@ def _special_case_bleury(towns):
     https://www.insee.fr/fr/metadonnees/cog/commune/COM28361-Saint-symphorien-le-chateau
     https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau
     https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau-bleury-saint-symphorien
-
     """
     bleury = towns.filter(depcom='28042')[0]
     _, st_sympho_chateau1, st_sympho_chateau2 = towns.filter(depcom='28361')
     auneau, auneau_bleury = towns.filter(depcom='28015')
     bleury_st_sympho = st_sympho_chateau1.generate(
         id=compute_id(st_sympho_chateau1.depcom,
-                      st_sympho_chateau1.end_date + DELTA),
+                      st_sympho_chateau1.end_datetime + DELTA),
         start_datetime=st_sympho_chateau1.end_datetime + DELTA,
         end_datetime=st_sympho_chateau2.start_datetime - DELTA,
         successors=st_sympho_chateau2.id,
@@ -412,6 +411,36 @@ def _special_case_bleury(towns):
         successors=auneau_bleury.id
     )
     towns.upsert(st_sympho_chateau2_new)
+
+
+@only_if_depcom('14472')
+def _special_case_oudon(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14472-Notre-Dame-de-Fresnay
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14624-Saint-Martin-de-Fresnay
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14472-L-Oudon
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14654-Saint-Pierre-en-Auge
+    """
+    oudon = towns.filter(depcom='14472')[0]
+    st_martin_fresnay, oudon_wrong = towns.filter(depcom='14624')
+    st_pierre_dives, st_pierre_auge = towns.filter(depcom='14654')
+    oudon_new = oudon.generate(
+        id=compute_id(oudon.depcom, st_martin_fresnay.end_datetime + DELTA),
+        start_datetime=st_martin_fresnay.end_datetime + DELTA,
+        successors=st_pierre_auge.id
+    )
+    towns.upsert(oudon_new)
+    nd_fresnay = oudon.generate(
+        nccenr='Notre-Dame-de-Fresnay',
+        end_datetime=st_martin_fresnay.end_datetime,
+        successors=oudon_new.id
+    )
+    towns.upsert(nd_fresnay)
+    st_martin_fresnay_new = st_martin_fresnay.generate(successors=oudon_new.id)
+    towns.upsert(st_martin_fresnay_new)
+    towns.update_successors(oudon_new, from_town=oudon_wrong)
+    towns.delete(oudon_wrong)
 
 
 def compute_specials(towns):

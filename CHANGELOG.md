@@ -1,9 +1,8 @@
 # CHANGELOG
 
-## 7.0.1 — 2017-04-20
+## 7.0.1 — 2017-04-22
 
-* Fixed #24: Misunderstanding of modification code 332
-             + special case of Lamarche-en-Woëvre.
+* Fixed #24: Misunderstanding of modification code 332 + special cases.
 
 ## 7.0.0 — 2017-04-19
 

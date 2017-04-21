@@ -72,6 +72,8 @@ def convert_name_with_article(source, ncc_key='NCCENR', tncc_key='TNCC'):
 
 def compute_id(depcom, start_date):
     """Return the unique string id for a given `depcom` + `start_date`."""
+    if isinstance(start_date, datetime):
+        start_date = start_date.date()
     return 'COM{depcom}{separator}{start_date}'.format(
         depcom=depcom, separator=SEPARATOR, start_date=start_date.isoformat())
 
