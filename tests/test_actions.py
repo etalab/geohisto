@@ -1245,7 +1245,8 @@ def test_creation_not_delegated_pole():
 def test_change_county_creation():
     """Only for Gernicourt and Fresne-sur-Loire."""
     towns = towns_factory(
-        town_factory(dep='02', com='344', nccenr='Gernicourt')
+        town_factory(dep='02', com='344', nccenr='Gernicourt'),
+        town_factory(dep='51', com='664', nccenr='Gernicourt')
     )
     change_county_creation_record = record_factory(
         dep='51', com='664', mod=CHANGE_COUNTY_CREATION,

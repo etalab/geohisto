@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 7.0.1 — 2017-04-22
+## 7.0.1 — 2017-04-23
 
 * Fixed #24: Misunderstanding of modification code 332 + special cases.
 

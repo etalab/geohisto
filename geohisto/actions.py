@@ -301,7 +301,8 @@ def change_county_creation(towns, record):
 
     In both cases the change is coupled with a fusion, hence the 1ms lifetime.
     """
-    current_town = towns.get_current(record.depanc, record.eff)
+    current_town = towns.get_current(record.depcom, record.eff)
+    old_town = towns.get_current(record.depanc, record.eff)
     new_town = current_town.generate(
         id=compute_id(record.depcom, record.effdate),
         depcom=record.depcom,
@@ -311,13 +312,14 @@ def change_county_creation(towns, record):
         end_datetime=record.eff + DELTA  # Only 1ms lifetime to keep track.
     )
     towns.upsert(new_town)
-    old_town = current_town.generate(
+    towns.delete(current_town)
+    old_town_new = old_town.generate(
         end_datetime=record.eff - DELTA,
         successors=new_town.id,
         modification=record.mod
     )
-    towns.upsert(old_town)
-    towns.update_successors(new_town, from_town=old_town)
+    towns.upsert(old_town_new)
+    towns.update_successors(new_town, from_town=old_town_new)
 
 
 @in_case_of(OBSOLETE)
