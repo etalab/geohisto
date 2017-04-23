@@ -2,7 +2,7 @@
 import inspect
 
 from geohisto import specials
-from .constants import DELTA, END_DATETIME
+from .constants import CREATION_DELEGATED_POLE, DELTA
 from .utils import compute_id, only_if_depcom
 
 
@@ -132,7 +132,11 @@ def _special_case_arthieul(towns):
 def _special_case_chisa(towns):
     """Special case: county changed and id not updated."""
     chisa_wrong, chisa_old = towns.filter(depcom='20366')
-    chisa_new = chisa_wrong.generate(id='COM2B366@1976-01-01')
+    chisa_new = chisa_wrong.generate(
+        id='COM2B366@1976-01-01',
+        dep='2B',
+        com='366',
+        depcom='2B366')
     towns.upsert(chisa_new)
     towns.delete(chisa_wrong)
 
@@ -141,7 +145,11 @@ def _special_case_chisa(towns):
 def _special_case_butry_oise(towns):
     """Special case: county changed and id not updated."""
     butry_oise_wrong, butry_oise_old = towns.filter(depcom='78692')
-    butry_oise_new = butry_oise_wrong.generate(id='COM95120@1968-01-01')
+    butry_oise_new = butry_oise_wrong.generate(
+        id='COM95120@1968-01-01',
+        dep='95',
+        com='120',
+        depcom='95120')
     towns.upsert(butry_oise_new)
     towns.delete(butry_oise_wrong)
 
@@ -198,24 +206,6 @@ def _special_case_langrolay(towns):
     langrolay_rance = langrolay_rance.replace_successor(
         'COM22213@1942-01-01', 'COM22213@1973-03-15')
     towns.upsert(langrolay_rance)
-
-
-@only_if_depcom('91620')
-def _special_case_toussus_noble(towns):
-    """Special case: inexisting entry.
-
-    Even bugged on INSEE website:
-    * https://www.insee.fr/fr/metadonnees/cog/commune/COM91620-Toussus-le-Noble
-    * https://www.insee.fr/fr/metadonnees/cog/commune/COM78620-Toussus-le-Noble
-    """
-    toussus_noble_old = towns.filter(depcom='91620')[0]
-    toussus_noble_new = toussus_noble_old.generate(
-        id='COM78620@1969-11-29',
-        start_datetime=toussus_noble_old.end_datetime + DELTA,
-        end_datetime=END_DATETIME,
-        successors=''
-    )
-    towns.upsert(toussus_noble_new)
 
 
 @only_if_depcom('77316')
@@ -293,7 +283,7 @@ def _special_case_morannes(towns):
     """
     morannes, morannes_daumeray = towns.filter(depcom='49220')
     sur_sarthe = morannes.generate(
-        id=compute_id(morannes.depcom, morannes.end_date + DELTA),
+        id=compute_id(morannes.depcom, morannes.end_datetime + DELTA),
         start_datetime=morannes.end_datetime + DELTA,
         end_datetime=morannes_daumeray.start_datetime - DELTA,
         successors=morannes_daumeray.id
@@ -330,10 +320,7 @@ def _special_case_madine(towns):
         successors=madine.id
     )
     towns.upsert(nonsard_new)
-    lamarche2_new = lamarche2.generate(
-        end_datetime=END_DATETIME,
-        successors=''
-    )
+    lamarche2_new = lamarche2.generate(successors=nonsard_lamarche.id)
     towns.upsert(lamarche2_new)
 
 
@@ -356,6 +343,104 @@ def _special_case_saint_alvere(towns):
         successors=val_louyre.id
     )
     towns.upsert(st_laurent_new)
+
+
+@only_if_depcom('49101')
+def _special_case_clefs(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49101-Clefs
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49380-Vaulandry
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49101-Clefs-val-d-anjou
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM49018-Bauge-en-anjou
+    """
+    clefs1, clefs2 = towns.filter(depcom='49101')
+    volandry, vaulandry = towns.filter(depcom='49380')
+    bauge, bauge_anjou = towns.filter(depcom='49018')
+    clefs_val_anjou = clefs1.generate(
+        id=compute_id(clefs1.depcom, clefs1.end_datetime + DELTA),
+        start_datetime=clefs1.end_datetime + DELTA,
+        end_datetime=clefs2.start_datetime - DELTA,
+        successors=clefs2.id,
+        nccenr="Clefs-Val d'Anjou",
+        modification=CREATION_DELEGATED_POLE
+    )
+    towns.upsert(clefs_val_anjou)
+    clefs1_new = clefs1.generate(successors=clefs_val_anjou.id)
+    towns.upsert(clefs1_new)
+    clefs2_new = clefs2.generate(
+        successors=bauge_anjou.id,
+        end_datetime=clefs2.start_datetime + DELTA
+    )
+    towns.upsert(clefs2_new)
+    vaulandry_new = vaulandry.generate(successors=clefs_val_anjou.id)
+    towns.upsert(vaulandry_new)
+
+
+@only_if_depcom('28042')
+def _special_case_bleury(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28042-Bleury
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28361-Bleury-saint-symphorien
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28361-Saint-symphorien-le-chateau
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau-bleury-saint-symphorien
+    """
+    bleury = towns.filter(depcom='28042')[0]
+    _, st_sympho_chateau1, st_sympho_chateau2 = towns.filter(depcom='28361')
+    auneau, auneau_bleury = towns.filter(depcom='28015')
+    bleury_st_sympho = st_sympho_chateau1.generate(
+        id=compute_id(st_sympho_chateau1.depcom,
+                      st_sympho_chateau1.end_datetime + DELTA),
+        start_datetime=st_sympho_chateau1.end_datetime + DELTA,
+        end_datetime=st_sympho_chateau2.start_datetime - DELTA,
+        successors=st_sympho_chateau2.id,
+        nccenr='Bleury-Saint-Symphorien',
+        modification=CREATION_DELEGATED_POLE
+    )
+    towns.upsert(bleury_st_sympho)
+    bleury_new = bleury.generate(successors=bleury_st_sympho.id)
+    towns.upsert(bleury_new)
+    st_sympho_chateau1_new = st_sympho_chateau1.generate(
+        successors=bleury_st_sympho.id
+    )
+    towns.upsert(st_sympho_chateau1_new)
+    st_sympho_chateau2_new = st_sympho_chateau2.generate(
+        end_datetime=st_sympho_chateau2.start_datetime + DELTA,
+        successors=auneau_bleury.id
+    )
+    towns.upsert(st_sympho_chateau2_new)
+
+
+@only_if_depcom('14472')
+def _special_case_oudon(towns):
+    """Special case: too many modifications.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14472-Notre-Dame-de-Fresnay
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14624-Saint-Martin-de-Fresnay
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14472-L-Oudon
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM14654-Saint-Pierre-en-Auge
+    """
+    oudon = towns.filter(depcom='14472')[0]
+    st_martin_fresnay, oudon_wrong = towns.filter(depcom='14624')
+    st_pierre_dives, st_pierre_auge = towns.filter(depcom='14654')
+    oudon_new = oudon.generate(
+        id=compute_id(oudon.depcom, st_martin_fresnay.end_datetime + DELTA),
+        start_datetime=st_martin_fresnay.end_datetime + DELTA,
+        successors=st_pierre_auge.id
+    )
+    towns.upsert(oudon_new)
+    nd_fresnay = oudon.generate(
+        nccenr='Notre-Dame-de-Fresnay',
+        end_datetime=st_martin_fresnay.end_datetime,
+        successors=oudon_new.id
+    )
+    towns.upsert(nd_fresnay)
+    st_martin_fresnay_new = st_martin_fresnay.generate(successors=oudon_new.id)
+    towns.upsert(st_martin_fresnay_new)
+    towns.update_successors(oudon_new, from_town=oudon_wrong)
+    towns.delete(oudon_wrong)
 
 
 def compute_specials(towns):

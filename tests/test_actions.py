@@ -16,7 +16,7 @@ from geohisto.constants import (
     CREATION_NOT_DELEGATED, CREATION_NOT_DELEGATED_POLE,
     FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED,
     CREATION_DELEGATED_POLE, CREATION_PREEXISTING_ASSOCIATED,
-    CHANGE_COUNTY, OBSOLETE
+    CHANGE_COUNTY, CHANGE_COUNTY_CREATION, OBSOLETE
 )
 from .factories import towns_factory, town_factory, record_factory
 
@@ -1084,20 +1084,14 @@ def test_fusion_then_delegated_with_intermediate_successor():
         creation_delegated_pole_record3,
     ]
     compute(towns, history)
-    cuisiat1, cuisiat2 = towns.filter(depcom='01137')
+    cuisiat = towns.filter(depcom='01137')[0]
     treffort, treffort_cuisiat, val_revermont = towns.filter(depcom='01426')
-    assert cuisiat1.id == 'COM01137@1942-01-01'
-    assert cuisiat1.successors == treffort_cuisiat.id
-    assert cuisiat1.modification == FUSION_ASSOCIATION_ASSOCIATED
-    assert cuisiat1.nccenr == 'Cuisiat'
-    assert cuisiat1.start_datetime == START_DATETIME
-    assert cuisiat1.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
-    assert cuisiat2.id == 'COM01137@2016-01-01'
-    assert cuisiat2.successors == ''
-    assert cuisiat2.modification == CREATION_PREEXISTING_ASSOCIATED
-    assert cuisiat2.nccenr == 'Cuisiat'
-    assert cuisiat2.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
-    assert cuisiat2.end_datetime == END_DATETIME
+    assert cuisiat.id == 'COM01137@1942-01-01'
+    assert cuisiat.successors == treffort_cuisiat.id
+    assert cuisiat.modification == FUSION_ASSOCIATION_ASSOCIATED
+    assert cuisiat.nccenr == 'Cuisiat'
+    assert cuisiat.start_datetime == START_DATETIME
+    assert cuisiat.end_datetime == datetime(1972, 11, 30, 23, 59, 59, 999999)
     assert treffort.id == 'COM01426@1942-01-01'
     assert treffort.successors == treffort_cuisiat.id
     assert treffort.modification == CHANGE_NAME_FUSION
@@ -1246,3 +1240,29 @@ def test_creation_not_delegated_pole():
     assert sylvains_lais.start_datetime == datetime(2016, 1, 1, 0, 0, 0)
     assert sylvains_lais.end_datetime == END_DATETIME
     assert sylvains_lais.successors == ''
+
+
+def test_change_county_creation():
+    """Only for Gernicourt and Fresne-sur-Loire."""
+    towns = towns_factory(
+        town_factory(dep='02', com='344', nccenr='Gernicourt'),
+        town_factory(dep='51', com='664', nccenr='Gernicourt')
+    )
+    change_county_creation_record = record_factory(
+        dep='51', com='664', mod=CHANGE_COUNTY_CREATION,
+        effdate=date(2016, 12, 31),
+        nccoff='Gernicourt', depanc='02344')
+
+    history = [change_county_creation_record]
+    compute(towns, history)
+    gernicourt_old = towns.filter(depcom='02344')[0]
+    gernicourt_new = towns.filter(depcom='51664')[0]
+    assert gernicourt_old.id == 'COM02344@1942-01-01'
+    assert gernicourt_old.start_datetime == START_DATETIME
+    assert (gernicourt_old.end_datetime ==
+            datetime(2016, 12, 30, 23, 59, 59, 999999))
+    assert gernicourt_old.successors == gernicourt_new.id
+    assert gernicourt_new.id == 'COM51664@2016-12-31'
+    assert gernicourt_new.start_datetime == datetime(2016, 12, 31, 0, 0)
+    assert gernicourt_new.end_datetime == datetime(2016, 12, 31, 0, 0, 0, 1)
+    assert gernicourt_new.successors == ''

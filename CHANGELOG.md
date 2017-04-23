@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 7.0.0 — 2017-04-18
+## 7.0.1 — 2017-04-23
+
+* Fixed #24: Misunderstanding of modification code 332 + special cases.
+
+## 7.0.0 — 2017-04-19
 
 * Use COG 2017 (previously 2016) from INSEE as source.
 

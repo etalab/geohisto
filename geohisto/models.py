@@ -142,6 +142,22 @@ class Town(namedtuple('Town', [
                 end_datetime=end_datetime,
                 town=self)
             raise Exception(msg)
+        id_ = kwargs.get('id', self.id)
+        dep = kwargs.get('dep', self.dep)
+        com = kwargs.get('com', self.com)
+        depcom = kwargs.get('depcom', self.depcom)
+        if depcom != dep + com:
+            msg = (
+                'You cannot set {dep} as a dep and {com} as a com and '
+                '{depcom} as a depcom for Town {town}.'
+            ).format(dep=dep, com=com, depcom=depcom, town=self)
+            raise Exception(msg)
+        if depcom != id_[3:8]:
+            msg = (
+                'You cannot set {id} as an id and {depcom} as a depcom '
+                'for Town {town}.'
+            ).format(id=id_, depcom=dep + com, town=self)
+            raise Exception(msg)
         return self._replace(**kwargs)
 
     def add_modification(self, modification):
