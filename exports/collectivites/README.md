@@ -23,6 +23,7 @@ The initial date has been chosen given their
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in `communes.csv`. Default is an empty string.
 * `parents`: List of `id`s separated by semicolons of the parents for that county, as found in `regions.csv`.
+* `iso2`: [ISO 3166-1 alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for that overseas collectivity.
 
 The `id` column is unique, the `insee_code` one is NOT. Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 8.1.1 — 2017-05-12
+
+* Add 2-letters ISO codes for overseas collectivities.
+
 ## 8.1.0 — 2017-05-12
 
 * Add overseas collectivities.
