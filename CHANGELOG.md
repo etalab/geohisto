@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 8.0.0 — 2017-05-12
+
+* Rename `counties` to `departements` and `towns` to `communes` in exports.
+
 ## 7.0.1 — 2017-04-23
 
 * Fixed #24: Misunderstanding of modification code 332 + special cases.

@@ -1,6 +1,6 @@
 # History of counties
 
-**The `counties.csv` file contains history for counties since 1790-03-04.**
+**The `departements.csv` file contains history for counties since 1790-03-04.**
 
 The initial date (1860-07-01) has been chosen given that:
 

@@ -31,13 +31,13 @@ def main(at_date):
     compute_parents(counties, towns)
 
     # Finally write files.
-    write_results_on('exports/towns/towns.csv', towns)
-    generate_head_results_from('exports/towns/towns.csv')
+    write_results_on('exports/communes/communes.csv', towns)
+    generate_head_results_from('exports/communes/communes.csv')
     if at_date:
         for date_ in at_date:
             date_ = date(*[int(part) for part in date_.split('-')])
             datetime_ = datetime.combine(date_, datetime.min.time())
-            export_path = 'exports/towns/towns_{date_}.csv'.format(
+            export_path = 'exports/communes/communes_{date_}.csv'.format(
                 date_=date_.isoformat())
             write_results_on(export_path, towns, datetime_)
 

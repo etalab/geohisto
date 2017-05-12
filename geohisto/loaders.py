@@ -101,7 +101,7 @@ def load_populations():
     }
 
 
-def load_counties(filename='exports/counties/counties.csv'):
+def load_counties(filename='exports/departements/departements.csv'):
     """Load counties from `filename` into a dict."""
     counties = defaultdict(list)
     with open(filename) as counties_csv:

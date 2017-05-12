@@ -7,7 +7,7 @@ It might be useful if you have to deal with redirections and is in use by the [g
 
 ## Usage
 
-If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/counties/) and [towns](exports/towns/). There is a dedicated documentation at these places.
+If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/departements/) and [towns](exports/communes/). There is a dedicated documentation at these places.
 
 
 ## Sources
@@ -29,7 +29,7 @@ Optionally, you can specify a date to only export towns valid at that given date
 
     $ python -m geohisto --at-date 2016-01-01
 
-It will be generated within the `exports/towns/` folder with an explicit name.
+It will be generated within the `exports/communes/` folder with an explicit name.
 
 
 ## Tests

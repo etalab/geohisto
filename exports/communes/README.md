@@ -1,6 +1,6 @@
 # History of towns
 
-**The `towns.csv` file contains mainly links between previous and current towns and their INSEE codes.**
+**The `communes.csv` file contains mainly links between previous and current towns and their INSEE codes.**
 
 Beware that the same INSEE code is recycled when towns are renamed and (sometimes!) merged.
 
@@ -25,9 +25,9 @@ Regarding dates, the initial date + time has been set as `1942-01-01 00:00:00` g
 
 This is a regular CSV file with value separated by commas and a header line with previously described column names.
 
-The `towns_head.csv` file contains the first 100 lines of the generated file for an easy preview within Github if you click on it.
+The `communes_head.csv` file contains the first 100 lines of the generated file for an easy preview within Github if you click on it.
 
-The `towns_{date}.csv` files contain towns valid at the given date.
+The `communes_{date}.csv` files contain towns valid at the given date.
 
 
 ## Examples
