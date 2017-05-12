@@ -1,8 +1,8 @@
-id,insee_code,start_datetime,end_datetime,name,successors,ancestors,chef_lieu,parents
-COL975@2003-03-28,975,2003-03-28 00:00:00,9999-12-31 23:59:59,Saint-Pierre-et-Miquelon,,DEP975@1976-07-19,,
-COL977@2007-02-21,977,2007-02-21 00:00:00,9999-12-31 23:59:59,Saint-Barthélemy,,,,
-COL978@2007-02-21,978,2007-02-21 00:00:00,9999-12-31 23:59:59,Saint-Martin,,,,
-COL986@2003-03-28,986,2003-03-28 00:00:00,9999-12-31 23:59:59,Wallis-et-Futuna,,,,
-COL987@2004-02-27,987,2004-02-27 00:00:00,9999-12-31 23:59:59,Polynésie française,,,,
-COL988@1999-03-19,988,1999-03-19 00:00:00,9999-12-31 23:59:59,Nouvelle-Calédonie,,,,
-COL984@2007-02-21,984,2007-02-21 00:00:00,9999-12-31 23:59:59,Terres australes et antarctiques françaises,,,,
+id,insee_code,start_datetime,end_datetime,name,successors,ancestors,chef_lieu,parents,iso2
+COL975@2003-03-28,975,2003-03-28 00:00:00,9999-12-31 23:59:59,Saint-Pierre-et-Miquelon,,DEP975@1976-07-19,,pm
+COL977@2007-02-21,977,2007-02-21 00:00:00,9999-12-31 23:59:59,Saint-Barthélemy,,,,,bl
+COL978@2007-02-21,978,2007-02-21 00:00:00,9999-12-31 23:59:59,Saint-Martin,,,,,mf
+COL986@2003-03-28,986,2003-03-28 00:00:00,9999-12-31 23:59:59,Wallis-et-Futuna,,,,,wf
+COL987@2004-02-27,987,2004-02-27 00:00:00,9999-12-31 23:59:59,Polynésie française,,,,,pf
+COL988@1999-03-19,988,1999-03-19 00:00:00,9999-12-31 23:59:59,Nouvelle-Calédonie,,,,,nc
+COL984@2007-02-21,984,2007-02-21 00:00:00,9999-12-31 23:59:59,Terres australes et antarctiques françaises,,,,,tf
