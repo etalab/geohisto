@@ -1,13 +1,13 @@
 # GeoHisto
 
-**Historic information for French regions, counties and towns based on INSEE and Wikipedia data, exported as (re)usable CSV files.**
+**Historic information for French regions, counties, overseas collectivities and towns based on INSEE and Wikipedia data, exported as (re)usable CSV files.**
 
 It might be useful if you have to deal with redirections and is in use by the [geozones](https://github.com/etalab/geozones) project to feed [data.gouv.fr](http://www.data.gouv.fr/fr/).
 
 
 ## Usage
 
-If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/departements/) and [towns](exports/communes/). There is a dedicated documentation at these places.
+If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/departements/), [overseas collectivities](exports/collectivites/) and [towns](exports/communes/). There is a dedicated documentation at these places.
 
 
 ## Sources

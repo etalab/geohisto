@@ -1,29 +1,24 @@
-# History of counties (départements)
+# History of overseas collectivities (Collectivités d’Outre-Mer)
 
-**The `departements.csv` file contains history for counties since 1790-03-04.**
+**The `collectivites.csv` file contains history for overseas collectivities.**
 
-The initial date (1860-07-01) has been chosen given that:
-
-* we do not want to deal with the complexity of the Napoleonian period with a lot of annexation of european territories
-* we want stable INSEE codes and as such the creation of Alpes-Maritimes as of 1860-06-23 and Haute-Savoie/Savoie as of 1860-06-15 are required
-
-Recent (since 1946-03-19) overseas counties are listed too with their respective regions.
+The initial date has been chosen given their
+[respective histories](https://insee.fr/fr/metadonnees/definition/c1842).
 
 
 ## Sources
 
-* https://fr.wikipedia.org/wiki/Histoire_des_d%C3%A9partements_fran%C3%A7ais
-* https://fr.wikipedia.org/wiki/Liste_des_d%C3%A9partements_fran%C3%A7ais
-* https://fr.wikipedia.org/wiki/Liste_des_d%C3%A9partements_fran%C3%A7ais_de_1811
+* https://fr.wikipedia.org/wiki/France_d%27outre-mer
+* https://insee.fr/fr/information/2028040
 
 
 ## Columns
 
-* `id`: This is the unique combination of `DEP` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
+* `id`: This is the unique combination of `COL` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
 * `insee_code`: The 2-digits code delivered by INSEE.
 * `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
 * `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
-* `name`: The name of the county.
+* `name`: The name of the collectivite.
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in `communes.csv`. Default is an empty string.

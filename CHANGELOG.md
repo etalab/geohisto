@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 8.1.0 — 2017-05-12
+
+* Add overseas collectivities.
+
 ## 8.0.0 — 2017-05-12
 
 * Rename `counties` to `departements` and `towns` to `communes` in exports.
