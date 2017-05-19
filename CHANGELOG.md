@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 8.1.1 — 2017-05-12
+## 8.1.3 — 2017-05-18
+
+* Correct successors/ancestors in case of fusions then splits.
+
+## 8.1.2 — 2017-05-12
 
 * Add 2-letters ISO codes for overseas collectivities.
 

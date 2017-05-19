@@ -112,7 +112,7 @@ def creation_delegated(towns, record):
         towns.delete(current_town)
 
 
-@in_case_of(CHANGE_NAME_REINSTATEMENT, REINSTATEMENT)
+@in_case_of(REINSTATEMENT)
 def reinstatement(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
@@ -134,12 +134,42 @@ def reinstatement(towns, record):
     towns.upsert(new_town)
 
     old_town = current_town.generate(
-        nccenr=record.nccanc or record.nccoff,
+        nccenr=record.nccoff,
         end_datetime=min(current_town.end_datetime, record.eff - DELTA),
         modification=record.mod
     )
     if new_town.valid_at(old_town.end_datetime + DELTA):
         old_town = old_town.add_successor(new_town.id)
+    towns.upsert(old_town)
+    towns.replace_successor(old_town, new_town,
+                            valid_datetime=new_town.start_datetime - DELTA)
+
+
+@in_case_of(CHANGE_NAME_REINSTATEMENT)
+def change_name_reinstatement(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+    new_town = current_town.generate(
+        id=compute_id(current_town.depcom, record.effdate),
+        start_datetime=record.eff,
+        end_datetime=END_DATETIME,
+        nccenr=record.nccoff,
+        successors='',
+        modification=0
+    )
+    towns.upsert(new_town)
+
+    old_town = current_town.generate(
+        nccenr=record.nccanc or record.nccoff,
+        end_datetime=min(current_town.end_datetime, record.eff - DELTA),
+        modification=record.mod
+    )
+    old_town = old_town.add_successor(new_town.id)
+    for ancestor in old_town.get_ancestors(towns):
+        for guessed_successor in towns.valid_at(
+                old_town.end_datetime + DELTA, depcom=ancestor.depcom):
+            if (guessed_successor and guessed_successor.id != old_town.id and
+                    guessed_successor.id != new_town.id):
+                old_town = old_town.add_successor(guessed_successor.id)
     towns.upsert(old_town)
 
 
@@ -153,16 +183,34 @@ def spliting(towns, record):
     towns.upsert(current_town)
 
 
-@in_case_of(DELETION_PARTITION, DELETION_FUSION,
-            FUSION_ASSOCIATION_ASSOCIATED, CREATION_DELEGATED)
+@in_case_of(DELETION_PARTITION, DELETION_FUSION, CREATION_DELEGATED)
 def deletion(towns, record):
+    current_town = towns.get_current(record.depcom, record.eff)
+    old_town = current_town.generate(
+        nccenr=record.nccoff,
+        end_datetime=record.eff - DELTA,
+        modification=record.mod
+    )
+    successor = towns.get_current(record.comech, record.eff)
+    old_town = old_town.add_successor(successor.id)
+    towns.upsert(old_town)
+
+
+@in_case_of(FUSION_ASSOCIATION_ASSOCIATED)
+def fusion_association_associated(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
     end_datetime = record.eff - DELTA
 
-    # It happens with `Lamarche-en-Woëvre` for instance
+    # TODO: move to specials.
+    # It happens only with `Lamarche-en-Woëvre` for instance
     # because the reinstatement is at the same date of the (re)fusion,
     # so we set the end_date just after the start_date exceptionnally.
+    # Record(depcom='55273', mod=330, eff=datetime.datetime(1983, 1, 1, 0, 0),
+    # nccoff='Lamarche-en-Woëvre', nccanc='', comech='55386', dep='55',
+    # com='273', depanc='', last=None, effdate=datetime.date(1983, 1, 1))
+    # Current town: <Town (COM55273@1983-01-01): Lamarche-en-Woëvre
+    # from 1983-01-01 to 9999-12-31 with successors  and mod 0>
     has_temporary_existence = current_town.start_datetime == record.eff
     if has_temporary_existence:
         end_datetime = record.eff + DELTA
@@ -174,6 +222,13 @@ def deletion(towns, record):
     )
     successor = towns.get_current(record.comech, record.eff)
     old_town = old_town.add_successor(successor.id)
+    if successor.modification == CHANGE_NAME_REINSTATEMENT:
+        # Deal with fusions then splits declared in the wrong order.
+        if old_town.depcom not in successor.successors:
+            new_town = towns.get_current(
+                old_town.depcom, successor.end_datetime + DELTA)
+            successor = successor.add_successor(new_town.id)
+            towns.upsert(successor)
     towns.upsert(old_town)
 
 
