@@ -202,15 +202,10 @@ def fusion_association_associated(towns, record):
 
     end_datetime = record.eff - DELTA
 
-    # TODO: move to specials.
-    # It happens only with `Lamarche-en-Woëvre` for instance
-    # because the reinstatement is at the same date of the (re)fusion,
+    # It happens only with `Lamarche-en-Woëvre` because
+    # the reinstatement is at the same date of the (re)fusion,
     # so we set the end_date just after the start_date exceptionnally.
-    # Record(depcom='55273', mod=330, eff=datetime.datetime(1983, 1, 1, 0, 0),
-    # nccoff='Lamarche-en-Woëvre', nccanc='', comech='55386', dep='55',
-    # com='273', depanc='', last=None, effdate=datetime.date(1983, 1, 1))
-    # Current town: <Town (COM55273@1983-01-01): Lamarche-en-Woëvre
-    # from 1983-01-01 to 9999-12-31 with successors  and mod 0>
+    # Cannot be moved to specials because of model enforcement.
     has_temporary_existence = current_town.start_datetime == record.eff
     if has_temporary_existence:
         end_datetime = record.eff + DELTA
