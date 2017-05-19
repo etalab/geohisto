@@ -88,7 +88,13 @@ def compute_ancestors(towns):
         for successor_id in town.successors.split(';'):
             successor = towns.retrieve(successor_id)
             if successor:
-                successor = successor.add_ancestor(town.id)
-                towns.upsert(successor)
+                # Avoid weird parenthood relations.
+                if (town.id not in town.successors and
+                        town.end_datetime <= successor.end_datetime):
+                    successor = successor.add_ancestor(town.id)
+                    towns.upsert(successor)
+                else:
+                    town = town.remove_successor(successor.id)
+                    towns.upsert(town)
             else:
                 print('Successor not found for', town.repr_insee)

@@ -156,14 +156,24 @@ def test_change_name_reinstatement_after_fusion():
         dep='28', com='159', mod=SPLITING,
         effdate=date(1987, 1, 1),
         nccoff='Framboisière', comech='28368')
+    fusion_association_associated = record_factory(
+        dep='28', com='368', mod=FUSION_ASSOCIATION_ASSOCIATED,
+        effdate=date(1972, 12, 22), comech='28159',
+        nccoff='Saucelle')
+    reinstatement_record = record_factory(
+        dep='28', com='368', mod=REINSTATEMENT,
+        effdate=date(1987, 1, 1), comech='28159',
+        nccoff='Saucelle', nccanc='Framboisière-la-Saucelle')
     history = [
         change_name_fusion_record, change_name_reinstatement_record,
-        spliting_record
+        spliting_record, fusion_association_associated, reinstatement_record
     ]
     compute(towns, history)
     framb, framb_saucelle, framb2 = towns.filter(depcom='28159')
+    saucelle, saucelle2 = towns.filter(depcom='28368')
+    assert saucelle.successors == framb_saucelle.id
     assert framb_saucelle.id == 'COM28159@1972-12-22'
-    assert framb_saucelle.successors == framb2.id
+    assert framb_saucelle.successors == framb2.id + ';' + saucelle2.id
     assert framb_saucelle.modification == CHANGE_NAME_REINSTATEMENT
     assert framb.id == 'COM28159@1942-01-01'
     assert framb.successors == framb_saucelle.id

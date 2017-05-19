@@ -181,6 +181,13 @@ class Town(namedtuple('Town', [
             ancestor = self.ancestors + ';' + ancestor
         return self._replace(**{'ancestors': ancestor})
 
+    def get_ancestors(self, towns):
+        """Iterator across ancestors of the current town."""
+        for town in towns.with_successors():
+            for successor_id in town.successors.split(';'):
+                if successor_id == self.id:
+                    yield town
+
     def add_successor(self, successor):
         """Append the given successor to the current list if any."""
         if self.successors:
@@ -191,6 +198,13 @@ class Town(namedtuple('Town', [
         """Replace a successor within the current list."""
         successors = self.successors.replace(old_successor, new_successor)
         return self._replace(**{'successors': successors.strip(';')})
+
+    def remove_successor(self, successor):
+        """Remove the given successor from the current list."""
+        successors = ';'.join([
+            succ for succ in self.successors.split(';')
+            if succ != successor])
+        return self._replace(**{'successors': successors})
 
     def clear_successors(self):
         """Remove all successors."""

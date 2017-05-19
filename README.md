@@ -43,9 +43,3 @@ Note that the duration of the whole test suite run is about 5 minutes.
 That's why you would probably prefer to run a particular test:
 
     $ python -m pytest tests/test_actions.py::test_change_name
-
-
-
-## TODO
-
-* Collect feedback from reusers
