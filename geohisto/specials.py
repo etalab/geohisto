@@ -1,8 +1,11 @@
 """Special cases handled manually."""
 import inspect
+from datetime import datetime
 
 from geohisto import specials
-from .constants import CREATION_DELEGATED_POLE, DELTA
+from .constants import (
+    CREATION_DELEGATED_POLE, DELTA, FUSION_ASSOCIATION_ASSOCIATED
+)
 from .utils import compute_id, only_if_depcom
 
 
@@ -441,6 +444,45 @@ def _special_case_oudon(towns):
     towns.upsert(st_martin_fresnay_new)
     towns.update_successors(oudon_new, from_town=oudon_wrong)
     towns.delete(oudon_wrong)
+
+
+@only_if_depcom('55409')
+def _special_case_pretz(towns):
+    """Special case: change name during split.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM55409-Pretz
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM55409-Pretz-en-Argonne
+    """
+    pretz_wrong, pretz_argonne = towns.filter(depcom='55409')
+    triaucourt, triaucourt_arg, seuil_argonne = towns.filter(depcom='55517')
+    pretz = pretz_wrong.generate(
+        end_datetime=seuil_argonne.start_datetime - DELTA,
+        successors=seuil_argonne.id,
+        modification=FUSION_ASSOCIATION_ASSOCIATED
+    )
+    towns.upsert(pretz)
+    seuil_argonne_new = seuil_argonne.add_successor(pretz_argonne.id)
+    towns.upsert(seuil_argonne_new)
+
+
+@only_if_depcom('73024')
+def _special_case_avanchers(towns):
+    """Special case: change name during split.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM73024-Avanchers
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM73024-Les-Avanchers-Valmorel
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM73003-Aigueblanche
+    """
+    avanchers_wrong, avanchers_valmorel = towns.filter(depcom='73024')
+    aigueblanche = towns.filter(depcom='73003')[0]
+    avanchers = avanchers_wrong.generate(
+        end_datetime=datetime(1972, 7, 17, 23, 59, 59, 999999),
+        successors=aigueblanche.id,
+        modification=FUSION_ASSOCIATION_ASSOCIATED
+    )
+    towns.upsert(avanchers)
+    aigueblanche_new = aigueblanche.add_successor(avanchers_valmorel.id)
+    towns.upsert(aigueblanche_new)
 
 
 def compute_specials(towns):

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 8.1.4 — 2017-05-25
+
+* Handle special cases of Pretz and Avanchers, fixed #42.
+
 ## 8.1.3 — 2017-05-18
 
 * Correct successors/ancestors in case of fusions then splits.
