@@ -20,4 +20,8 @@ def test_successors_are_valid(towns):
         for successor_id in town.successors.split(';'):
             successor = successor_id and towns.retrieve(successor_id) or None
             if successor:
-                assert successor.valid_at(town.end_datetime + DELTA)
+                try:
+                    assert successor.valid_at(town.end_datetime + DELTA)
+                except OverflowError:
+                    # Happens when end_datetime is already EN_DATETIME.
+                    assert successor.valid_at(town.end_datetime)

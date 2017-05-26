@@ -117,8 +117,9 @@ def reinstatement(towns, record):
     current_town = towns.get_current(record.depcom, record.eff)
 
     id_ = compute_id(current_town.depcom, record.effdate)
-    # It happens with `Avanchers-Valmorel` for instance
-    # where a change name is performed at the same date.
+    # It happens with `Nonsard-Lamarche`, `Pretz-en-Argonne` and
+    # `Les Avanchers-Valmorel` where a change name is performed
+    # at the same date. Handled in special cases.
     is_already_registered = id_ in towns
     if is_already_registered:
         return
