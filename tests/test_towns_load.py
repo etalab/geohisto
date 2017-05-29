@@ -1,9 +1,9 @@
 import pytest
 
-from geohisto.loaders import load_towns
 from geohisto.constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME
+	END_DATE, END_DATETIME, START_DATE, START_DATETIME
 )
+from geohisto.loaders import load_towns
 
 
 @pytest.fixture

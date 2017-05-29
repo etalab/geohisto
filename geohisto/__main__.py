@@ -2,9 +2,9 @@ from datetime import date, datetime
 
 import click
 
-from .loaders import load_counties, load_towns, load_history, load_populations
 from .actions import compute
-from .exports import write_results_on, generate_head_results_from
+from .exports import generate_head_results_from, write_results_on
+from .loaders import load_counties, load_history, load_populations, load_towns
 from .parents import compute_parents
 from .populations import compute_populations
 from .specials import compute_specials

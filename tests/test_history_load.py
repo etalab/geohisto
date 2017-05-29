@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from geohisto.constants import FUSION_ASSOCIATION_ASSOCIATED, CREATION
+from geohisto.constants import CREATION, FUSION_ASSOCIATION_ASSOCIATED
 
 
 def test_initial_load(history_list):

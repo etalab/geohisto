@@ -3,8 +3,9 @@ import inspect
 from datetime import datetime
 
 from geohisto import specials
+
 from .constants import (
-    CREATION_DELEGATED_POLE, DELTA, FUSION_ASSOCIATION_ASSOCIATED
+	CREATION_DELEGATED_POLE, DELTA, FUSION_ASSOCIATION_ASSOCIATED
 )
 from .utils import compute_id, only_if_depcom
 

@@ -5,8 +5,8 @@ Sane defaults are set for the generated namedtuples.
 """
 from datetime import datetime
 
-from geohisto.constants import START_DATE, END_DATE
-from geohisto.models import Towns, Town, Record
+from geohisto.constants import END_DATE, START_DATE
+from geohisto.models import Record, Town, Towns
 from geohisto.utils import compute_id
 
 

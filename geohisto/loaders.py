@@ -2,13 +2,13 @@ import csv
 from collections import defaultdict
 
 from .constants import (
-    START_DATE, END_DATE, START_DATETIME, END_DATETIME,
-    CREATION_DELEGATED_POLE, CREATION_NOT_DELEGATED_POLE
+	CREATION_DELEGATED_POLE, CREATION_NOT_DELEGATED_POLE, END_DATE, END_DATETIME,
+	START_DATE, START_DATETIME
 )
-from .models import Towns, Town, Record
+from .models import Record, Town, Towns
 from .utils import (
-    convert_date, convert_datetime, convert_name_with_article, compute_id,
-    iter_over_insee_csv_file
+	compute_id, convert_date, convert_datetime, convert_name_with_article,
+	iter_over_insee_csv_file
 )
 
 

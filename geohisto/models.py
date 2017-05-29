@@ -1,4 +1,4 @@
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 
 from .constants import DELTA, START_DATETIME
 
