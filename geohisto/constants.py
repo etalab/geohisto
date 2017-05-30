@@ -3,6 +3,9 @@ from datetime import date, datetime, timedelta
 # In use to concatenate ids.
 SEPARATOR = '@'
 
+# See https://github.com/etalab/geoids.
+GEOID_PREFIX = 'fr:commune:'
+
 # The first date in history records is 1942-08-01. We need these
 # boundaries to deal with ranges related to renamed towns
 # with the same INSEE (DEP+COM) codes.

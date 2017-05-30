@@ -8,7 +8,7 @@ import csv
 from datetime import date, datetime
 from functools import wraps
 
-from .constants import SEPARATOR, TNCC2ARTICLE
+from .constants import GEOID_PREFIX, SEPARATOR, TNCC2ARTICLE
 
 ACTIONS = {}
 
@@ -74,8 +74,9 @@ def compute_id(depcom, start_date):
     """Return the unique string id for a given `depcom` + `start_date`."""
     if isinstance(start_date, datetime):
         start_date = start_date.date()
-    return 'COM{depcom}{separator}{start_date}'.format(
-        depcom=depcom, separator=SEPARATOR, start_date=start_date.isoformat())
+    return '{prefix}{depcom}{separator}{start_date}'.format(
+        prefix=GEOID_PREFIX, depcom=depcom, separator=SEPARATOR,
+        start_date=start_date.isoformat())
 
 
 def compute_ancestors(towns):

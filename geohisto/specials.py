@@ -1,6 +1,6 @@
 """Special cases handled manually."""
 import inspect
-from datetime import datetime
+from datetime import datetime, date
 
 from geohisto import specials
 
@@ -63,7 +63,8 @@ def _special_case_charbonnieres_sapins(towns):
     """Special case: town changed and successor does not exist yet."""
     charbonnieres_sapins = towns.filter(depcom='25123')[0]
     charbonnieres_sapins_new = charbonnieres_sapins.replace_successor(
-        'COM25222@1942-01-01', 'COM25222@2017-01-01')
+        compute_id('25222', date(1942, 1, 1)),
+        compute_id('25222', date(2017, 1, 1)))
     towns.upsert(charbonnieres_sapins_new)
 
 
@@ -72,7 +73,8 @@ def _special_case_dommerville(towns):
     """Special case: county changed and successor not updated."""
     dommerville_current = towns.filter(depcom='28131')[0]
     dommerville_new = dommerville_current.replace_successor(
-        'COM91016@1942-01-01', 'COM91016@1968-01-01')
+        compute_id('91016', date(1942, 1, 1)),
+        compute_id('91016', date(1968, 1, 1)))
     towns.upsert(dommerville_new)
 
 
@@ -81,7 +83,8 @@ def _special_case_crepieux_pape(towns):
     """Special case: county changed and successor not updated."""
     crepieux_current = towns.filter(depcom='69274')[0]
     crepieux_new = crepieux_current.replace_successor(
-        'COM69286@1942-01-01', 'COM69286@1972-12-15')
+        compute_id('69286', date(1942, 1, 1)),
+        compute_id('69286', date(1972, 12, 15)))
     towns.upsert(crepieux_new)
 
 
@@ -90,7 +93,8 @@ def _special_case_congerville(towns):
     """Special case: county changed and id not updated."""
     congerville_current = towns.filter(depcom='91173')[0]
     congerville_new = congerville_current.replace_successor(
-        'COM91613@1942-01-01', 'COM91613@1974-01-01')
+        compute_id('91613', date(1942, 1, 1)),
+        compute_id('91613', date(1974, 1, 1)))
     towns.upsert(congerville_new)
 
 
@@ -109,7 +113,8 @@ def _special_case_blamecourt(towns):
         end_datetime=blamecourt_current.start_datetime + DELTA
     )
     blamecourt_new = blamecourt_new.replace_successor(
-        'COM95355@1942-01-01', 'COM95355@1968-01-01')
+        compute_id('95355', date(1942, 1, 1)),
+        compute_id('95355', date(1968, 1, 1)))
     towns.upsert(blamecourt_new)
 
 
@@ -128,7 +133,8 @@ def _special_case_arthieul(towns):
         end_datetime=arthieul_current.start_datetime + DELTA
     )
     arthieul_new = arthieul_new.replace_successor(
-        'COM95355@1942-01-01', 'COM95355@1968-01-01')
+        compute_id('95355', date(1942, 1, 1)),
+        compute_id('95355', date(1968, 1, 1)))
     towns.upsert(arthieul_new)
 
 
@@ -137,7 +143,7 @@ def _special_case_chisa(towns):
     """Special case: county changed and id not updated."""
     chisa_wrong, chisa_old = towns.filter(depcom='20366')
     chisa_new = chisa_wrong.generate(
-        id='COM2B366@1976-01-01',
+        id=compute_id('2B366', date(1976, 1, 1)),
         dep='2B',
         com='366',
         depcom='2B366')
@@ -150,7 +156,7 @@ def _special_case_butry_oise(towns):
     """Special case: county changed and id not updated."""
     butry_oise_wrong, butry_oise_old = towns.filter(depcom='78692')
     butry_oise_new = butry_oise_wrong.generate(
-        id='COM95120@1968-01-01',
+        id=compute_id('95120', date(1968, 1, 1)),
         dep='95',
         com='120',
         depcom='95120')
@@ -163,7 +169,8 @@ def _special_case_tivolaggio(towns):
     """Special case: county changed and successor does not exist."""
     tivolaggio = towns.filter(depcom='2A325')[0]
     tivolaggio = tivolaggio.replace_successor(
-        'COM2A249@1976-01-01', 'COM20249@1942-01-01')
+        compute_id('2A249', date(1976, 1, 1)),
+        compute_id('20249', date(1942, 1, 1)))
     towns.upsert(tivolaggio)
 
 
@@ -172,7 +179,8 @@ def _special_case_labergement(towns):
     """Special case: successor change on same date."""
     labergement = towns.filter(depcom='25319')[0]
     labergement = labergement.replace_successor(
-        'COM25334@1942-01-01', 'COM25334@2017-01-01')
+        compute_id('25334', date(1942, 1, 1)),
+        compute_id('25334', date(2017, 1, 1)))
     towns.upsert(labergement)
 
 
@@ -181,7 +189,8 @@ def _special_case_villalet(towns):
     """Special case: successor change on same date."""
     villalet = towns.filter(depcom='27688')[0]
     villalet = villalet.replace_successor(
-        'COM27693@1972-10-01', 'COM27693@2016-01-01')
+        compute_id('27693', date(1972, 10, 1)),
+        compute_id('27693', date(2016, 1, 1)))
     towns.upsert(villalet)
 
 
@@ -190,7 +199,8 @@ def _special_case_pezy(towns):
     """Special case: successor change on same date."""
     pezy = towns.filter(depcom='28297')[0]
     pezy = pezy.replace_successor(
-        'COM28383@1942-01-01', 'COM28383@2016-01-01')
+        compute_id('28383', date(1942, 1, 1)),
+        compute_id('28383', date(2016, 1, 1)))
     towns.upsert(pezy)
 
 
@@ -199,7 +209,8 @@ def _special_case_rocourt(towns):
     """Special case: successor change on same date."""
     rocourt = towns.filter(depcom='88392')[0]
     rocourt = rocourt.replace_successor(
-        'COM88475@1942-01-01', 'COM88475@2017-01-01')
+        compute_id('88475', date(1942, 1, 1)),
+        compute_id('88475', date(2017, 1, 1)))
     towns.upsert(rocourt)
 
 
@@ -208,7 +219,8 @@ def _special_case_langrolay(towns):
     """Special case: successor change on same date."""
     langrolay, langrolay_rance, langrolay_rance2 = towns.filter(depcom='22103')
     langrolay_rance = langrolay_rance.replace_successor(
-        'COM22213@1942-01-01', 'COM22213@1973-03-15')
+        compute_id('22213', date(1942, 1, 1)),
+        compute_id('22213', date(1973, 3, 15)))
     towns.upsert(langrolay_rance)
 
 

@@ -9,7 +9,7 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 
 ## Columns
 
-* `id`: This is the unique combination of `REG` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
+* `id`: This is a [GeoID](https://github.com/etalab/geoids).
 * `insee_code`: The 2-digits code delivered by INSEE.
 * `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
 * `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
@@ -18,7 +18,7 @@ The initial date has been chosen given the latest modification (fusion of Corsic
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
 * `population`: The population as of 2013.
 * `surface`: The area in km2.
-* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that region, as found in `communes.csv`. Default is an empty string.
+* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that region, as found in [communes.csv](exports/communes/). Default is an empty string.
 * `nuts_code`: The 4-chars code delivered by Eurostat.
 * `wikipedia`: The wikipedia page for that region (note that given how recent the change is, some links still redirect to temporary region names).
 

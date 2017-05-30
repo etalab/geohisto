@@ -17,7 +17,7 @@ def test_initial_load(loaded_towns):
 
 def test_contains_arles(loaded_towns):
     arles = loaded_towns.filter(depcom='13004')[0]
-    assert arles.id == 'COM13004@1942-01-01'
+    assert arles.id == 'fr:commune:13004@1942-01-01'
     assert arles.dep == '13'
     assert arles.com == '004'
     assert arles.start_date == START_DATE

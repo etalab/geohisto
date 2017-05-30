@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 9.0.0 — 2017-05-30
+
+* Switch to GeoIDs, see https://github.com/etalab/geoids
+
 ## 8.1.4 — 2017-05-25
 
 * Handle special cases of Pretz and Avanchers, fixed #42.
