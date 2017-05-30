@@ -26,8 +26,8 @@ Recent (since 1946-03-19) overseas counties are listed too with their respective
 * `name`: The name of the county.
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
-* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in [communes.csv](exports/communes/). Default is an empty string.
-* `parents`: List of `id`s separated by semicolons of the parents for that county, as found in [regions.csv](exports/regions/).
+* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in [communes.csv](../../exports/communes/). Default is an empty string.
+* `parents`: List of `id`s separated by semicolons of the parents for that county, as found in [regions.csv](../../exports/regions/).
 
 The `id` column is unique, the `insee_code` one is NOT. Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
 

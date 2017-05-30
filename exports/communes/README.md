@@ -14,7 +14,7 @@ Beware that the same INSEE code is recycled when towns are renamed and (sometime
 * `name`: The name of the town, including the article (`Le `, `La `, `L'` etc).
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
-* `parents`: List of `id`s separated by semicolons of the parents for that town, as found in [departements.csv](exports/departements/).
+* `parents`: List of `id`s separated by semicolons of the parents for that town, as found in [departements.csv](../../exports/departements/).
 * `population`: The population as of 2013, for merged towns since then it is the computed sum. In case of towns “mortes pour la France”, the population is set to `0` otherwise fallback on `NULL` to reflect that it is intentional.
 * `insee_modification`: Indicate the [INSEE modification](https://www.insee.fr/fr/information/2114773#mod) performed on the town.
 
