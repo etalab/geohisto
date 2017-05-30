@@ -1,7 +1,7 @@
 import pytest
 
 from geohisto.constants import (
-	END_DATE, END_DATETIME, START_DATE, START_DATETIME
+    END_DATE, END_DATETIME, START_DATE, START_DATETIME
 )
 from geohisto.loaders import load_towns
 
