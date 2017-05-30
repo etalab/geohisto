@@ -113,7 +113,7 @@ class Town(namedtuple('Town', [
     def repr_insee(self):
         """Prepend the INSEE URL (useful for debugging)."""
         insee_base = 'https://www.insee.fr/fr/metadonnees/cog/commune/'
-        insee_id = self.id.split('@')[0] + '-' + self.nccenr
+        insee_id = 'COM' + self.depcom + '-' + self.nccenr
         return '{repr} {insee_url}'.format(
             repr=self.__repr__(),
             insee_url='{insee_base}{insee_id}'.format(insee_base=insee_base,
@@ -152,7 +152,7 @@ class Town(namedtuple('Town', [
                 '{depcom} as a depcom for Town {town}.'
             ).format(dep=dep, com=com, depcom=depcom, town=self)
             raise Exception(msg)
-        if depcom != id_[3:8]:
+        if depcom not in id_:
             msg = (
                 'You cannot set {id} as an id and {depcom} as a depcom '
                 'for Town {town}.'

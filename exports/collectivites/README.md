@@ -14,15 +14,15 @@ The initial date has been chosen given their
 
 ## Columns
 
-* `id`: This is the unique combination of `COL` + `insee_code` + `@` + `start_date` (using ISO format `YYYY-MM-DD`).
+* `id`: This is a [GeoID](https://github.com/etalab/geoids).
 * `insee_code`: The 2-digits code delivered by INSEE.
 * `start_datetime`: The effective start date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
 * `end_datetime`: The effective end date + time for the current `id` using ISO format (`YYYY-MM-DD HH:MM:SS`).
 * `name`: The name of the collectivite.
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`. Default is an empty string.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`. Default is an empty string.
-* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in `communes.csv`. Default is an empty string.
-* `parents`: List of `id`s separated by semicolons of the parents for that county, as found in `regions.csv`.
+* `chef_lieu`: List of `id`s separated by semicolons of the Chef-lieux for that county, as found in [communes.csv](../../exports/communes/). Default is an empty string.
+* `parents`: List of `id`s separated by semicolons of the parents for that county, as found in [regions.csv](../../exports/regions/).
 * `iso2`: [ISO 3166-1 alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for that overseas collectivity.
 
 The `id` column is unique, the `insee_code` one is NOT. Arbitrarily, the far future end date has been set to `9999-12-31 23:59:59`.
