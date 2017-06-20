@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 9.0.1 — 2017-06-20
+
+* Fix 2A, 2B and 17 departements’ parents references.
+
 ## 9.0.0 — 2017-05-30
 
 * Switch to GeoIDs, see https://github.com/etalab/geoids
