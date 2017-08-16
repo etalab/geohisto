@@ -1,5 +1,11 @@
+import logging
+
+log = logging.getLogger(__name__)
+
+
 def compute_parents(counties, towns):
     """Update the parents for each town."""
+    log.info('Updating parents')
     for _, town in towns.items():
         dep = town.depcom[:2]
         if dep == '97':  # DROM have 3-digits codes.

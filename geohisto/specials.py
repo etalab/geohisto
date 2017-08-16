@@ -1,5 +1,7 @@
 """Special cases handled manually."""
 import inspect
+import logging
+
 from datetime import datetime, date
 
 from geohisto import specials
@@ -8,6 +10,9 @@ from .constants import (
     CREATION_DELEGATED_POLE, DELTA, FUSION_ASSOCIATION_ASSOCIATED
 )
 from .utils import compute_id, only_if_depcom
+
+
+log = logging.getLogger(__name__)
 
 
 @only_if_depcom('49092')
@@ -500,6 +505,7 @@ def _special_case_avanchers(towns):
 
 def compute_specials(towns):
     """Apply all special case functions from that file."""
+    log.info('Applying special cases')
     for name, func in inspect.getmembers(specials, inspect.isfunction):
         if name.startswith('_special_case_'):
             func(towns)

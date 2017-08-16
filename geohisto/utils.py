@@ -5,12 +5,16 @@ Most of the cryptic keys in that script are documented here:
 https://www.insee.fr/fr/information/2114819#titre-bloc-10
 """
 import csv
+import logging
+
 from datetime import date, datetime
 from functools import wraps
 
 from .constants import GEOID_PREFIX, SEPARATOR, TNCC2ARTICLE
 
 ACTIONS = {}
+
+log = logging.getLogger(__name__)
 
 
 def iter_over_insee_csv_file(csv_filepath):
@@ -85,6 +89,7 @@ def compute_ancestors(towns):
 
     Useful to compute new populations for instance.
     """
+    log.info('Computing ancestors')
     for town in towns.with_successors():
         for successor_id in town.successors.split(';'):
             successor = towns.retrieve(successor_id)
@@ -98,4 +103,4 @@ def compute_ancestors(towns):
                     town = town.remove_successor(successor.id)
                     towns.upsert(town)
             else:
-                print('Successor not found for', town.repr_insee)
+                log.warning('Successor not found for %s', town.repr_insee)

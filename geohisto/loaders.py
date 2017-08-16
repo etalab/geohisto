@@ -1,4 +1,6 @@
 import csv
+import logging
+
 from collections import defaultdict
 
 from .constants import (
@@ -11,6 +13,8 @@ from .utils import (
     iter_over_insee_csv_file
 )
 
+log = logging.getLogger(__name__)
+
 
 def load_towns(filename='sources/France2017.txt'):
     """
@@ -18,6 +22,7 @@ def load_towns(filename='sources/France2017.txt'):
 
     Warning: default file contains outdated towns but NOT renamed ones.
     """
+    log.info('Loading towns')
     towns = Towns()
     for i, line in iter_over_insee_csv_file(filename):
         actual = int(line['ACTUAL'])
@@ -46,6 +51,7 @@ def load_towns(filename='sources/France2017.txt'):
 
 def load_history(filename='sources/historiq2017.txt'):
     """Load all towns from `filename` into a list of `Record`s."""
+    log.info('Loading history')
     history = []
     last_log = defaultdict(int)
     for i, line in iter_over_insee_csv_file(filename):
@@ -92,6 +98,7 @@ def load_population_from(filename):
 
 def load_populations():
     """Load all populations into a dedicated dict."""
+    log.info('Loading populations')
     return {
         'metropole': load_population_from('sources/population_metropole.csv'),
         'arrondissements': load_population_from(
@@ -103,6 +110,7 @@ def load_populations():
 
 def load_counties(filename='exports/departements/departements.csv'):
     """Load counties from `filename` into a dict."""
+    log.info('Loading counties')
     counties = defaultdict(list)
     with open(filename) as counties_csv:
         for line in csv.DictReader(counties_csv):

@@ -1,5 +1,9 @@
 import csv
+import logging
+
 from itertools import islice
+
+log = logging.getLogger(__name__)
 
 
 def write_results_on(filename, towns, at_datetime=None):
@@ -15,6 +19,7 @@ def write_results_on(filename, towns, at_datetime=None):
     The `at_datetime` parameter allows you to only filter valid towns at
     that given datetime.
     """
+    log.info('Writing towns file to %s', filename)
     with open(filename, 'w') as csvfile:
         fieldnames = [
             'id', 'insee_code',
@@ -56,6 +61,7 @@ def generate_head_results_from(filename_in, nb_of_lines=100):
     """
     filepath, extension = filename_in.split('.')
     filename_out = filepath + '_head.' + extension
+    log.info('Writing %s head file to %s', filename_in, filename_out)
     with open(filename_in) as file_in, open(filename_out, 'w') as file_out:
         head = islice(file_in, nb_of_lines)
         file_out.write(''.join(head))

@@ -31,6 +31,14 @@ Optionally, you can specify a date to only export towns valid at that given date
 
 It will be generated within the `exports/communes/` folder with an explicit name.
 
+To also generate the intercommunalities, you need to add the `--intercommunalities` flag.
+
+    $ python -m geohisto --intercommunalities
+
+The whole process takes about 3 hours to generate both towns and intercommunalities exports.
+You may add some extra output to see the progress by setting the verbosity to `debug`:
+
+    $ python -m geohisto --intercommunalities -v debug
 
 ## Tests
 

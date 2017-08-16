@@ -1,26 +1,92 @@
-from collections import OrderedDict, namedtuple
+import logging
 
-from .constants import DELTA, START_DATETIME
+from datetime import date
+from collections import OrderedDict, namedtuple, defaultdict
+
+from .constants import DELTA, START_DATETIME, END_DATE
+from .constants import END_KIND, END_NAME, END_INNER, END_TAXMODEL
+from .constants import INTERCOMMUNALITY_START_DATE
+
+log = logging.getLogger(__name__)
 
 
-class Towns(OrderedDict):
-
-    def upsert(self, town):
-        """Update or insert a Town, return True in case of insertion."""
-        is_created = town.id not in self
-        self[town.id] = town
+class Collection(object):
+    def upsert(self, item):
+        """Update or insert an item, return True in case of insertion."""
+        is_created = item.id not in self
+        self[item.id] = item
         return is_created
 
     def retrieve(self, id):
-        """Get a Town by `id`."""
+        """Get an item by `id`."""
         try:
             return self[id]
         except KeyError:
-            print('Id not found:', id)
+            log.error('Id not found: %s', id)
 
-    def delete(self, town):
-        """Remove a given `town`, do not forget to update references."""
-        del self[town.id]
+    def delete(self, item):
+        """Remove a given `item`, do not forget to update references."""
+        del self[item.id]
+
+    def replace_successor(self, old_successor, new_successor,
+                          valid_datetime=None):
+        """Run across all items and update successors."""
+        if valid_datetime is None:
+            is_date_valid = True
+        for _item in self.with_successors():
+            if valid_datetime:
+                try:
+                    is_date_valid = _item.valid_at(valid_datetime)
+                except OverflowError:  # Happens on END_DATETIME + DELTA
+                    is_date_valid = True
+            if (old_successor.id in _item.successors and
+                    is_date_valid and
+                    new_successor.start_datetime != START_DATETIME):
+                _item = _item.replace_successor(old_successor.id,
+                                                new_successor.id)
+                self.upsert(_item)
+
+    def filter(self, sort=True, **filters):
+        """
+        Return a (sorted) list of items with the given filters applied.
+
+        Useful to look up by `depcom`, `nccenr` and so on.
+        """
+        _items = [item
+                  for item in self.values()
+                  for k, v in filters.items()
+                  if getattr(item, k) == v]
+        if sort:
+            _items.sort()  # Useful for tests. (but very bad for performances)
+        return _items
+
+    def with_successors(self):
+        """Return a generator of Towns having successors."""
+        return (item for item in self.values() if item.successors)
+
+
+class Towns(Collection, OrderedDict):
+    def latest(self, depcom):
+        """Get the most recent town for a given `depcom`."""
+        _towns = self.filter(depcom=depcom, sort=False)  # Sort once
+        _towns.sort(key=lambda town: town.end_datetime, reverse=True)
+        return _towns[0]
+
+    def valid_at(self, valid_datetime, depcom=None):
+        """Return a list of Towns existing at the given `valid_datetime`."""
+        # Beware, ternary operator is tricky here, keep it explicit.
+        if depcom:
+            _towns = self.filter(depcom=depcom, sort=False)
+        else:
+            _towns = self.values()
+        return [town for town in _towns if town.valid_at(valid_datetime)]
+
+    def get_current(self, depcom, valid_datetime):
+        """Try to return the more pertinent Town given a depcom and date."""
+        try:
+            return self.valid_at(valid_datetime, depcom=depcom)[0]
+        except IndexError:
+            return self.latest(depcom)
 
     def update_successors(self, town, from_town=None, to_town=None):
         """Update references in case of a Town rename or creation."""
@@ -33,65 +99,60 @@ class Towns(OrderedDict):
         elif from_town and from_town.valid_at(valid_datetime):
             self.replace_successor(from_town, town)
 
-    def replace_successor(self, old_successor, new_successor,
-                          valid_datetime=None):
-        """Run across all Towns and update successors."""
+
+class Item(object):
+    def set_population(self, population):
+        """Update the population."""
+        return self._replace(**{'population': population})
+
+    def set_parents(self, parents):
+        """Update the parents."""
+        return self._replace(**{'parents': parents})
+
+    def add_ancestor(self, ancestor):
+        """Append the given ancestor to the current list if any."""
+        if self.ancestors:
+            ancestor = self.ancestors + ';' + ancestor
+        return self._replace(**{'ancestors': ancestor})
+
+    def get_ancestors(self, towns):
+        """Iterator across ancestors of the current town."""
+        for town in towns.with_successors():
+            for successor_id in town.successors.split(';'):
+                if successor_id == self.id:
+                    yield town
+
+    def add_successor(self, successor):
+        """Append the given successor to the current list if any."""
+        if self.successors:
+            successor = self.successors + ';' + successor
+        return self._replace(**{'successors': successor})
+
+    def replace_successor(self, old_successor, new_successor):
+        """Replace a successor within the current list."""
+        successors = self.successors.replace(old_successor, new_successor)
+        return self._replace(**{'successors': successors.strip(';')})
+
+    def remove_successor(self, successor):
+        """Remove the given successor from the current list."""
+        successors = ';'.join([
+            succ for succ in self.successors.split(';')
+            if succ != successor])
+        return self._replace(**{'successors': successors})
+
+    def clear_successors(self):
+        """Remove all successors."""
+        return self._replace(**{'successors': ''})
+
+    def valid_at(self, valid_datetime):
+        """Check the existence of the Town at a given `valid_datetime`."""
         if valid_datetime is None:
-            is_date_valid = True
-        for _town in self.with_successors():
-            if valid_datetime:
-                try:
-                    is_date_valid = _town.valid_at(valid_datetime)
-                except OverflowError:  # Happens on END_DATETIME + DELTA
-                    is_date_valid = True
-            if (old_successor.id in _town.successors and
-                    is_date_valid and
-                    new_successor.start_datetime != START_DATETIME):
-                _town = _town.replace_successor(old_successor.id,
-                                                new_successor.id)
-                self.upsert(_town)
-
-    def filter(self, **filters):
-        """
-        Return a (sorted) list of Town with the given filters applied.
-
-        Useful to look up by `depcom`, `nccenr` and so on.
-        """
-        _towns = [town
-                  for town in self.values()
-                  for k, v in filters.items()
-                  if getattr(town, k) == v]
-        _towns.sort()  # Useful for tests.
-        return _towns
-
-    def with_successors(self):
-        """Return a generator of Towns having successors."""
-        return (town for town in self.values() if town.successors)
-
-    def latest(self, depcom):
-        """Get the most recent town for a given `depcom`."""
-        _towns = self.filter(depcom=depcom)
-        _towns.sort(key=lambda town: town.end_datetime, reverse=True)
-        return _towns[0]
-
-    def valid_at(self, valid_datetime, depcom=None):
-        """Return a list of Towns existing at the given `valid_datetime`."""
-        # Beware, ternary operator is tricky here, keep it explicit.
-        if depcom:
-            _towns = self.filter(depcom=depcom)
-        else:
-            _towns = self.values()
-        return [town for town in _towns if town.valid_at(valid_datetime)]
-
-    def get_current(self, depcom, valid_datetime):
-        """Try to return the more pertinent Town given a depcom and date."""
-        try:
-            return self.valid_at(valid_datetime, depcom=depcom)[0]
-        except IndexError:
-            return self.latest(depcom)
+            return False
+        return self.start_datetime <= valid_datetime <= self.end_datetime
 
 
-class Town(namedtuple('Town', [
+class Town(Item,
+           namedtuple('Town', [
                       'id', 'actual', 'modification', 'successors',
                       'ancestors', 'start_date', 'end_date', 'start_datetime',
                       'end_datetime', 'dep', 'com', 'nccenr', 'depcom',
@@ -167,57 +228,120 @@ class Town(namedtuple('Town', [
                 modifications=self.modification, modification=modification)
         return self._replace(**{'modification': modification})
 
-    def set_population(self, population):
-        """Update the population."""
-        return self._replace(**{'population': population})
-
-    def set_parents(self, parents):
-        """Update the parents."""
-        return self._replace(**{'parents': parents})
-
-    def add_ancestor(self, ancestor):
-        """Append the given ancestor to the current list if any."""
-        if self.ancestors:
-            ancestor = self.ancestors + ';' + ancestor
-        return self._replace(**{'ancestors': ancestor})
-
-    def get_ancestors(self, towns):
-        """Iterator across ancestors of the current town."""
-        for town in towns.with_successors():
-            for successor_id in town.successors.split(';'):
-                if successor_id == self.id:
-                    yield town
-
-    def add_successor(self, successor):
-        """Append the given successor to the current list if any."""
-        if self.successors:
-            successor = self.successors + ';' + successor
-        return self._replace(**{'successors': successor})
-
-    def replace_successor(self, old_successor, new_successor):
-        """Replace a successor within the current list."""
-        successors = self.successors.replace(old_successor, new_successor)
-        return self._replace(**{'successors': successors.strip(';')})
-
-    def remove_successor(self, successor):
-        """Remove the given successor from the current list."""
-        successors = ';'.join([
-            succ for succ in self.successors.split(';')
-            if succ != successor])
-        return self._replace(**{'successors': successors})
-
-    def clear_successors(self):
-        """Remove all successors."""
-        return self._replace(**{'successors': ''})
-
-    def valid_at(self, valid_datetime):
-        """Check the existence of the Town at a given `valid_datetime`."""
-        if valid_datetime is None:
-            return False
-        return self.start_datetime <= valid_datetime <= self.end_datetime
-
 
 Record = namedtuple('Record', [
     'depcom', 'mod', 'eff', 'nccoff', 'nccanc', 'comech', 'dep', 'com',
     'depanc', 'last', 'effdate'
 ])
+
+
+class Intercommunalities(Collection, defaultdict):
+    def latest(self, siren):
+        """Get the latest valid intercommunality for a given `siren`."""
+        # No need to sort, there is theoricaly only one town
+        # with a gvien siren at a time
+        _items = self.filter(siren=siren, end_date=END_DATE, sort=False)
+        # _items.sort(key=lambda item: item.end_date, reverse=True)
+        return _items[0]
+
+    def valid_at(self, valid_date, siren=None):
+        """
+        Return a list of Intercommunalities existing at the given `valid_date`.
+        """
+        # Beware, ternary operator is tricky here, keep it explicit.
+        if siren:
+            _items = self.filter(siren=siren)
+        else:
+            _items = self.values()
+        return [item for item in _items if item.valid_at(valid_date)]
+
+    @property
+    def open_sirens(self):
+        return set(item.siren for item in self.filter(end_date=END_DATE,
+                                                      sort=False))
+
+    def ends(self, siren, year, reason):
+        intercommunality = self.latest(siren)
+        self.upsert(intercommunality.end_on(year, reason))
+
+    def update(self, intercommunality, year):
+        current = self.latest(intercommunality.siren)
+        changes = []
+        if intercommunality.towns != current.towns:
+            # This is a perimeter change
+            changes.append(END_INNER)
+        if intercommunality.name != current.name:
+            # This is a name change
+            changes.append(END_NAME)
+        if intercommunality.kind != current.kind:
+            # This is a kind change
+            changes.append(END_KIND)
+        if intercommunality.taxmodel != current.taxmodel:
+            # This is a tax model change
+            changes.append(END_TAXMODEL)
+
+        if changes:
+            changes = ';'.join(changes)
+            intercommunality = intercommunality.create_on(year, [current.id])
+            self.upsert(current.end_on(year, changes, [intercommunality.id]))
+            self.upsert(intercommunality)
+            return True
+        return False
+
+
+class Intercommunality(Item, namedtuple('Intercommunalitite', [
+        'id',  # GeoID
+        'siren',  # SIREN identifier
+        'name',  # Normalized name
+        'acronym',  # Public acronym, not always initials
+        'kind',  # One of CC, CA, CU, CV, DISTRICT, METRO, METRO69, SAN
+        'successors',  # List of successors identifiers
+        'ancestors',  # List of ancestors identifiers
+        'towns',  # Set of components towns identifiers
+        'missing_towns',  # Set of towns INSEE code not matched to a town
+        'start_date',  # Start validity date
+        'end_date',  # End validity date
+        'end_reason',  # Reason this intercommunality is ended. See above.
+        'taxmodel',  # One of 4TX, TPU, FA, FPU
+        'population',  # Known population from last census
+        ])):
+    """Inherit from a namedtuple with empty slots for performances."""
+    __slots__ = ()
+
+    def __new__(cls, **kwargs):
+        '''Set default values to allow shorter constructors'''
+        kwargs.setdefault('id', None)
+        kwargs.setdefault('siren', None)
+        kwargs.setdefault('name', None)
+        kwargs.setdefault('acronym', None)
+        kwargs.setdefault('kind', None)
+        kwargs.setdefault('start_date', INTERCOMMUNALITY_START_DATE)
+        kwargs.setdefault('end_date', END_DATE)
+        kwargs.setdefault('end_reason', None)
+        kwargs.setdefault('taxmodel', None)
+        kwargs.setdefault('population', None)
+        # Don't use setdefault on values which are mutable
+        kwargs['successors'] = kwargs.get('successors', [])
+        kwargs['ancestors'] = kwargs.get('ancestors', [])
+        kwargs['towns'] = kwargs.get('towns', set([]))
+        kwargs['missing_towns'] = kwargs.get('missing_towns', set([]))
+        return super().__new__(cls, **kwargs)
+
+    def create_on(self, year, ancestors=None):
+        start_date = date(year, 1, 1)
+        id = 'fr:epci:{0}@{1}'.format(self.siren, start_date)
+        return self._replace(id=id, start_date=start_date,
+                             ancestors=ancestors or [])
+
+    def end_on(self, year, reason, successors=None):
+        return self._replace(end_date=date(year, 12, 31),
+                             end_reason=reason,
+                             successors=successors or [])
+
+    @property
+    def start_datetime(self):
+        return self.start_date
+
+    @property
+    def end_datetime(self):
+        return self.end_date

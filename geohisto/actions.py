@@ -3,6 +3,8 @@ Perform actions on towns given the modifications' types.
 
 The modifications come from the history of changes.
 """
+import logging
+
 from .constants import (
     CHANGE_COUNTY, CHANGE_COUNTY_CREATION, CHANGE_NAME, CHANGE_NAME_CREATION,
     CHANGE_NAME_FUSION, CHANGE_NAME_REINSTATEMENT, CREATION,
@@ -12,6 +14,8 @@ from .constants import (
     SPLITING, START_DATE, START_DATETIME
 )
 from .utils import ACTIONS, compute_id, in_case_of
+
+log = logging.getLogger(__name__)
 
 
 @in_case_of(CHANGE_NAME, CHANGE_NAME_FUSION)
@@ -384,6 +388,7 @@ def obsolete(towns, record):
 
 
 def compute(towns, history):
+    log.info('Computing history from actions')
     for record in history:
         try:
             ACTIONS.get(record.mod, lambda a, b: a)(towns, record)
