@@ -36,6 +36,8 @@ def main(at_date, intercommunalities):
     compute_ancestors(towns)
     compute_populations(populations, towns)
     compute_parents(counties, towns)
+
+    # Intercommunalitite should be processed after the whole towns process
     if intercommunalities:
         intercommunalities = load_intercommunalities(towns)
 

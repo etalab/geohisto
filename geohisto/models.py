@@ -4,13 +4,19 @@ from datetime import date
 from collections import OrderedDict, namedtuple, defaultdict
 
 from .constants import DELTA, START_DATETIME, END_DATE
-from .constants import END_KIND, END_NAME, END_INNER, END_TAXMODEL
+from .constants import INTERCOMMUNALITY_INNER_CHANGE
+from .constants import INTERCOMMUNALITY_KIND_CHANGE
+from .constants import INTERCOMMUNALITY_RENAMED
 from .constants import INTERCOMMUNALITY_START_DATE
+from .constants import INTERCOMMUNALITY_TAXMODEL_CHANGE
 
 log = logging.getLogger(__name__)
 
 
-class Collection(object):
+class CollectionMixin:
+    """
+    Adds some behavior to a `dict` or an `OrderedDict` (any `dict` interface).
+    """
     def upsert(self, item):
         """Update or insert an item, return True in case of insertion."""
         is_created = item.id not in self
@@ -65,7 +71,7 @@ class Collection(object):
         return (item for item in self.values() if item.successors)
 
 
-class Towns(Collection, OrderedDict):
+class Towns(CollectionMixin, OrderedDict):
     def latest(self, depcom):
         """Get the most recent town for a given `depcom`."""
         _towns = self.filter(depcom=depcom, sort=False)  # Sort once
@@ -100,7 +106,10 @@ class Towns(Collection, OrderedDict):
             self.replace_successor(from_town, town)
 
 
-class Item(object):
+class Item:
+    """
+    Adds some common behavior to `namedtuple` resulting classes.
+    """
     def set_population(self, population):
         """Update the population."""
         return self._replace(**{'population': population})
@@ -235,18 +244,17 @@ Record = namedtuple('Record', [
 ])
 
 
-class Intercommunalities(Collection, defaultdict):
+class Intercommunalities(CollectionMixin, defaultdict):
     def latest(self, siren):
         """Get the latest valid intercommunality for a given `siren`."""
         # No need to sort, there is theoricaly only one town
-        # with a gvien siren at a time
+        # with a given siren at a time
         _items = self.filter(siren=siren, end_date=END_DATE, sort=False)
-        # _items.sort(key=lambda item: item.end_date, reverse=True)
         return _items[0]
 
     def valid_at(self, valid_date, siren=None):
         """
-        Return a list of Intercommunalities existing at the given `valid_date`.
+        Return a list of Intercommunalities existing at the given `valid_date`
         """
         # Beware, ternary operator is tricky here, keep it explicit.
         if siren:
@@ -269,16 +277,16 @@ class Intercommunalities(Collection, defaultdict):
         changes = []
         if intercommunality.towns != current.towns:
             # This is a perimeter change
-            changes.append(END_INNER)
+            changes.append(INTERCOMMUNALITY_INNER_CHANGE)
         if intercommunality.name != current.name:
             # This is a name change
-            changes.append(END_NAME)
+            changes.append(INTERCOMMUNALITY_RENAMED)
         if intercommunality.kind != current.kind:
             # This is a kind change
-            changes.append(END_KIND)
+            changes.append(INTERCOMMUNALITY_KIND_CHANGE)
         if intercommunality.taxmodel != current.taxmodel:
             # This is a tax model change
-            changes.append(END_TAXMODEL)
+            changes.append(INTERCOMMUNALITY_TAXMODEL_CHANGE)
 
         if changes:
             changes = ';'.join(changes)
@@ -289,23 +297,27 @@ class Intercommunalities(Collection, defaultdict):
         return False
 
 
-class Intercommunality(Item, namedtuple('Intercommunalitite', [
-        'id',  # GeoID
-        'siren',  # SIREN identifier
-        'name',  # Normalized name
-        'acronym',  # Public acronym, not always initials
-        'kind',  # One of CC, CA, CU, CV, DISTRICT, METRO, METRO69, SAN
-        'successors',  # List of successors identifiers
-        'ancestors',  # List of ancestors identifiers
-        'towns',  # Set of components towns identifiers
-        'missing_towns',  # Set of towns INSEE code not matched to a town
-        'start_date',  # Start validity date
-        'end_date',  # End validity date
-        'end_reason',  # Reason this intercommunality is ended. See above.
-        'taxmodel',  # One of 4TX, TPU, FA, FPU
-        'population',  # Known population from last census
+class Intercommunality(Item, namedtuple(
+        'Intercommunality', [
+            'id',  # GeoID
+            'siren',  # SIREN identifier
+            'name',  # Normalized name
+            'acronym',  # Public acronym, not always initials
+            'kind',  # One of CC, CA, CU, CV, DISTRICT, METRO, METRO69, SAN
+            'successors',  # List of successors identifiers
+            'ancestors',  # List of ancestors identifiers
+            'towns',  # Set of components towns identifiers
+            'missing_towns',  # Set of towns INSEE code not matched to a town
+            'start_date',  # Start validity date
+            'end_date',  # End validity date
+            'end_reason',  # Reason this intercommunality is ended. See above
+            'taxmodel',  # One of 4TX, TPU, FA, FPU
+            'population',  # Known population from last census
         ])):
-    """Inherit from a namedtuple with empty slots for performances."""
+    """
+    Represents a French intercommunality or EPCI in French
+    """
+    # Inherit from a namedtuple with empty slots for performances.
     __slots__ = ()
 
     def __new__(cls, **kwargs):
@@ -328,20 +340,37 @@ class Intercommunality(Item, namedtuple('Intercommunalitite', [
         return super().__new__(cls, **kwargs)
 
     def create_on(self, year, ancestors=None):
+        """
+        Instanciate a new intercommunality with start date and id defined.
+
+        Values are populated from the given year
+        (intercommunalities are only created or modified on the 1st january)
+        Optionnal ancestors can be provided in case of change.
+        """
         start_date = date(year, 1, 1)
         id = 'fr:epci:{0}@{1}'.format(self.siren, start_date)
         return self._replace(id=id, start_date=start_date,
                              ancestors=ancestors or [])
 
     def end_on(self, year, reason, successors=None):
+        """
+        Instanciate a new intercommunality with end date and reason defined.
+
+        Values are populated from the given year
+        (intercommunalities are only created or modified on the 1st january
+        so close has to be on the 31st december from the previous year)
+        Optionnal successors can be provided in case of change.
+        """
         return self._replace(end_date=date(year, 12, 31),
                              end_reason=reason,
                              successors=successors or [])
 
     @property
     def start_datetime(self):
+        '''Property used by `Item.valid_at`'''
         return self.start_date
 
     @property
     def end_datetime(self):
+        '''Property used by `Item.valid_at`'''
         return self.end_date

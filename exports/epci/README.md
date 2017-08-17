@@ -11,7 +11,7 @@
 ## Columns
 
 * `id`: This is a [GeoID](https://github.com/etalab/geoids).
-* `siren`: The 9-digits code delivered by INSEE.
+* `siren`: The [9-digits code delivered by INSEE](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
 * `name`: The name of the intercommunality.
 * `acronym`: An optionnal known acronym or short name.
 * `kind`: The legal form of the intercommunality.
@@ -19,7 +19,7 @@
 * `towns`: List of component towns `id`s separated by semicolons.
 * `start_date`: The effective start date for the current `id` using ISO format (`YYYY-MM-DD`).
 * `end_date`: The effective end date for the current `id` using ISO format (`YYYY-MM-DD`).
-* `end_reason`: The reason explaining the end of this intercommunality.
+* `end_reason`: The reason explaining the end of this intercommunality, see [Changes](#changes)
 * `successors`: List of `id`s separated by semicolons which are successors of the current `id`.
 * `ancestors`: List of `id`s separated by semicolons which are ancestors of the current `id`.
 * `population`: The legal population from last census.
@@ -32,7 +32,19 @@ A new entry/line is registered when the intercommunality changed one of its:
 - `name`
 - `taxmodel`
 - `kind`
-- conponent `towns`
+- component `towns`
+
+
+## Changes
+
+| code       | Meaning                                                         |
+|------------|-----------------------------------------------------------------|
+| `inner`    | This is an inner change, ie. perimeter changed, town renamed... |
+| `renamed`  | The intercommunality changed its name                           |
+| `kind`     | The intercommunality changed its legal form                     |
+| `taxmodel` | The intercommunality changed its tax model/system               |
+| `removed`  | The intercommunality does not exist anymore                     |
+| `merged`   | The intercommunality has been merge with other(s)               |
 
 
 ## Format

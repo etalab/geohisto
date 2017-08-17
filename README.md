@@ -7,7 +7,7 @@ It might be useful if you have to deal with redirections and is in use by the [g
 
 ## Usage
 
-If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [regions](exports/regions/), [counties](exports/departements/), [overseas collectivities](exports/collectivites/) and [towns](exports/communes/). There is a dedicated documentation at these places.
+If you’re only interested in generated data, check out the `exports` folder which contains CSV files related to [intercommunalities](exports/epci), [regions](exports/regions/), [counties](exports/departements/), [overseas collectivities](exports/collectivites/) and [towns](exports/communes/). There is a dedicated documentation at these places.
 
 
 ## Sources
@@ -15,6 +15,8 @@ If you’re only interested in generated data, check out the `exports` folder wh
 Source files are coming from the [INSEE downloads page](https://www.insee.fr/fr/information/2666684) which allows to retrieve information related to the “Code officiel géographique 2017”. We’re using the list of existing towns and their history which are both available within the `sources` folder.
 
 Additionaly, files containing the population for almost all towns has been computed too in the `sources` folder. They are coming from [a XLS dataset](http://www.insee.fr/fr/ppp/bases-de-donnees/recensement/populations-legales/pages2015/zip/HIST_POP_COM_RP13.zip) provided by  [INSEE](http://www.insee.fr/fr/ppp/bases-de-donnees/recensement/populations-legales/), manually completed with Wikipedia data for [Lyon](https://fr.wikipedia.org/wiki/Arrondissements_de_Lyon) and [Marseille](https://fr.wikipedia.org/wiki/Secteurs_et_arrondissements_de_Marseille) districts, and converted into CSV.
+
+[Intercommunalities source files are fully documented into their folder](sources/epci).
 
 
 ## Development
@@ -35,7 +37,7 @@ To also generate the intercommunalities, you need to add the `--intercommunaliti
 
     $ python -m geohisto --intercommunalities
 
-The whole process takes about 3 hours to generate both towns and intercommunalities exports.
+The whole process takes about 2 hours to generate both towns and intercommunalities exports.
 You may add some extra output to see the progress by setting the verbosity to `debug`:
 
     $ python -m geohisto --intercommunalities -v debug

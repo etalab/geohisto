@@ -94,14 +94,9 @@ TODO
 - Encode in UTF-8 with ';' as field separator.
 - Name the file `{year}.csv`
 
-To help the process, there is a `EPCI.ods` with all years, merges and references as sheets.
-You can use it to add an extra year from the original CSV (`Sheets > Insert Sheet from File...`)
-and then format and sort it.
-This document contains a macro to automate the export of the sheets to CSV in the right format
-(you can safely ignore the warning message when you open the document).
-You can execute it from the menu `Tools > Macros > Run macro...`
-and then select `EPCI.ods > export_as_csv` in the left column and `export_sheets_to_csv` in the right one
-and then click on `Run`.
+To help the process, you can use the `EPCI.ods` file from the ["Liste et composition des EPCI à fiscalité propre" dataset](https://www.data.gouv.fr/fr/datasets/liste-et-composition-des-epci-a-fiscalite-propre/)
+It contains all all years, merges and references as separate sheets.
+
 
 
 [download]: https://www.collectivites-locales.gouv.fr/liste-et-composition-des-epci-a-fiscalite-propre

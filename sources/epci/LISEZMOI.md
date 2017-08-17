@@ -31,7 +31,6 @@ Certains fichiers peuvent contenir les colonnes supplémentaires suivantes:
 
 ## Natures juridiques
 
-
 | Code     | Nom                                 |
 |----------|-------------------------------------|
 | CC       | Communauté de Communes              |
@@ -47,14 +46,12 @@ Certains fichiers peuvent contenir les colonnes supplémentaires suivantes:
 
 ## Fiscalités
 
-**TODO**
-
-| Code | Nom |
-|------|-----|
-| 4TX  |     |
-| TPU  |     |
-| FA   |     |
-| FPU  |     |
+| Code | Nom                                                 |
+|------|-----------------------------------------------------|
+| 4TX  | Régime fiscal à 4 TauX pour la taxe professionnelle |
+| TPU  | Régime de la Taxe Professionnelle Unique            |
+| FA   | Régime de la Fiscalité Additionnelle                |
+| FPU  | Régime de la Fiscalité Professionnelle Unique       |
 
 
 ## Population
@@ -80,7 +77,7 @@ Elles sont **calculées** au moyen du recensement de la population de façon cyc
 
 ## Règles de nommage
 
-D'une année sur l'autre, la colonne `nom` peu changer de règle de nommage.
+D'une année sur l'autre, la colonne `nom` peut changer de règle de nommage.
 
 Les règles observées sont les suivantes:
 TODO
@@ -93,16 +90,8 @@ TODO
 - Encoder en UTF-8 avec ';' comme séparateur de champ.
 - Nommer le fichier `{année}.csv`
 
-Pour faciliter la procédure, il y a un fichier `EPCI.ods` contenant les années,
-les fusions et les références dans des euilles séparées.
-Vous pouvez l'utiliser pour ajouter une colonne d'année additionnelle depuis le CSV original
-(`Feuilles > Insérer Feuille depuis un Fichier...`) et effectuer le formattage et tri nécéssaire.
-Ce document contient une macro pour automtiser l'export des feuilles en CSV dans le bon format
-(vous pouvez ignorer le message d'avertissement à l'ouverture du fichier en toute sécurité).
-Vous pouvez l'executer depuis le menu `Outils > Macros > Executer Macro...`
-puis en sélectionnant `EPCI.ods > export_as_csv` dans la colonne de gauche
-et `export_sheets_to_csv` dans celle de droite
-puis en cliquant sur `Executer`.
+Pour faciliter la procédure, il est possible d'utiliser le fichier `EPCI.ods` du [jeu de données "Liste et composition des EPCI à fiscalité propre"](https://www.data.gouv.fr/fr/datasets/liste-et-composition-des-epci-a-fiscalite-propre/). Il contient les années,
+les fusions et les références dans des feuilles séparées.
 
 
 [download]: https://www.collectivites-locales.gouv.fr/liste-et-composition-des-epci-a-fiscalite-propre

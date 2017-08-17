@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 from itertools import groupby
 
-from .constants import END_REMOVED, INTERCOMMUNALITY_START_YEAR
+from .constants import INTERCOMMUNALITY_REMOVED, INTERCOMMUNALITY_START_DATE
 from .models import Intercommunality, Intercommunalities, Towns
 
 
@@ -88,6 +88,18 @@ POST_REPLACEMENTS = {
 
 
 def should_replace_kind(name, kind):
+    """
+    Tells wether a kind code should be inlined or not.
+
+    The rule is: if the name start by any combination
+    of '{kind code} {preposition}'
+    or '{kind code} {common prefix} {preposition}',
+    it should be inlined.
+    Ex: "CC du Valromey" should be inlined
+    but "CC Terre d'Eaux" should not.
+    DI Urbain de Mouy should be inlined
+    DI Urbain Montrevel should not
+    """
     return name.startswith(tuple(
         ' '.join((kind, prep)) for prep in PREPOSITIONS
     )) or name.lower().startswith(tuple(
@@ -97,6 +109,9 @@ def should_replace_kind(name, kind):
 
 
 def fix_typos(name):
+    """
+    Replace some common kind code typos in names.
+    """
     for typo, fix in TYPOS.items():
         if typo in name:
             name = name.replace(typo, fix)
@@ -104,6 +119,9 @@ def fix_typos(name):
 
 
 def fix_word_casing(word):
+    """
+    Fix casing for an upper case word (old school DB style).
+    """
     if any(word.lower().startswith(prefix) for prefix in WITH_APOSTROPHE):
         prefix, suffix = word.split('\'', 1)
         return '\''.join((prefix.lower(), suffix.capitalize()))
@@ -115,10 +133,6 @@ def fix_word_casing(word):
         return word.capitalize()
 
 
-def fix_casing(name):
-    return ' '.join(fix_word_casing(word) for word in name.split(' '))
-
-
 def extract_name(line):
     """Extract and normalize an intercommunality name"""
     name = line['nom'].strip('\' ')
@@ -126,9 +140,10 @@ def extract_name(line):
         name = name.replace(char, replacement)
     kind = line['nature']
     name = fix_typos(name)
-    name = ' '.join(name.split())  # replace multiple spaces
+    parts = name.split()
     if name.isupper():
-        name = fix_casing(name)
+        parts = (fix_word_casing(p) for p in parts)
+    name = ' '.join(parts)  # replace multiple spaces
     if line['nature'] == 'DISTRICT':
         for prefix, replacement in DISTRICT_PREFIXES:
             if name.startswith(prefix):
@@ -143,8 +158,7 @@ def extract_name(line):
         name = ' '.join((NAME_RULES[kind], name))
     elif name.lower().startswith(tuple(
             ' '.join((kind.lower(), prefix, prep)) for prep in PREPOSITIONS
-            for prefix in COMMON_PREFIXES
-            )):
+            for prefix in COMMON_PREFIXES)):
         name = ' '.join((NAME_RULES[kind], name))
     if name.lower().startswith(COMMON_PREFIXES):
         name = ' '.join(name.split(' ')[1:])
@@ -165,26 +179,20 @@ def extract_acronym(line):
         return match.group(1).strip().upper() if match else None
 
 
-def siren_key(line):
-    return line['siren']
-
-
 def load_intercommunalities_from(filename, year, towns):
     """
     Load EPCIs for a given year from a CSV file given its filename.
     """
     log.debug('Load intercommunalities from %s', filename)
     validity = datetime(year, 1, 1)
-    # validity = datetime.combine(datetime(year, 1, 1), datetime.max.time())
     intercommunality = Intercommunality()
     # Filter towns only valid on the first of the year to speed up the lookup
     towns = Towns([(town.id, town) for town in towns.valid_at(validity)])
     with open(filename) as epci_csv:
         all_lines = csv.DictReader(epci_csv, delimiter=';', quotechar='"')
         # No need to sort CSV are already sorted by SIREN
-        # all_lines = sorted(all_lines, key=siren_key)
 
-        for siren, lines in groupby(all_lines, siren_key):
+        for siren, lines in groupby(all_lines, lambda l: l['siren']):
             for line in lines:
                 if siren != intercommunality.siren:
                     intercommunality = Intercommunality(
@@ -201,7 +209,7 @@ def load_intercommunalities_from(filename, year, towns):
 
 
 def load_intercommunalities(towns, directory='sources/epci',
-                            start=INTERCOMMUNALITY_START_YEAR, end=2017):
+                            start=INTERCOMMUNALITY_START_DATE.year, end=2017):
     """
     Load all intercommunalities from directory for the years from start to end
     """
@@ -224,14 +232,14 @@ def load_intercommunalities(towns, directory='sources/epci',
 
         # All remaining SIRENs are now obsolete intercommunalities
         for siren in open_sirens:
-            intercommunalities.ends(siren, year - 1, END_REMOVED)
+            intercommunalities.ends(siren, year - 1, INTERCOMMUNALITY_REMOVED)
     return intercommunalities
 
 
 def attach_town(intercommunality, insee, validity, towns):
     try:
         intercommunality.towns.add(towns.get_current(insee, validity).id)
-    except:
+    except Exception:
         log.error('Failed for %s on %s@%s',
                   intercommunality.name, insee, validity.isoformat())
         intercommunality.missing_towns.add((insee, validity))
