@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 10.0.0.0 - 2017-08-18
+
+* Integrate intercommunalities (ie. french EPCIs) historical data
+
 ## 9.0.1 — 2017-06-20
 
 * Fix 2A, 2B and 17 departements’ parents references.
