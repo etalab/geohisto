@@ -102,6 +102,11 @@ class Towns(CollectionMixin, OrderedDict):
         elif from_town and from_town.valid_at(valid_datetime):
             self.replace_successor(from_town, town)
 
+    def sort_by_id(self):
+        '''Sort the towns on ID. Order of insertion is lost.'''
+        for id_ in sorted(list(self.keys())):
+            self.move_to_end(id_)
+
 
 class Item:
     """

@@ -5,8 +5,6 @@ The modifications come from the history of changes.
 """
 import logging
 
-from collections import OrderedDict
-
 from .constants import (
     CHANGE_COUNTY, CHANGE_COUNTY_CREATION, CHANGE_NAME, CHANGE_NAME_CREATION,
     CHANGE_NAME_FUSION, CHANGE_NAME_REINSTATEMENT, CREATION,
@@ -399,7 +397,4 @@ def compute(towns, history):
             raise e
 
     # Sort towns by id at the end of all computations, useful for tests.
-    tmp = [(id_, towns[id_]) for id_ in towns]
-    tmp.sort()
-    towns.clear()
-    towns.update(OrderedDict(tmp))
+    towns.sort_by_id()
