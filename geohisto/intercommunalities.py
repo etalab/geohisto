@@ -187,7 +187,7 @@ def load_intercommunalities_from(filename, year, towns):
     validity = datetime(year, 1, 1)
     intercommunality = Intercommunality()
     # Filter towns only valid on the first of the year to speed up the lookup
-    towns = Towns([(town.id, town) for town in towns.valid_at(validity)])
+    towns = Towns((town.id, town) for town in towns.valid_at(validity))
     with open(filename) as epci_csv:
         all_lines = csv.DictReader(epci_csv, delimiter=';', quotechar='"')
         # No need to sort CSV are already sorted by SIREN

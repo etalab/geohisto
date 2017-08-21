@@ -58,10 +58,10 @@ class CollectionMixin:
 
         Useful to look up by `depcom`, `nccenr` and so on.
         """
-        return [item
+        return (item
                 for item in self.values()
                 for k, v in filters.items()
-                if getattr(item, k) == v]
+                if getattr(item, k) == v)
 
     def with_successors(self):
         """Return a generator of Towns having successors."""
@@ -71,7 +71,7 @@ class CollectionMixin:
 class Towns(CollectionMixin, OrderedDict):
     def latest(self, depcom):
         """Get the most recent town for a given `depcom`."""
-        _towns = self.filter(depcom=depcom)
+        _towns = list(self.filter(depcom=depcom))
         _towns.sort(key=lambda town: town.end_datetime, reverse=True)
         return _towns[0]
 
@@ -82,13 +82,13 @@ class Towns(CollectionMixin, OrderedDict):
             _towns = self.filter(depcom=depcom)
         else:
             _towns = self.values()
-        return [town for town in _towns if town.valid_at(valid_datetime)]
+        return (town for town in _towns if town.valid_at(valid_datetime))
 
     def get_current(self, depcom, valid_datetime):
         """Try to return the more pertinent Town given a depcom and date."""
         try:
-            return self.valid_at(valid_datetime, depcom=depcom)[0]
-        except IndexError:
+            return next(self.valid_at(valid_datetime, depcom=depcom))
+        except StopIteration:
             return self.latest(depcom)
 
     def update_successors(self, town, from_town=None, to_town=None):
@@ -246,7 +246,7 @@ class Intercommunalities(CollectionMixin, defaultdict):
         """Get the latest valid intercommunality for a given `siren`."""
         # No need to sort, there is theoricaly only one town
         # with a given siren at a time
-        return self.filter(siren=siren, end_date=END_DATE)[0]
+        return next(self.filter(siren=siren, end_date=END_DATE))
 
     def valid_at(self, valid_date, siren=None):
         """
@@ -257,7 +257,7 @@ class Intercommunalities(CollectionMixin, defaultdict):
             _items = self.filter(siren=siren)
         else:
             _items = self.values()
-        return [item for item in _items if item.valid_at(valid_date)]
+        return (item for item in _items if item.valid_at(valid_date))
 
     @property
     def open_sirens(self):

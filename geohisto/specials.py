@@ -34,31 +34,31 @@ def _special_case_chemille_en_anjou(towns):
     )
     towns.upsert(chemille_melay_new)
     # Then manually update references to successors.
-    cosse_anjou = towns.filter(depcom='49111')[0]
+    cosse_anjou = next(towns.filter(depcom='49111'))
     cosse_anjou_new = cosse_anjou.generate(successors=chemille_en_anjou.id)
     towns.upsert(cosse_anjou_new)
-    jumeliere = towns.filter(depcom='49169')[0]
+    jumeliere = next(towns.filter(depcom='49169'))
     jumeliere_new = jumeliere.generate(successors=chemille_en_anjou.id)
     towns.upsert(jumeliere_new)
-    neuvy = towns.filter(depcom='49225')[0]
+    neuvy = next(towns.filter(depcom='49225'))
     neuvy_new = neuvy.generate(successors=chemille_en_anjou.id)
     towns.upsert(neuvy_new)
-    christine = towns.filter(depcom='49268')[0]
+    christine = next(towns.filter(depcom='49268'))
     christine_new = christine.generate(successors=chemille_en_anjou.id)
     towns.upsert(christine_new)
-    georges = towns.filter(depcom='49281')[1]
+    georges = list(towns.filter(depcom='49281'))[1]
     georges_new = georges.generate(successors=chemille_en_anjou.id)
     towns.upsert(georges_new)
-    lezin = towns.filter(depcom='49300')[0]
+    lezin = next(towns.filter(depcom='49300'))
     lezin_new = lezin.generate(successors=chemille_en_anjou.id)
     towns.upsert(lezin_new)
-    vihiers = towns.filter(depcom='49325')[0]
+    vihiers = next(towns.filter(depcom='49325'))
     vihiers_new = vihiers.generate(successors=chemille_en_anjou.id)
     towns.upsert(vihiers_new)
-    tourlandry = towns.filter(depcom='49351')[0]
+    tourlandry = next(towns.filter(depcom='49351'))
     tourlandry_new = tourlandry.generate(successors=chemille_en_anjou.id)
     towns.upsert(tourlandry_new)
-    valanjou = towns.filter(depcom='49153')[1]
+    valanjou = list(towns.filter(depcom='49153'))[1]
     valanjou_new = valanjou.generate(successors=chemille_en_anjou.id)
     towns.upsert(valanjou_new)
 
@@ -66,7 +66,7 @@ def _special_case_chemille_en_anjou(towns):
 @only_if_depcom('25123')
 def _special_case_charbonnieres_sapins(towns):
     """Special case: town changed and successor does not exist yet."""
-    charbonnieres_sapins = towns.filter(depcom='25123')[0]
+    charbonnieres_sapins = next(towns.filter(depcom='25123'))
     charbonnieres_sapins_new = charbonnieres_sapins.replace_successor(
         compute_id('25222', date(1942, 1, 1)),
         compute_id('25222', date(2017, 1, 1)))
@@ -76,7 +76,7 @@ def _special_case_charbonnieres_sapins(towns):
 @only_if_depcom('28131')
 def _special_case_dommerville(towns):
     """Special case: county changed and successor not updated."""
-    dommerville_current = towns.filter(depcom='28131')[0]
+    dommerville_current = next(towns.filter(depcom='28131'))
     dommerville_new = dommerville_current.replace_successor(
         compute_id('91016', date(1942, 1, 1)),
         compute_id('91016', date(1968, 1, 1)))
@@ -86,7 +86,7 @@ def _special_case_dommerville(towns):
 @only_if_depcom('69274')
 def _special_case_crepieux_pape(towns):
     """Special case: county changed and successor not updated."""
-    crepieux_current = towns.filter(depcom='69274')[0]
+    crepieux_current = next(towns.filter(depcom='69274'))
     crepieux_new = crepieux_current.replace_successor(
         compute_id('69286', date(1942, 1, 1)),
         compute_id('69286', date(1972, 12, 15)))
@@ -96,7 +96,7 @@ def _special_case_crepieux_pape(towns):
 @only_if_depcom('91173')
 def _special_case_congerville(towns):
     """Special case: county changed and id not updated."""
-    congerville_current = towns.filter(depcom='91173')[0]
+    congerville_current = next(towns.filter(depcom='91173'))
     congerville_new = congerville_current.replace_successor(
         compute_id('91613', date(1942, 1, 1)),
         compute_id('91613', date(1974, 1, 1)))
@@ -113,7 +113,7 @@ def _special_case_blamecourt(towns):
     * https://www.insee.fr/fr/metadonnees/cog/commune/COM95065-Blamecourt
     * https://www.insee.fr/fr/metadonnees/cog/commune/COM78065-Blamecourt
     """
-    blamecourt_current = towns.filter(depcom='95065')[0]
+    blamecourt_current = next(towns.filter(depcom='95065'))
     blamecourt_new = blamecourt_current.generate(
         end_datetime=blamecourt_current.start_datetime + DELTA
     )
@@ -133,7 +133,7 @@ def _special_case_arthieul(towns):
     * https://www.insee.fr/fr/metadonnees/cog/commune/COM95025-Arthieul
     * https://www.insee.fr/fr/metadonnees/cog/commune/COM78025-Arthieul
     """
-    arthieul_current = towns.filter(depcom='95025')[0]
+    arthieul_current = next(towns.filter(depcom='95025'))
     arthieul_new = arthieul_current.generate(
         end_datetime=arthieul_current.start_datetime + DELTA
     )
@@ -172,7 +172,7 @@ def _special_case_butry_oise(towns):
 @only_if_depcom('2A325')
 def _special_case_tivolaggio(towns):
     """Special case: county changed and successor does not exist."""
-    tivolaggio = towns.filter(depcom='2A325')[0]
+    tivolaggio = next(towns.filter(depcom='2A325'))
     tivolaggio = tivolaggio.replace_successor(
         compute_id('2A249', date(1976, 1, 1)),
         compute_id('20249', date(1942, 1, 1)))
@@ -182,7 +182,7 @@ def _special_case_tivolaggio(towns):
 @only_if_depcom('25319')
 def _special_case_labergement(towns):
     """Special case: successor change on same date."""
-    labergement = towns.filter(depcom='25319')[0]
+    labergement = next(towns.filter(depcom='25319'))
     labergement = labergement.replace_successor(
         compute_id('25334', date(1942, 1, 1)),
         compute_id('25334', date(2017, 1, 1)))
@@ -192,7 +192,7 @@ def _special_case_labergement(towns):
 @only_if_depcom('27688')
 def _special_case_villalet(towns):
     """Special case: successor change on same date."""
-    villalet = towns.filter(depcom='27688')[0]
+    villalet = next(towns.filter(depcom='27688'))
     villalet = villalet.replace_successor(
         compute_id('27693', date(1972, 10, 1)),
         compute_id('27693', date(2016, 1, 1)))
@@ -202,7 +202,7 @@ def _special_case_villalet(towns):
 @only_if_depcom('28297')
 def _special_case_pezy(towns):
     """Special case: successor change on same date."""
-    pezy = towns.filter(depcom='28297')[0]
+    pezy = next(towns.filter(depcom='28297'))
     pezy = pezy.replace_successor(
         compute_id('28383', date(1942, 1, 1)),
         compute_id('28383', date(2016, 1, 1)))
@@ -212,7 +212,7 @@ def _special_case_pezy(towns):
 @only_if_depcom('88392')
 def _special_case_rocourt(towns):
     """Special case: successor change on same date."""
-    rocourt = towns.filter(depcom='88392')[0]
+    rocourt = next(towns.filter(depcom='88392'))
     rocourt = rocourt.replace_successor(
         compute_id('88475', date(1942, 1, 1)),
         compute_id('88475', date(2017, 1, 1)))
@@ -253,10 +253,10 @@ def _special_case_orvanne(towns):
     )
     towns.upsert(moret_orvanne_new)
     # Then manually update references to successors.
-    ecuelles = towns.filter(depcom='77166')[0]
+    ecuelles = next(towns.filter(depcom='77166'))
     ecuelles_new = ecuelles.generate(successors=orvanne.id)
     towns.upsert(ecuelles_new)
-    veneux = towns.filter(depcom='77491')[0]
+    veneux = next(towns.filter(depcom='77491'))
     veneux_new = veneux.generate(successors=with_hyphens.id)
     towns.upsert(veneux_new)
 
@@ -284,10 +284,10 @@ def _special_case_noyers(towns):
     )
     towns.upsert(noyers_missy_new)
     # Then manually update references to successors.
-    missy = towns.filter(depcom='14432')[0]
+    missy = next(towns.filter(depcom='14432'))
     missy_new = missy.generate(successors=noyers_missy.id)
     towns.upsert(missy_new)
-    tournay_odon = towns.filter(depcom='14702')[1]
+    tournay_odon = list(towns.filter(depcom='14702'))[1]
     tournay_odon_new = tournay_odon.generate(successors=val_arry.id)
     towns.upsert(tournay_odon_new)
 
@@ -315,7 +315,7 @@ def _special_case_morannes(towns):
     )
     towns.upsert(morannes_new)
     # Then manually update references to successors.
-    chemire_sarthe = towns.filter(depcom='49093')[0]
+    chemire_sarthe = next(towns.filter(depcom='49093'))
     chemire_sarthe_new = chemire_sarthe.generate(successors=sur_sarthe.id)
     towns.upsert(chemire_sarthe_new)
 
@@ -408,7 +408,7 @@ def _special_case_bleury(towns):
     https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau
     https://www.insee.fr/fr/metadonnees/cog/commune/COM28015-Auneau-bleury-saint-symphorien
     """
-    bleury = towns.filter(depcom='28042')[0]
+    bleury = next(towns.filter(depcom='28042'))
     _, st_sympho_chateau1, st_sympho_chateau2 = towns.filter(depcom='28361')
     auneau, auneau_bleury = towns.filter(depcom='28015')
     bleury_st_sympho = st_sympho_chateau1.generate(
@@ -443,7 +443,7 @@ def _special_case_oudon(towns):
     https://www.insee.fr/fr/metadonnees/cog/commune/COM14472-L-Oudon
     https://www.insee.fr/fr/metadonnees/cog/commune/COM14654-Saint-Pierre-en-Auge
     """
-    oudon = towns.filter(depcom='14472')[0]
+    oudon = next(towns.filter(depcom='14472'))
     st_martin_fresnay, oudon_wrong = towns.filter(depcom='14624')
     st_pierre_dives, st_pierre_auge = towns.filter(depcom='14654')
     oudon_new = oudon.generate(
@@ -492,7 +492,7 @@ def _special_case_avanchers(towns):
     https://www.insee.fr/fr/metadonnees/cog/commune/COM73003-Aigueblanche
     """
     avanchers_wrong, avanchers_valmorel = towns.filter(depcom='73024')
-    aigueblanche = towns.filter(depcom='73003')[0]
+    aigueblanche = next(towns.filter(depcom='73003'))
     avanchers = avanchers_wrong.generate(
         end_datetime=datetime(1972, 7, 17, 23, 59, 59, 999999),
         successors=aigueblanche.id,
