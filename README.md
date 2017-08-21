@@ -37,7 +37,7 @@ To also generate the intercommunalities, you need to add the `--intercommunaliti
 
     $ python -m geohisto --intercommunalities
 
-The whole process takes about 2 hours to generate both towns and intercommunalities exports.
+The whole process takes about one hour and a half to generate both towns and intercommunalities exports (on a core i7 with 16Gb RAM).
 You may add some extra output to see the progress by setting the verbosity to `debug`:
 
     $ python -m geohisto --intercommunalities -v debug
