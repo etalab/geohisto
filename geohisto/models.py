@@ -52,19 +52,16 @@ class CollectionMixin:
                                                 new_successor.id)
                 self.upsert(_item)
 
-    def filter(self, sort=True, **filters):
+    def filter(self, **filters):
         """
-        Return a (sorted) list of items with the given filters applied.
+        Return a list of items with the given filters applied.
 
         Useful to look up by `depcom`, `nccenr` and so on.
         """
-        _items = [item
-                  for item in self.values()
-                  for k, v in filters.items()
-                  if getattr(item, k) == v]
-        if sort:
-            _items.sort()  # Useful for tests. (but very bad for performances)
-        return _items
+        return [item
+                for item in self.values()
+                for k, v in filters.items()
+                if getattr(item, k) == v]
 
     def with_successors(self):
         """Return a generator of Towns having successors."""
@@ -74,7 +71,7 @@ class CollectionMixin:
 class Towns(CollectionMixin, OrderedDict):
     def latest(self, depcom):
         """Get the most recent town for a given `depcom`."""
-        _towns = self.filter(depcom=depcom, sort=False)  # Sort once
+        _towns = self.filter(depcom=depcom)
         _towns.sort(key=lambda town: town.end_datetime, reverse=True)
         return _towns[0]
 
@@ -82,7 +79,7 @@ class Towns(CollectionMixin, OrderedDict):
         """Return a list of Towns existing at the given `valid_datetime`."""
         # Beware, ternary operator is tricky here, keep it explicit.
         if depcom:
-            _towns = self.filter(depcom=depcom, sort=False)
+            _towns = self.filter(depcom=depcom)
         else:
             _towns = self.values()
         return [town for town in _towns if town.valid_at(valid_datetime)]
@@ -249,8 +246,7 @@ class Intercommunalities(CollectionMixin, defaultdict):
         """Get the latest valid intercommunality for a given `siren`."""
         # No need to sort, there is theoricaly only one town
         # with a given siren at a time
-        _items = self.filter(siren=siren, end_date=END_DATE, sort=False)
-        return _items[0]
+        return self.filter(siren=siren, end_date=END_DATE)[0]
 
     def valid_at(self, valid_date, siren=None):
         """
@@ -265,8 +261,7 @@ class Intercommunalities(CollectionMixin, defaultdict):
 
     @property
     def open_sirens(self):
-        return set(item.siren for item in self.filter(end_date=END_DATE,
-                                                      sort=False))
+        return set(item.siren for item in self.filter(end_date=END_DATE))
 
     def ends(self, siren, year, reason):
         intercommunality = self.latest(siren)
