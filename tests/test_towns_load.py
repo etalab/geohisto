@@ -16,7 +16,7 @@ def test_initial_load(loaded_towns):
 
 
 def test_contains_arles(loaded_towns):
-    arles = loaded_towns.filter(depcom='13004')[0]
+    arles = next(loaded_towns.filter(depcom='13004'))
     assert arles.id == 'fr:commune:13004@1942-01-01'
     assert arles.dep == '13'
     assert arles.com == '004'
@@ -30,7 +30,7 @@ def test_contains_arles(loaded_towns):
 
 
 def test_convert_name(loaded_towns):
-    la_batie_neuve = loaded_towns.filter(depcom='05017')[0]
+    la_batie_neuve = next(loaded_towns.filter(depcom='05017'))
     assert la_batie_neuve.nccenr == 'La Bâtie-Neuve'
-    lescale = loaded_towns.filter(depcom='04079')[0]
+    lescale = next(loaded_towns.filter(depcom='04079'))
     assert lescale.nccenr == "L'Escale"
