@@ -1,8 +1,8 @@
 # CHANGELOG
 
-## 10.0.0.0 - 2017-08-18
+## 10.0.0 - 2017-08-22
 
-* Integrate intercommunalities (ie. french EPCIs) historical data
+* Integrate intercommunalities (ie. French EPCIs) historical data.
 
 ## 9.0.1 — 2017-06-20
 
