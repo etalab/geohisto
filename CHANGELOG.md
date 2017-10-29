@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 10.0.1 - 2017-10-30
+
+* Deal with Centre region renaming in 2015, fix #57
+
 ## 10.0.0 - 2017-08-22
 
 * Integrate intercommunalities (ie. French EPCIs) historical data.
