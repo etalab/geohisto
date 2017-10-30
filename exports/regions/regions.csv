@@ -5,7 +5,8 @@ fr:region:03@1970-01-09,03,1970-01-09 00:00:00,9999-12-31 23:59:59,Guyane,,,2441
 fr:region:04@1970-01-09,04,1970-01-09 00:00:00,9999-12-31 23:59:59,La Réunion,,,833944,2512,FRA4,fr:commune:97411@1942-01-01,https://fr.wikipedia.org/wiki/La_R%C3%A9union
 fr:region:06@1970-01-09,06,1970-01-09 00:00:00,9999-12-31 23:59:59,Mayotte,,,226915,376,FRA5,fr:commune:97611@1942-01-01,https://fr.wikipedia.org/wiki/Mayotte
 fr:region:11@1970-01-09,11,1970-01-09 00:00:00,9999-12-31 23:59:59,Île-de-France,,,11959807,12011,FR10,fr:commune:75056@1942-01-01,https://fr.wikipedia.org/wiki/%C3%8Ele-de-France
-fr:region:24@1970-01-09,24,1970-01-09 00:00:00,9999-12-31 23:59:59,Centre-Val de Loire,,,2570546,39151,FR24,fr:commune:45234@1942-01-01,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire
+fr:region:24@1970-01-09,24,1970-01-09 00:00:00,2015-01-16 23:59:59,Centre,fr:region:24@2015-01-17,,2570546,39151,FR24,fr:commune:45234@1942-01-01,https://fr.wikipedia.org/wiki/Centre_(r%C3%A9gion_fran%C3%A7aise)
+fr:region:24@2015-01-17,24,2015-01-17 00:00:00,9999-12-31 23:59:59,Centre-Val de Loire,,fr:region:24@1970-01-09,2570546,39151,FR24,fr:commune:45234@1942-01-01,https://fr.wikipedia.org/wiki/Centre-Val_de_Loire
 fr:region:27@2016-01-01,27,2016-01-01 00:00:00,9999-12-31 23:59:59,Bourgogne-Franche-Comté,,fr:region:26@1970-01-09;fr:region:43@1970-01-09,2816814,47784,FR26,fr:commune:21231@1942-01-01,https://fr.wikipedia.org/wiki/Bourgogne-Franche-Comt%C3%A9
 fr:region:26@1970-01-09,26,1970-01-09 00:00:00,2015-12-31 23:59:59,Bourgogne,fr:region:27@2016-01-01,,1641130,31582,FR26,fr:commune:21231@1942-01-01,https://fr.wikipedia.org/wiki/Bourgogne
 fr:region:43@1970-01-09,43,1970-01-09 00:00:00,2015-12-31 23:59:59,Franche-Comté,fr:region:27@2016-01-01,,1177906,16202,FR43,fr:commune:25056@1942-01-01,https://fr.wikipedia.org/wiki/Franche-Comt%C3%A9
