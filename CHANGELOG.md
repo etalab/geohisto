@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 10.0.2 - 2017-12-01
+
+* Handle special case of Mauvezin-sur-Gupie, fix #59
+
 ## 10.0.1 - 2017-10-30
 
 * Deal with Centre region renaming in 2015, fix #57

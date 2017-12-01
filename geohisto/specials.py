@@ -1,16 +1,11 @@
 """Special cases handled manually."""
 import inspect
 import logging
+from datetime import date, datetime
 
-from datetime import datetime, date
-
-from geohisto import specials
-
-from .constants import (
-    CREATION_DELEGATED_POLE, DELTA, FUSION_ASSOCIATION_ASSOCIATED
-)
+from .constants import (CREATION_DELEGATED_POLE, DELTA,
+                        FUSION_ASSOCIATION_ASSOCIATED, REINSTATEMENT)
 from .utils import compute_id, only_if_depcom
-
 
 log = logging.getLogger(__name__)
 
@@ -503,9 +498,29 @@ def _special_case_avanchers(towns):
     towns.upsert(aigueblanche_new)
 
 
+@only_if_depcom('47163')
+def _special_case_mauvezin_sur_gupie(towns):
+    """Special case: change name during split.
+
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM47157-Marmande
+    https://www.insee.fr/fr/metadonnees/cog/commune/COM47163-Mauvezin-sur-Gupie
+    """
+    mauvezin_old, mauvezin_new = towns.filter(depcom='47163')
+    marmande = next(towns.filter(depcom='47157'))
+    mauvezin = mauvezin_new.generate(modification=REINSTATEMENT)
+    towns.upsert(mauvezin)
+    mauvezin2 = mauvezin_old.generate(
+        modification=FUSION_ASSOCIATION_ASSOCIATED
+    )
+    towns.upsert(mauvezin2)
+    marmande_new = marmande.add_successor(mauvezin.id)
+    towns.upsert(marmande_new)
+
+
 def compute_specials(towns):
     """Apply all special case functions from that file."""
     log.info('Applying special cases')
+    from geohisto import specials  # NOQA
     for name, func in inspect.getmembers(specials, inspect.isfunction):
         if name.startswith('_special_case_'):
             func(towns)
