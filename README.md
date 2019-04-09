@@ -1,3 +1,5 @@
+⚠️ Not maintained anymore. See https://github.com/etalab/decoupage-administratif
+
 # GeoHisto
 
 **Historic information for French regions, counties, overseas collectivities and towns based on INSEE and Wikipedia data, exported as (re)usable CSV files.**
